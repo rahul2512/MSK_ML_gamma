@@ -1,5 +1,6 @@
-# MSK_ML_beta
+# MSK_ML_gamma
 # #This file contains the code corresponding to the article "Machine Learning to Map Inertial Motion Capture Inputs to Optical Motion Capture-driven Musculoskeletal Model Outputs".
+
 
 #A HPC cluster was used to run the complete cross-validation runs which are not feasible to run on a normap laptop. However, few instances, can be easily done using the function "specific" and "specific_CV" in pytorch.py, respectively.
 
@@ -31,4 +32,3 @@ Input data --  https://www.dropbox.com/sh/8isp6yl29np6ngo/AAAqRWIc8lTOtYieehUSEQ
 Output data -- https://www.dropbox.com/sh/7h1oncpyru9vupl/AACm0YPmlmdu2rlabUpynCW4a?dl=0
 The full training can be obtained on request to vikranth.harthikotenagaraja@eng.ox.ac.uk
 
-# MSK_ML_gamma
