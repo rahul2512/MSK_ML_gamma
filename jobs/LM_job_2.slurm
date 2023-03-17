@@ -1,0 +1,31 @@
+#!/bin/bash -l
+#SBATCH -J LM_2
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --time 72:00:00 # 12 hours
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=rs25.iitr@gmail.com
+
+path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
+python  ${path}/main.py 36 &
+python  ${path}/main.py 37 &
+python  ${path}/main.py 38 &
+python  ${path}/main.py 39 &
+python  ${path}/main.py 40 &
+python  ${path}/main.py 41 &
+python  ${path}/main.py 42 &
+python  ${path}/main.py 43 &
+python  ${path}/main.py 44 &
+python  ${path}/main.py 45 &
+python  ${path}/main.py 46 &
+python  ${path}/main.py 47 &
+python  ${path}/main.py 48 &
+python  ${path}/main.py 49 &
+python  ${path}/main.py 50 &
+python  ${path}/main.py 51 &
+python  ${path}/main.py 52 &
+python  ${path}/main.py 53 &
+python  ${path}/main.py 54 &
+wait
