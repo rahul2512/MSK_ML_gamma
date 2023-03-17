@@ -882,6 +882,6 @@ def explore(data, hyper_arg):
                     None
 
                 try:
-                    model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=True)        
+                    model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 except:
                     None
