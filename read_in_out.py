@@ -14,27 +14,6 @@ color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:br
          'deeppink','goldenrod','darkred','darkviolet']
 ls = ['-','--',':']
 
-def transform_data_into_windows(d1,o1,window_size):
-    s0,s1 = d1.shape
-    tmp = np.zeros([s0-window_size,window_size,s1])
-    for i in d1.index.to_list():
-        if i > window_size-1:
-            tmp[i-window_size] = d1.iloc[i-window_size:i].to_numpy()
-
-    tmpo = o1.iloc[window_size::]
-    return tmp, tmpo
-
-def Muscle_process(Y,which):
-#######  ListModify[list_] := {list[[1 ;; 5]] // Max, list[[6 ;; 7]] // Max,    list[[14 ;; 19]] // Max, list[[20 ;; 21]] // Max};
-    Y.columns = np.arange(21)
-    tmp = copy.deepcopy(Y.iloc[:,[0,1,2,3]])
-    tmp.iloc[:,0] = Y.iloc[:,[0,1,2,3,4]].max(axis=1)
-    tmp.iloc[:,1] = Y.iloc[:,[5,6]].max(axis=1)
-    tmp.iloc[:,2] = Y.iloc[:,[13,14,15,16,17,18]].max(axis=1)
-    tmp.iloc[:,3] = Y.iloc[:,[19,20]].max(axis=1)
-    Y = tmp
-    return Y
-
 def combine(d):
     if d.index in [1,2,3,4,8,12,13,14,15,16]:
         u = pd.concat([d.T1,d.T2,d.T3])
@@ -48,6 +27,51 @@ def combine(d):
         print("unrecognised index")
         sys.exit()            
     return u
+
+def combine_RNN(d):
+    if d.index in [1,2,3,4,8,12,13,14,15,16]:
+        u = np.concatenate([d.T1,d.T2,d.T3])
+    elif d.index in [6,9,11]:
+        u = d.T1
+    elif d.index in [5,10]:
+        u = np.concatenate([d.T1,d.T2])
+    elif d.index in [7]:
+        u = np.concatenate([d.T1,d.T3])
+    else:
+        print("unrecognised index")
+        sys.exit()            
+    return u
+
+
+def transform_trial_into_windows(i1,o1,window_size):
+    s0,s1 = i1.shape
+    tmp = np.zeros([s0-window_size+1,window_size,s1])
+    st = i1.index[0]-1
+    for enum, i in enumerate(i1.index.to_list()):
+        if i >= st + window_size:
+            tmp[enum-window_size+1] = i1.loc[i-window_size+1:i].to_numpy()  ###loc uses the 
+    tmpo = o1.loc[st+window_size::]
+    return tmp, tmpo
+
+def transform_subject_into_windows(i1,o1,window_size):
+    i1.T1, o1.T1 = transform_trial_into_windows(i1.T1, o1.T1, window_size)
+    i1.T2, o1.T2 = transform_trial_into_windows(i1.T2, o1.T2, window_size)
+    i1.T3, o1.T3 = transform_trial_into_windows(i1.T3, o1.T3, window_size)
+    i1.all = combine_RNN(i1)
+    o1.all = combine(o1)
+    return i1, o1
+
+def Muscle_process(Y,which):
+#######  ListModify[list_] := {list[[1 ;; 5]] // Max, list[[6 ;; 7]] // Max,    list[[14 ;; 19]] // Max, list[[20 ;; 21]] // Max};
+    Y.columns = np.arange(21)
+    tmp = copy.deepcopy(Y.iloc[:,[0,1,2,3]])
+    tmp.iloc[:,0] = Y.iloc[:,[0,1,2,3,4]].max(axis=1)
+    tmp.iloc[:,1] = Y.iloc[:,[5,6]].max(axis=1)
+    tmp.iloc[:,2] = Y.iloc[:,[13,14,15,16,17,18]].max(axis=1)
+    tmp.iloc[:,3] = Y.iloc[:,[19,20]].max(axis=1)
+    Y = tmp
+    return Y
+
 
 def filt(d):
     d.filter = filters.iloc[d.index-1] 
@@ -307,6 +331,36 @@ class initiate_data:
                   }
         # cv.time = cv.test_in['time']
         return cv 
+
+
+class dumdum(initiate_data):
+    def __init__(self, window_size):
+        initiate_data.__init__(self)
+        self.window = window_size
+        self.i1, self.o1 = transform_subject_into_windows(self.i1, self.o1, window_size)
+        self.i2, self.o2 = transform_subject_into_windows(self.i2, self.o2, window_size)
+        self.i3, self.o3 = transform_subject_into_windows(self.i3, self.o3, window_size)
+        self.i4, self.o4 = transform_subject_into_windows(self.i4, self.o4, window_size)
+        self.i5, self.o5 = transform_subject_into_windows(self.i5, self.o5, window_size)
+        self.i6, self.o6 = transform_subject_into_windows(self.i6, self.o6, window_size)
+        self.i7, self.o7 = transform_subject_into_windows(self.i7, self.o7, window_size)
+        self.i8, self.o8 = transform_subject_into_windows(self.i8, self.o8, window_size)
+        self.i9, self.o9 = transform_subject_into_windows(self.i9, self.o9, window_size)
+        self.i10, self.o10 = transform_subject_into_windows(self.i10, self.o10, window_size)
+        self.i11, self.o11 = transform_subject_into_windows(self.i11, self.o11, window_size)
+        self.i12, self.o12 = transform_subject_into_windows(self.i12, self.o12, window_size)
+        self.i13, self.o13 = transform_subject_into_windows(self.i13, self.o13, window_size)
+        self.i14, self.o14 = transform_subject_into_windows(self.i14, self.o14, window_size)
+        self.i15, self.o15 = transform_subject_into_windows(self.i15, self.o15, window_size)
+        self.i16, self.o16 = transform_subject_into_windows(self.i16, self.o16, window_size)
+        self.data_class = 'RNN'
+        self.inp = [self.i1, self.i2, self.i3, self.i4, self.i5, self.i6, self.i7, self.i8, self.i9, self.i10, self.i11, self.i12, self.i13, self.i14, self.i15, self.i16]
+        self.out = [self.o1, self.o2, self.o3, self.o4, self.o5, self.o6, self.o7, self.o8, self.o9, self.o10, self.o11, self.o12, self.o13, self.o14, self.o15, self.o16]
+
+        self.inp_all = [self.i1.all, self.i2.all, self.i3.all, self.i4.all, self.i5.all, self.i6.all, self.i7.all, self.i8.all, 
+                        self.i9.all, self.i10.all, self.i11.all, self.i12.all, self.i13.all, self.i14.all, self.i15.all, self.i16.all]
+        self.out_all = [self.o1.all, self.o2.all, self.o3.all, self.o4.all, self.o5.all, self.o6.all, self.o7.all, self.o8.all, 
+                        self.o9.all, self.o10.all, self.o11.all, self.o12.all, self.o13.all, self.o14.all, self.o15.all, self.o16.all]
 
 class initiate_RNN_data:
 
