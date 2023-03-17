@@ -72,4 +72,5 @@ def avg_stat(fm):
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
 hyper_index = sys.argv[1]
+print(hyper_index)
 explore(fm.NN, hyper_index)
