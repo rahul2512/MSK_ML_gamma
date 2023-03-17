@@ -9,3 +9,5 @@
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
+python  ${path}/main.py 9720 &
+wait

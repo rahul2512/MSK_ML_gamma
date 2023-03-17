@@ -1,6 +1,6 @@
-for i in {1..1216}
+for i in {2..271}
 do 
 echo "Submitting job ${i}"
-sbatch jobs/job_${i}.slurm 
+sbatch jobs/NN_job_${i}.slurm 
 sleep 65
 done
