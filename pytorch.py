@@ -682,7 +682,7 @@ def run_final_model(data,hyper_arg,hyper_val,model_class, save_model=True):
 
 def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
 
-    Da = [data.cv1, data.cv2, data.cv3, data.cv4]
+    Da = [data.cv1, data.cv2, data.cv3]
     try:
         for enum,d in enumerate(Da):
             X_Train, Y_Train, X_Test, Y_Test = d['train_in'], d['train_out'], d['val_in'], d['val_out']

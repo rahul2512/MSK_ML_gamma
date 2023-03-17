@@ -170,16 +170,16 @@ def hyper_param():
     with open('hyperparam.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', file=f)
         for optim in ['Adam', 'RMSprop', 'SGD']:
-            for kinit in ['glorot_normal','random_normal', 'he_normal']:
-                for batch_size in [64,256,1028]:
+            for kinit in ['glorot_normal']:
+                for batch_size in [64,128]:
                     for epoch in [50,100,200]:
                         for act in ['relu','tanh','sigmoid']:
-                            for H_layer in [1,2,4,6,8,10]:
+                            for H_layer in [1,2,4,6,8]:
                                 for metric in ['mse']:
                                     for loss in ['mse']:
                                         for lr in [0.001,0.005]:
                                             for p in [0,0.2]:
-                                                for num_nodes in np.arange(200,2100,200):
+                                                for num_nodes in np.arange(200,1900,200):
                                                     for reg in [0]:
                                                         print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, file=f)
     return None
