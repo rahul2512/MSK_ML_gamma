@@ -13,7 +13,6 @@ import sys
 from barchart_err import barchart_error, barchart_params
 
 path = './'
-#path = '/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
 
 window = 10
 fm = ML_analysis('final_model_list', path, window)
@@ -94,4 +93,5 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-explore(fm.NN, 1)
+hyper_index = sys.argv[1]
+explore(fm.NN, hyper_index)
