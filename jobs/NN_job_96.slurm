@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH -J MM
+#SBATCH -J NN_96
 #SBATCH --nodes=1
 #SBATCH --ntasks=36
 #SBATCH --cpus-per-task=1

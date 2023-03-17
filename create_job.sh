@@ -16,5 +16,5 @@ cat NN_job_${index}.slurm >> tmp
 echo "wait" >> tmp
 rm NN_job_${index}.slurm
 mv tmp jobs/NN_job_${index}.slurm
-sed -i "s/RNA9/NN_${index}/g" jobs/NN_job_${index}.slurm
+sed -i "s/MMM/NN_${index}/g" jobs/NN_job_${index}.slurm
 done
