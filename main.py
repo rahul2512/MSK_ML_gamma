@@ -4,7 +4,7 @@ import os.path
 from pathlib import Path
 
 from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs , plot_MSK_data
-from pytorch import RNN_models,  feature_slist, feature_list, print_optimal_results, stat, specific_CV, specific, print_SI_table1, print_SI_table2
+from pytorch import RNN_models,  feature_slist, feature_list, print_optimal_results, stat, specific_CV, specific, print_SI_table1, print_SI_table2, explore
 from pytorch import print_SI_table3
 from pytorch_utilities import hyper_param
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
@@ -34,27 +34,6 @@ fm.NN.naive.arch         = ['NN']*5
 # fm.RNN.naive.arg         = [     52,     36,   694,  1037,  1934]  
 # fm.RNN.naive.arch        = ['BLSTM', 'LSTM', 'GRU', 'GRU', 'LSTM']
 
-
-def explore(data, hyper_arg):
-    
-    hyper_val =  data.hyper.iloc[hyper_arg]
-
-    for label in data.feature:
-        tmp_data1 = data.data.subject_exposed(label)
-        tmp_data2 = data.data.subject_naive(label)
-    
-        for model_class in [data.what]:
-            for Data in [tmp_data1,tmp_data2]:        
-
-                try:
-                    model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
-                except:
-                    None
-
-                try:
-                    model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=True)        
-                except:
-                    None
 
 
 def compute_stat(fm):

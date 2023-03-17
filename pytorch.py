@@ -863,3 +863,26 @@ def print_SI_table3(fm):
     print("\n \n")
     D = [fm.NN.naive, fm.RNN.naive]    
     tab3(fm, D)
+
+
+def explore(data, hyper_arg):
+    
+    hyper_val =  data.hyper.iloc[hyper_arg]
+
+    for label in data.feature:
+        tmp_data1 = data.data.subject_exposed(label)
+        tmp_data2 = data.data.subject_naive(label)
+    
+        for model_class in [data.what]:
+            for Data in [tmp_data1,tmp_data2]:        
+
+                try:
+                    model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
+                except:
+                    None
+
+                try:
+                    model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=True)        
+                except:
+                    None
+
