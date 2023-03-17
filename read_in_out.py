@@ -413,17 +413,17 @@ class subject:
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
 
 class ML:
-    def __init__(self, what, path, window):
+    def __init__(self, what, window):
 
         if what == 'NN':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv(path+'hyperparam.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('hyperparam.txt',delimiter='\s+')
         elif what == 'LM':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv(path+'hyperparam_linear.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('hyperparam_linear.txt',delimiter='\s+')
         elif what == 'RNN':
             self.data  = initiate_RNN_data(window_size=window)
-            self.hyper = pd.read_csv(path+'hyperparam_RNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('hyperparam_RNN.txt',delimiter='\s+')
 
         self.what = what
         self.exposed =  subject('exposed', self.data, self.hyper, self.what)
@@ -433,12 +433,15 @@ class ML:
         self.feature = ['JA','JRF','JM','MF','MA']
 
 class ML_analysis:
-    def __init__(self, what, path, window):
+    def __init__(self, what, data_kind, window):
         self.what = what
-        self.LM  = ML('LM',  path, window)
-        self.NN  = ML('NN',  path, window)
-        # self.RNN = ML('RNN', path, window)
-        self.path = path        
+        
+        if 'LM' in data_kind:
+            self.LM  = ML('LM', window)
+        if 'NN' in data_kind:
+            self.NN  = ML('NN', window)
+        if 'RNN' in data_kind:
+            self.RNN = ML('RNN', window)
 
         self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']

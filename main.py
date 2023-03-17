@@ -12,10 +12,10 @@ import matplotlib.pyplot as plt
 import sys
 from barchart_err import barchart_error, barchart_params
 
-path = './'
 
 window = 10
-fm = ML_analysis('final_model_list', path, window)
+data_kind  =  ['LM', 'NN', 'RNN']
+fm = ML_analysis('final_model_list', data_kind, window)
 
 fm.LM.exposed.arg      = [11, 10, 8, 8,10]
 fm.LM.naive.arg        = [0, 0, 0, 2, 0]
