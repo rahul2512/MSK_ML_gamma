@@ -14,6 +14,10 @@ color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:br
          'deeppink','goldenrod','darkred','darkviolet']
 ls = ['-','--',':']
 
+#################################################
+# Some functions used later to handle data
+#################################################
+
 def combine(d):
     if d.index in [1,2,3,4,8,12,13,14,15,16]:
         u = pd.concat([d.T1,d.T2,d.T3])
@@ -41,7 +45,6 @@ def combine_RNN(d):
         print("unrecognised index")
         sys.exit()            
     return u
-
 
 def transform_trial_into_windows(i1,o1,window_size):
     s0,s1 = i1.shape
@@ -80,6 +83,10 @@ def filt(d):
     d.T3 = d.T3.iloc[d.filter[4]:d.filter[5]+1]
     return d
 
+
+#################################################
+# Classes to read data
+#################################################
 class subject_in:
     def __init__(self,index):
         self.index = index
@@ -96,11 +103,6 @@ class subject_in:
         self.T3[57] = np.linspace(0, 1, self.T3.shape[0])
         
         self.all = combine(self)
-
-        # ## add dummy variables for 
-        # self.RNN_T1 = None
-        # self.RNN_T2 = None
-        # self.RNN_T3 = None
 
     def plot(self):
         for i in range(57):
@@ -156,10 +158,6 @@ class subject_out:
         self.T1, self.T2, self.T3 = self.T1/self.subject_scale, self.T2/self.subject_scale, self.T3/self.subject_scale
         self.all = combine(self)
 
-        # self.RNN_T1 = None
-        # self.RNN_T2 = None
-        # self.RNN_T3 = None
-
     def plot(self):
         for enum, lab in enumerate(self.col_labels):
             for enumc, T in enumerate([self.T1, self.T2, self.T3]):
@@ -170,6 +168,9 @@ class subject_out:
             plt.close()
             input()
 
+#################################################
+# Initialising data class
+#################################################
 
 class cv_data:
     def __init__(self):
@@ -232,7 +233,7 @@ class initiate_data:
         cv = cv_data()
         cv.feature = feature
         cv.subject = 'naive'
-        cv.data_class = 'normal'
+        cv.data_class = self.data_class
         sub_col = self.label[feature]
         scale = self.std_out[sub_col]
         scale = self.std_dummy[sub_col]
@@ -272,7 +273,7 @@ class initiate_data:
         cv = cv_data()
         cv.feature = feature
         cv.subject = 'exposed'
-        cv.data_class = 'normal'
+        cv.data_class = self.data_class
         sub_col = self.label[feature]
         scale = self.std_out[sub_col]
         scale = self.std_dummy[sub_col]
@@ -336,6 +337,7 @@ class initiate_data:
 class dumdum(initiate_data):
     def __init__(self, window_size):
         initiate_data.__init__(self)
+        self.data_class = 'RNN'
         self.window = window_size
         self.i1, self.o1 = transform_subject_into_windows(self.i1, self.o1, window_size)
         self.i2, self.o2 = transform_subject_into_windows(self.i2, self.o2, window_size)
@@ -353,7 +355,6 @@ class dumdum(initiate_data):
         self.i14, self.o14 = transform_subject_into_windows(self.i14, self.o14, window_size)
         self.i15, self.o15 = transform_subject_into_windows(self.i15, self.o15, window_size)
         self.i16, self.o16 = transform_subject_into_windows(self.i16, self.o16, window_size)
-        self.data_class = 'RNN'
         self.inp = [self.i1, self.i2, self.i3, self.i4, self.i5, self.i6, self.i7, self.i8, self.i9, self.i10, self.i11, self.i12, self.i13, self.i14, self.i15, self.i16]
         self.out = [self.o1, self.o2, self.o3, self.o4, self.o5, self.o6, self.o7, self.o8, self.o9, self.o10, self.o11, self.o12, self.o13, self.o14, self.o15, self.o16]
 
@@ -364,38 +365,7 @@ class dumdum(initiate_data):
 
 class initiate_RNN_data:
 
-    def __init__(self,window_size):
-        self.o1 = subject_out(1)
-        self.o2 = subject_out(2)
-        self.o3 = subject_out(3)
-        self.o4 = subject_out(4)
-        self.o5 = subject_out(5)
-        
-        self.i1 = subject_in(1)
-        self.i2 = subject_in(2)
-        self.i3 = subject_in(3)
-        self.i4 = subject_in(4)
-        self.i5 = subject_in(5)
-        
-        self.i1.RNN_T1, self.o1.RNN_T1 = transform_data_into_windows(self.i1.T1, self.o1.T1, window_size)
-        self.i1.RNN_T2, self.o1.RNN_T2 = transform_data_into_windows(self.i1.T2, self.o1.T2, window_size)
-        self.i1.RNN_T3, self.o1.RNN_T3 = transform_data_into_windows(self.i1.T3, self.o1.T3, window_size)
-
-        self.i2.RNN_T1, self.o2.RNN_T1 = transform_data_into_windows(self.i2.T1, self.o2.T1, window_size)
-        self.i2.RNN_T2, self.o2.RNN_T2 = transform_data_into_windows(self.i2.T2, self.o2.T2, window_size)
-        self.i2.RNN_T3, self.o2.RNN_T3 = transform_data_into_windows(self.i2.T3, self.o2.T3, window_size)
-
-        self.i3.RNN_T1, self.o3.RNN_T1 = transform_data_into_windows(self.i3.T1, self.o3.T1, window_size)
-        self.i3.RNN_T2, self.o3.RNN_T2 = transform_data_into_windows(self.i3.T2, self.o3.T2, window_size)
-        self.i3.RNN_T3, self.o3.RNN_T3 = transform_data_into_windows(self.i3.T3, self.o3.T3, window_size)
-
-        self.i4.RNN_T1, self.o4.RNN_T1 = transform_data_into_windows(self.i4.T1, self.o4.T1, window_size)
-        self.i4.RNN_T2, self.o4.RNN_T2 = transform_data_into_windows(self.i4.T2, self.o4.T2, window_size)
-        self.i4.RNN_T3, self.o4.RNN_T3 = transform_data_into_windows(self.i4.T3, self.o4.T3, window_size)
-
-        self.i5.RNN_T1, self.o5.RNN_T1 = transform_data_into_windows(self.i5.T1, self.o5.T1, window_size)
-        self.i5.RNN_T2, self.o5.RNN_T2 = transform_data_into_windows(self.i5.T2, self.o5.T2, window_size)
-        self.i5.RNN_T3, self.o5.RNN_T3 = transform_data_into_windows(self.i5.T3, self.o5.T3, window_size)
+    def __init__(self):
         self.data_class = 'RNN'
 
     def subject_naive(self,feature):
@@ -406,45 +376,6 @@ class initiate_RNN_data:
         columns = self.o1.RNN_T1.columns.to_list()
         sc = self.o1.numer_of_features[feature]
         sub_col = columns[sc[0]:sc[-1]+1]
-
-        val_in_1  = np.concatenate([self.i1.RNN_T1, self.i1.RNN_T2, self.i1.RNN_T3])
-        val_in_2  = np.concatenate([self.i2.RNN_T1, self.i2.RNN_T2, self.i2.RNN_T3])
-        val_in_3  = np.concatenate([self.i3.RNN_T1, self.i3.RNN_T2, self.i3.RNN_T3])
-        val_in_4  = np.concatenate([self.i4.RNN_T1, self.i4.RNN_T2, self.i4.RNN_T3])
-
-        val_out_1 = pd.concat([self.o1.RNN_T1, self.o1.RNN_T2, self.o1.RNN_T3])[sub_col]
-        val_out_2 = pd.concat([self.o2.RNN_T1, self.o2.RNN_T2, self.o2.RNN_T3])[sub_col]
-        val_out_3 = pd.concat([self.o3.RNN_T1, self.o3.RNN_T2, self.o3.RNN_T3])[sub_col]
-        val_out_4 = pd.concat([self.o4.RNN_T1, self.o4.RNN_T2, self.o4.RNN_T3])[sub_col]
-
-        train_in_1 = np.concatenate([self.i2.RNN_T1, self.i2.RNN_T2, self.i2.RNN_T3, self.i3.RNN_T1, self.i3.RNN_T2, self.i3.RNN_T3, self.i4.RNN_T1, self.i4.RNN_T2, self.i4.RNN_T3])
-        train_in_2 = np.concatenate([self.i1.RNN_T1, self.i1.RNN_T2, self.i1.RNN_T3, self.i3.RNN_T1, self.i3.RNN_T2, self.i3.RNN_T3, self.i4.RNN_T1, self.i4.RNN_T2, self.i4.RNN_T3])
-        train_in_3 = np.concatenate([self.i1.RNN_T1, self.i1.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T1, self.i2.RNN_T2, self.i2.RNN_T3, self.i4.RNN_T1, self.i4.RNN_T2, self.i4.RNN_T3])
-        train_in_4 = np.concatenate([self.i1.RNN_T1, self.i1.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T1, self.i2.RNN_T2, self.i2.RNN_T3, self.i3.RNN_T1, self.i3.RNN_T2, self.i3.RNN_T3])
-
-        train_out_1 = pd.concat([self.o2.RNN_T1, self.o2.RNN_T2, self.o2.RNN_T3, self.o3.RNN_T1, self.o3.RNN_T2, self.o3.RNN_T3, self.o4.RNN_T1, self.o4.RNN_T2, self.o4.RNN_T3])[sub_col]
-        train_out_2 = pd.concat([self.o1.RNN_T1, self.o1.RNN_T2, self.o1.RNN_T3, self.o3.RNN_T1, self.o3.RNN_T2, self.o3.RNN_T3, self.o4.RNN_T1, self.o4.RNN_T2, self.o4.RNN_T3])[sub_col]
-        train_out_3 = pd.concat([self.o1.RNN_T1, self.o1.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T1, self.o2.RNN_T2, self.o2.RNN_T3, self.o4.RNN_T1, self.o4.RNN_T2, self.o4.RNN_T3])[sub_col]
-        train_out_4 = pd.concat([self.o1.RNN_T1, self.o1.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T1, self.o2.RNN_T2, self.o2.RNN_T3, self.o3.RNN_T1, self.o3.RNN_T2, self.o3.RNN_T3])[sub_col]
-
-
-        cv.train_in  = np.concatenate([val_in_1,train_in_1])
-        cv.train_out = pd.concat([val_out_1,train_out_1])  
-        std = cv.train_out.std()
-        cv.std = std
-
-        cv.test_in  = np.concatenate([self.i5.RNN_T1, self.i5.RNN_T2, self.i5.RNN_T3])
-        cv.time  = pd.concat([pd.DataFrame(np.linspace(0,1,self.i5.RNN_T1.shape[0]),columns=['time']), 
-                              pd.DataFrame(np.linspace(0,1,self.i5.RNN_T2.shape[0]),columns=['time']),
-                              pd.DataFrame(np.linspace(0,1,self.i5.RNN_T3.shape[0]),columns=['time'])])
-
-        cv.test_out = pd.concat([self.o5.RNN_T1, self.o5.RNN_T2, self.o5.RNN_T3])[sub_col]  #randomly chosen
-
-        cv.train_out, cv.test_out = cv.train_out/std, cv.test_out/std 
-        cv.cv1 = {'train_in':train_in_1, 'train_out':train_out_1, 'val_in':val_in_1,'val_out':val_out_1}
-        cv.cv2 = {'train_in':train_in_2, 'train_out':train_out_2, 'val_in':val_in_2,'val_out':val_out_2}
-        cv.cv3 = {'train_in':train_in_3, 'train_out':train_out_3, 'val_in':val_in_3,'val_out':val_out_3}
-        cv.cv4 = {'train_in':train_in_4, 'train_out':train_out_4, 'val_in':val_in_4,'val_out':val_out_4}
 
         return cv 
 
@@ -457,47 +388,14 @@ class initiate_RNN_data:
         sc = self.o1.numer_of_features[feature]
         sub_col = columns[sc[0]:sc[-1]+1]
         
-        val_in_1 = np.concatenate([self.i4.RNN_T1, self.i5.RNN_T1, self.i1.RNN_T2])
-        val_in_2 = np.concatenate([self.i2.RNN_T2, self.i3.RNN_T2, self.i4.RNN_T2])
-        val_in_3 = np.concatenate([self.i5.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T3])
-        val_in_4 = np.concatenate([self.i3.RNN_T3, self.i4.RNN_T3, self.i5.RNN_T3])
-
-        val_out_1 = pd.concat([self.o4.RNN_T1, self.o5.RNN_T1, self.o1.RNN_T2])[sub_col]
-        val_out_2 = pd.concat([self.o2.RNN_T2, self.o3.RNN_T2, self.o4.RNN_T2])[sub_col]
-        val_out_3 = pd.concat([self.o5.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T3])[sub_col]
-        val_out_4 = pd.concat([self.o3.RNN_T3, self.o4.RNN_T3, self.o5.RNN_T3])[sub_col]
-
-        train_in_1  = np.concatenate([self.i2.RNN_T2, self.i3.RNN_T2, self.i4.RNN_T2, self.i5.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T3, self.i3.RNN_T3, self.i4.RNN_T3, self.i5.RNN_T3])
-        train_in_2  = np.concatenate([self.i5.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T3, self.i3.RNN_T3, self.i4.RNN_T3, self.i5.RNN_T3, self.i4.RNN_T1, self.i5.RNN_T1, self.i1.RNN_T2])
-        train_in_3  = np.concatenate([self.i3.RNN_T3, self.i4.RNN_T3, self.i5.RNN_T3, self.i4.RNN_T1, self.i5.RNN_T1, self.i1.RNN_T2, self.i2.RNN_T2, self.i3.RNN_T2, self.i4.RNN_T2])
-        train_in_4  = np.concatenate([self.i4.RNN_T1, self.i5.RNN_T1, self.i1.RNN_T2, self.i2.RNN_T2, self.i3.RNN_T2, self.i4.RNN_T2, self.i5.RNN_T2, self.i1.RNN_T3, self.i2.RNN_T3])
-
-        train_out_1 = pd.concat([self.o2.RNN_T2, self.o3.RNN_T2, self.o4.RNN_T2, self.o5.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T3, self.o3.RNN_T3, self.o4.RNN_T3, self.o5.RNN_T3])[sub_col]
-        train_out_2 = pd.concat([self.o5.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T3, self.o3.RNN_T3, self.o4.RNN_T3, self.o5.RNN_T3, self.o4.RNN_T1, self.o5.RNN_T1, self.o1.RNN_T2])[sub_col]
-        train_out_3 = pd.concat([self.o3.RNN_T3, self.o4.RNN_T3, self.o5.RNN_T3, self.o4.RNN_T1, self.o5.RNN_T1, self.o1.RNN_T2, self.o2.RNN_T2, self.o3.RNN_T2, self.o4.RNN_T2])[sub_col]
-        train_out_4 = pd.concat([self.o4.RNN_T1, self.o5.RNN_T1, self.o1.RNN_T2, self.o2.RNN_T2, self.o3.RNN_T2, self.o4.RNN_T2, self.o5.RNN_T2, self.o1.RNN_T3, self.o2.RNN_T3])[sub_col]
-
-        cv.train_in  = np.concatenate([val_in_1,train_in_1])
-        cv.train_out = pd.concat([val_out_1,train_out_1])  
-        std = cv.train_out.std()
-        cv.std = std
-
-        cv.test_in  = np.concatenate([self.i1.RNN_T1, self.i2.RNN_T1, self.i3.RNN_T1])
-        cv.time  = pd.concat([pd.DataFrame(np.linspace(0,1,self.i1.RNN_T1.shape[0]),columns=['time']), 
-                              pd.DataFrame(np.linspace(0,1,self.i2.RNN_T1.shape[0]),columns=['time']),
-                              pd.DataFrame(np.linspace(0,1,self.i3.RNN_T1.shape[0]),columns=['time'])])
-
-
-        cv.test_out = pd.concat([self.o1.RNN_T1, self.o2.RNN_T1, self.o3.RNN_T1])[sub_col]   #randomly chosen
-        cv.train_out, cv.test_out = cv.train_out/std, cv.test_out/std 
-
-        cv.cv1 = {'train_in':train_in_1, 'train_out':train_out_1, 'val_in':val_in_1,'val_out':val_out_1}
-        cv.cv2 = {'train_in':train_in_2, 'train_out':train_out_2, 'val_in':val_in_2,'val_out':val_out_2}
-        cv.cv3 = {'train_in':train_in_3, 'train_out':train_out_3, 'val_in':val_in_3,'val_out':val_out_3}
-        cv.cv4 = {'train_in':train_in_4, 'train_out':train_out_4, 'val_in':val_in_4,'val_out':val_out_4}
-
         return cv 
     
+
+
+#################################################
+# Classes used for analysis
+#################################################
+
 class analysis_options:
     def __init__(self, what=None):
         self.what = what
