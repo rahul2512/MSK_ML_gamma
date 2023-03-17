@@ -189,6 +189,8 @@ class initiate_data:
         self.label = self.o1.label
         self.data_class = 'normal'
         self.std_out = pd.concat(self.out_all).std()
+        self.std_dummy = copy.deepcopy(self.std_out)
+        self.std_dummy[self.col_labels] = np.ones(40)
 
     def plot(self):
         for label  in self.col_labels:
@@ -208,7 +210,8 @@ class initiate_data:
         cv.subject = 'naive'
         cv.data_class = 'normal'
         sub_col = self.label[feature]
-
+        scale = self.std_out[sub_col]
+        scale = self.std_dummy[sub_col]
         ## held-out test data 2, 5, 9, 15
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
         HO = [1, 4, 8, 14]  #python indexing
@@ -219,26 +222,25 @@ class initiate_data:
         V3, T3 = shuffled[8:12],  shuffled[0:8] 
         
         cv.cv1 = {'train_in': pd.concat([self.inp_all[i] for i in T1]), 
-                  'train_out':pd.concat([self.out_all[i] for i in T1])[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat([self.out_all[i] for i in T1])[sub_col]/scale, 
                   'val_in':   pd.concat([self.inp_all[i] for i in V1]),
-                  'val_out':  pd.concat([self.out_all[i] for i in V1])[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat([self.out_all[i] for i in V1])[sub_col]/scale
                   }
         cv.cv2 = {'train_in': pd.concat([self.inp_all[i] for i in T2]), 
-                  'train_out':pd.concat([self.out_all[i] for i in T2])[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat([self.out_all[i] for i in T2])[sub_col]/scale, 
                   'val_in':   pd.concat([self.inp_all[i] for i in V2]),
-                  'val_out':  pd.concat([self.out_all[i] for i in V2])[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat([self.out_all[i] for i in V2])[sub_col]/scale
                   }
         cv.cv3 = {'train_in': pd.concat([self.inp_all[i] for i in T3]), 
-                  'train_out':pd.concat([self.out_all[i] for i in T3])[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat([self.out_all[i] for i in T3])[sub_col]/scale, 
                   'val_in':   pd.concat([self.inp_all[i] for i in V3]),
-                  'val_out':  pd.concat([self.out_all[i] for i in V3])[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat([self.out_all[i] for i in V3])[sub_col]/scale
                   }
 
         cv.train_in  = pd.concat([self.inp_all[i] for i in shuffled])
-        cv.train_out = pd.concat([self.out_all[i] for i in shuffled])[sub_col]/self.std_out[sub_col]
+        cv.train_out = pd.concat([self.out_all[i] for i in shuffled])[sub_col]/scale
         cv.test_in   = pd.concat([self.inp_all[i] for i in HO])
-        cv.test_out  = pd.concat([self.out_all[i] for i in HO])[sub_col]/self.std_out[sub_col]
-
+        cv.test_out  = pd.concat([self.out_all[i] for i in HO])[sub_col]/scale
 
         return cv 
 
@@ -248,61 +250,61 @@ class initiate_data:
         cv.subject = 'exposed'
         cv.data_class = 'normal'
         sub_col = self.label[feature]
-        
+        scale = self.std_out[sub_col]
+        scale = self.std_dummy[sub_col]
+
         ## python indexing
         ## [0,1,2,3,7,11,12,13,14,15] -- T1, T2, T3
         ## [5,8,10]  --- T1
         ## [4,9]    --- T1,T2
         ## [6]      --- T1,T3
-        ## super held-out test data 5
+        ## super held-out test data 5,8,10
 
         ## held-out test data 
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
         HO = [0,1,2,3,7,11,12,13,14,15]  #Trial1, python indexing
-        rem1 = [5,8,10]
+        rem1 = [5,8,10]  #super held-out test data 
         rem2 = [4,9]
         rem3 = [6]
         cv.test_in   = pd.concat([self.inp[i].T1 for i in HO])
-        cv.test_out  = pd.concat([self.out[i].T1 for i in HO])[sub_col]/self.std_out[sub_col]
+        cv.test_out  = pd.concat([self.out[i].T1 for i in HO])[sub_col]/scale
 
-        train_in_list  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem1] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
-        train_out_list = [self.out[i].T2 for i in HO] + [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem1] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
+        train_in_list  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
+        train_out_list = [self.out[i].T2 for i in HO] + [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
                                  
         cv.train_in  = pd.concat(train_in_list)
-        cv.train_out  = pd.concat(train_out_list)[sub_col]/self.std_out[sub_col]
-
-        T1_in  = [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem1] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
-        T1_out = [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem1] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
+        cv.train_out  = pd.concat(train_out_list)[sub_col]/scale
+        
+        T1_in  = [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
+        T1_out = [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
         V1_in  = [ self.inp[i].T2 for i in HO] 
         V1_out = [self.out[i].T2 for i in HO] 
 
-
-        T2_in  = [self.inp[i].T2 for i in HO] + [self.inp[i].T1 for i in rem1] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
-        T2_out = [self.out[i].T2 for i in HO] + [self.out[i].T1 for i in rem1] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
+        T2_in  = [self.inp[i].T2 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
+        T2_out = [self.out[i].T2 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
         V2_in  = [self.inp[i].T3 for i in HO] 
         V2_out = [self.out[i].T3 for i in HO] 
                     
-        T3_in  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2]  + [self.inp[i].T3 for i in rem3] 
-        T3_out = [self.out[i].T2 for i in HO] + [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T3 for i in rem3] 
-        V3_in  = [self.inp[i].T1 for i in rem1] + [self.inp[i].T1 for i in rem3]
-        V3_out = [self.out[i].T1 for i in rem1]  + [self.out[i].T1 for i in rem3] 
+        T3_in  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T2 for i in rem2]  + [self.inp[i].T3 for i in rem3] 
+        T3_out = [self.out[i].T2 for i in HO] + [self.out[i].T3 for i in HO] + [self.out[i].T2 for i in rem2] + [self.out[i].T3 for i in rem3] 
+        V3_in  = [self.inp[i].T1 for i in rem2] + [self.inp[i].T1 for i in rem3]
+        V3_out = [self.out[i].T1 for i in rem2] + [self.out[i].T1 for i in rem3]
 
         cv.cv1 = {'train_in': pd.concat(T1_in), 
-                  'train_out':pd.concat(T1_out)[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat(T1_out)[sub_col]/scale, 
                   'val_in':   pd.concat(V1_in),
-                  'val_out':  pd.concat(V1_out)[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat(V1_out)[sub_col]/scale
                   }
         cv.cv2 = {'train_in': pd.concat(T2_in), 
-                  'train_out':pd.concat(T2_out)[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat(T2_out)[sub_col]/scale, 
                   'val_in':   pd.concat(V2_in),
-                  'val_out':  pd.concat(V2_out)[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat(V2_out)[sub_col]/scale
                   }
         cv.cv3 = {'train_in': pd.concat(T3_in), 
-                  'train_out':pd.concat(T3_out)[sub_col]/self.std_out[sub_col], 
+                  'train_out':pd.concat(T3_out)[sub_col]/scale, 
                   'val_in':   pd.concat(V3_in),
-                  'val_out':  pd.concat(V3_out)[sub_col]/self.std_out[sub_col]
+                  'val_out':  pd.concat(V3_out)[sub_col]/scale
                   }
-
         # cv.time = cv.test_in['time']
         return cv 
 
