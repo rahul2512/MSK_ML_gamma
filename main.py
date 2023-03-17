@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import sys
 from barchart_err import barchart_error, barchart_params
 
-path = '/Users/rsharma/Dropbox/Musculoskeletal_Modeling/MSK_ML_gamma/'
+path = './'
 #path = '/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
 
 window = 10
