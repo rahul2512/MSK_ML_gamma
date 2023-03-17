@@ -160,7 +160,7 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
-def hyper_param():
+def hyper_param_NN():
 # batch-size {Automatic, 64, 1000, 2000}
 # epoch = 40
 # Adam, SGD, RMSprop
@@ -181,7 +181,8 @@ def hyper_param():
                                             for p in [0,0.2]:
                                                 for num_nodes in np.arange(200,1900,200):
                                                     for reg in [0]:
-                                                        print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, file=f)
+                                                        for NN_variant in ['NN']:
+                                                            print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, file=f)
     return None
 
 
@@ -206,7 +207,8 @@ def hyper_param_linear():
                                             for p in [0]:
                                                 for num_nodes in [200]:
                                                     for reg in [0]:
-                                                        print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, file=f)
+                                                        for NN_variant in ['LM']:
+                                                            print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, file=f)
     return None
 
 
@@ -232,5 +234,6 @@ def hyper_param_RNN():
                                             for p in [0.1,0.2]:
                                                 for num_nodes in [128, 256, 512]:
                                                     for reg in [0]:
-                                                        print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, file=f)
+                                                        for NN_variant in ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']:
+                                                            print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, file=f)
     return None

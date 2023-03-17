@@ -24,7 +24,7 @@ from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 
 
-RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']    
+RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
 feature_list = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
 feature_slist = ['JA','JRF','JM',  'MF', 'MA']
 
@@ -623,14 +623,14 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
     return None
 
 def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=False):
-    if model_class in RNN_models:
+    if model_class in 'RNN':
         dim = 2
     else:
         dim = 1 
     inp_dim = X_Train.shape[dim]
     out_dim = Y_Train.shape[1]
     t_dim = X_Train.shape[1]
-    opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val =   hyper_val
+    opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant =   hyper_val
 
     if debug_mode == True:
         num_nodes=128
@@ -654,8 +654,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
         model = initiate_Linear_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LR':
         model = initiate_LR_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
-    elif model_class in RNN_models:
-        model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], model_class)
+    elif model_class == 'RNN':
+        model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
         
     if debug_mode == True:
         history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
@@ -667,7 +667,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
 
 def run_final_model(data,hyper_arg,hyper_val,model_class, save_model=True):
     X_Train, Y_Train, X_Test, Y_Test = data.train_in, data.train_out, data.test_in, data.test_out
-    if model_class in RNN_models:
+    if model_class == 'RNN':
         X_Train = X_Train
         Y_Train = Y_Train.to_numpy()
         X_Test = X_Test
@@ -686,7 +686,7 @@ def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
     try:
         for enum,d in enumerate(Da):
             X_Train, Y_Train, X_Test, Y_Test = d['train_in'], d['train_out'], d['val_in'], d['val_out']
-            if model_class in RNN_models:
+            if model_class == 'RNN':
                 X_Train = X_Train
                 Y_Train = Y_Train.to_numpy()
                 X_Test = X_Test
