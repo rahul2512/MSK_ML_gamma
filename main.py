@@ -6,7 +6,6 @@ from pathlib import Path
 from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs , plot_MSK_data
 from pytorch import RNN_models,  feature_slist, feature_list, print_optimal_results, stat, specific_CV, specific, print_SI_table1, print_SI_table2, explore
 from pytorch import print_SI_table3
-from pytorch_utilities import hyper_param
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 import matplotlib.pyplot as plt
 import sys
@@ -15,17 +14,18 @@ from barchart_err import barchart_error, barchart_params
 
 window = 10
 data_kind  =  ['LM', 'NN', 'RNN']
+data_kind  =  ['RNN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
-fm.LM.exposed.arg      = [11, 10, 8, 8,10]
-fm.LM.naive.arg        = [0, 0, 0, 2, 0]
-fm.LM.exposed.arch     = ['LM']*5
-fm.LM.naive.arch       = ['LM']*5
+# fm.LM.exposed.arg      = [11, 10, 8, 8,10]
+# fm.LM.naive.arg        = [0, 0, 0, 2, 0]
+# fm.LM.exposed.arch     = ['LM']*5
+# fm.LM.naive.arch       = ['LM']*5
 
-fm.NN.exposed.arg        = [7560, 2286,  375, 34147, 2254]
-fm.NN.naive.arg          = [7077, 6591,  377, 30380, 7646]
-fm.NN.exposed.arch       = ['NN']*5
-fm.NN.naive.arch         = ['NN']*5
+# fm.NN.exposed.arg        = [7560, 2286,  375, 34147, 2254]
+# fm.NN.naive.arg          = [7077, 6591,  377, 30380, 7646]
+# fm.NN.exposed.arch       = ['NN']*5
+# fm.NN.naive.arch         = ['NN']*5
 
 # fm.RNN.exposed.arg       = [1252, 1836, 1537, 1489, 1416]
 # fm.RNN.exposed.arch      = ['BLSTM','LSTM','BLSTM','LSTM','LSTM']
@@ -59,7 +59,6 @@ def plot_final_results(fm):
         analysis_opt.model_naive_arch    = [fm.RNN.naive.arch[i],fm.NN.naive.arch[i]]
 
         combined_plot(analysis_opt)
-
     return None
 
 def avg_stat(fm):
@@ -72,4 +71,4 @@ def avg_stat(fm):
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
 hyper_index = int(sys.argv[1])
-explore(fm.NN, hyper_index)
+explore(fm.RNN, hyper_index)

@@ -874,7 +874,7 @@ def explore(data, hyper_arg):
         tmp_data2 = data.data.subject_naive(label)
     
         for model_class in [data.what]:
-            for Data in [tmp_data1,tmp_data2]:        
+            for Data in [tmp_data1,tmp_data2]:
 
                 try:
                     model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        

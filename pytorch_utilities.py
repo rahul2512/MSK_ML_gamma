@@ -168,7 +168,7 @@ def hyper_param_NN():
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
     with open('hyperparam.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', file=f)
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant', file=f)
         for optim in ['Adam', 'RMSprop', 'SGD']:
             for kinit in ['glorot_normal']:
                 for batch_size in [64,128]:
@@ -186,7 +186,7 @@ def hyper_param_NN():
     return None
 
 
-def hyper_param_linear():
+def hyper_param_LM():
 # batch-size {Automatic, 64, 1000, 2000}
 # epoch = 40
 # Adam, SGD, RMSprop
@@ -194,7 +194,7 @@ def hyper_param_linear():
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
     with open('hyperparam_linear.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', file=f)
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', 'NN_variant', file=f)
         for optim in ['Adam', 'RMSprop', 'SGD']:
             for kinit in ['glorot_normal','random_normal', 'he_normal']:
                 for batch_size in [64,256]:
@@ -221,16 +221,16 @@ def hyper_param_RNN():
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
     with open('hyperparam_RNN.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', file=f)
-        for optim in ['Adam', 'RMSprop', 'SGD']:
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant', file=f)
+        for optim in ['Adam', 'RMSprop']:
             for kinit in ['glorot_normal']:
-                for batch_size in [64, 128, 256]:
+                for batch_size in [64, 128]:
                     for epoch in [50,100, 200]:
                         for act in ['relu','tanh','sigmoid']:
                             for H_layer in [0, 1, 2, 3]:
                                 for metric in ['mse']:
                                     for loss in ['mse']:
-                                        for lr in [0.001, 0.005]:
+                                        for lr in [0.001]:
                                             for p in [0.1,0.2]:
                                                 for num_nodes in [128, 256, 512]:
                                                     for reg in [0]:

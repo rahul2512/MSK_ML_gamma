@@ -1,4 +1,4 @@
-optim kinit batch_size epoch act num_nodes H_layer metric loss lr p regularizer_val
+optim kinit batch_size epoch act num_nodes H_layer metric loss lr p regularizer_val NN_variant
 Adam glorot_normal 64 50 relu 200 1 mse mse 0.001 0 0 NN
 Adam glorot_normal 64 50 relu 400 1 mse mse 0.001 0 0 NN
 Adam glorot_normal 64 50 relu 600 1 mse mse 0.001 0 0 NN
