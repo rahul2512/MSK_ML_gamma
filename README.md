@@ -1,6 +1,5 @@
 # MSK_ML_gamma
-# #This file contains the code corresponding to the article "Machine Learning to Map Inertial Motion Capture Inputs to Optical Motion Capture-driven Musculoskeletal Model Outputs".
-
+#This file contains the code corresponding to the article "Comparing Accuracy and Robustness of Supervised Machine Learning Algorithms for Biomechanical Modelling".
 
 #A HPC cluster was used to run the complete cross-validation runs which are not feasible to run on a normap laptop. However, few instances, can be easily done using the function "specific" and "specific_CV" in pytorch.py, respectively.
 

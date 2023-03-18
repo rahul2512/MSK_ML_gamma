@@ -158,6 +158,13 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
 
 
 
+def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
+    #https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
+    
+    return None
+
+
+
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
 def hyper_param_NN():
