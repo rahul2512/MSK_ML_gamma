@@ -164,6 +164,10 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     return None
 
 
+def mask():
+    # masking layer in keras
+    return None
+
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
