@@ -13,8 +13,8 @@ from barchart_err import barchart_error, barchart_params
 
 
 window = 10
-data_kind  =  ['LM', 'NN', 'RNN']
-data_kind  =  ['RNN']
+data_kind  =  ['LM', 'NN', 'RNN', 'CNN']
+data_kind  =  ['CNN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
 # fm.LM.exposed.arg      = [11, 10, 8, 8,10]
@@ -70,5 +70,5 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-hyper_index = int(sys.argv[1])
-explore(fm.RNN, hyper_index)
+hyper_index = 1 #int(sys.argv[1])
+explore(fm.CNN, hyper_index)

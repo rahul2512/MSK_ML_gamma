@@ -1,15 +1,13 @@
-import torch as tr 
+import torch as tr, keras, numpy as np, pandas as pd, sys
 from torch import nn, sigmoid, tanh,relu
-import keras
-import numpy as np
 from torch.nn import Linear 
-import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from torch.autograd import Variable
 from tensorflow import keras
-import sys
 from keras.regularizers import l2
-from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout
+from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
 # from ann_visualizer.visualize import ann_viz;
 
 
@@ -160,7 +158,13 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
 
 def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
     #https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
-    
+    model = keras.Sequential()
+    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(t_dim, inp_dim)))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Flatten())
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(1))
+    model.compile(optimizer='adam', loss='mse')    
     return None
 
 

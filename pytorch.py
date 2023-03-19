@@ -656,6 +656,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
         model = initiate_LR_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'RNN':
         model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
+    elif model_class == 'CNN':
+        model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
         
     if debug_mode == True:
         history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
