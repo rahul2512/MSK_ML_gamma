@@ -163,9 +163,9 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(50, activation='relu'))
-    model.add(Dense(1))
+    model.add(Dense(out_dim))
     model.compile(optimizer='adam', loss='mse')    
-    return None
+    return model
 
 
 def mask():

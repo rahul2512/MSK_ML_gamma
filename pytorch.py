@@ -623,7 +623,9 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
     return None
 
 def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=False):
-    if model_class in 'RNN':
+    if model_class   == 'RNN':
+        dim = 2
+    elif model_class == 'CNN':
         dim = 2
     else:
         dim = 1 
@@ -877,7 +879,7 @@ def explore(data, hyper_arg):
     
         for model_class in [data.what]:
             for Data in [tmp_data1,tmp_data2]:
-
+                model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 try:
                     model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 except:

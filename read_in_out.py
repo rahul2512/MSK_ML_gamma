@@ -256,7 +256,7 @@ class initiate_data:
             cv.train_in         = pd.concat([self.inp_all[i] for i in shuffled])
             cv.test_in          = pd.concat([self.inp_all[i] for i in HO])
 
-        elif self.data_class in ['RNN']:
+        elif self.data_class in ['RNN','CNN']:
             cv.cv1['train_in']  = np.concatenate([self.inp_all[i] for i in T1])
             cv.cv1['val_in']    = np.concatenate([self.inp_all[i] for i in V1])
             cv.cv2['train_in']  = np.concatenate([self.inp_all[i] for i in T2])
@@ -329,7 +329,7 @@ class initiate_data:
             cv.train_in         = pd.concat(train_in_list)
             cv.test_in          = pd.concat([self.inp[i].T1  for i in HO])
 
-        elif self.data_class in ['RNN']:
+        elif self.data_class in ['RNN','CNN']:
             cv.cv1['train_in']  = np.concatenate(T1_in)
             cv.cv1['val_in']    = np.concatenate(V1_in)
             cv.cv2['train_in']  = np.concatenate(T2_in)
