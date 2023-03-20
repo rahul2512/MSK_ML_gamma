@@ -141,7 +141,6 @@ def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     return model
 
-
 def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
     #### rest of the parameters are redundnt but kept for generalisibilty of code
     model = keras.Sequential()
@@ -153,8 +152,6 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     print("Initialised logistic regression network")
     return model
-
-
 
 def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
     #https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
@@ -172,11 +169,9 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     print("Initialised CNN .....")
     return model
 
-
 def mask():
     # masking layer in keras
     return None
-
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
