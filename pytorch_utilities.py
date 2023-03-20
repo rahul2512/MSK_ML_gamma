@@ -155,16 +155,19 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
 
 def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
     #https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
+
     model = keras.Sequential()
     model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(t_dim, inp_dim)))
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(50, activation='relu'))
     model.add(Dense(out_dim))
+
     try:
         opt = optim(learning_rate=lr)
     except:
         opt = optim(lr=lr)
+
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     print("Initialised CNN .....")
     return model
