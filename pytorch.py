@@ -880,12 +880,12 @@ def explore(data, hyper_arg):
         for model_class in [data.what]:
             for Data in [tmp_data1,tmp_data2]:
                 model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
-                try:
-                    model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
-                except:
-                    None
+                # try:
+                #     model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
+                # except:
+                #     None
 
-                try:
-                    model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
-                except:
-                    None
+                # try:
+                #     model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
+                # except:
+                #     None

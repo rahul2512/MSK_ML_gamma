@@ -154,10 +154,12 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
     return model
 
 def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
-    #https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
+    # https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
+    # small number of filters in the first layer, such as 32 or 64, and gradually increase the number of filters in deeper layers. 
+    # as initial layers capture low-level features, while the deeper layers capture higher-level features that are more complex and abstract.
 
     model = keras.Sequential()
-    model.add(Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(t_dim, inp_dim)))
+    model.add(Conv1D(filters=32, kernel_size=3, strides=3, activation=act, dropout = p_drop, input_shape=(t_dim, inp_dim)))
     model.add(MaxPooling1D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(50, activation='relu'))
@@ -201,6 +203,33 @@ def hyper_param_NN():
                                                     for reg in [0]:
                                                         for NN_variant in ['NN']:
                                                             print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, file=f)
+    return None
+
+
+
+def hyper_param_CNN():
+# epoch = 40
+# Adam, SGD, RMSprop
+# mse
+# relu, tanh, sigmoid
+# random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
+    with open('hyperparam_CNN.txt', 'w') as f:
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant','filt_size', file=f)
+        for optim in ['Adam', 'SGD']:
+            for kinit in ['glorot_normal']:
+                for batch_size in [64,128]:
+                    for epoch in [50,100,200]:
+                        for act in ['relu','tanh','sigmoid']:
+                            for H_layer in [1,2,3]:
+                                for metric in ['mse']:
+                                    for loss in ['mse']:
+                                        for lr in [0.001,0.005]:
+                                            for p in [0.1,0.2]:
+                                                for num_nodes in [32,64]:
+                                                    for reg in [0]:
+                                                        for NN_variant in ['CNN']:
+                                                            for filt_size in [3,6]:
+                                                                print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, filt_size, file=f)
     return None
 
 
