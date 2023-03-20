@@ -164,7 +164,12 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     model.add(Flatten())
     model.add(Dense(50, activation='relu'))
     model.add(Dense(out_dim))
-    model.compile(optimizer='adam', loss='mse')    
+    try:
+        opt = optim(learning_rate=lr)
+    except:
+        opt = optim(lr=lr)
+    model.compile(loss=loss, optimizer=opt, metrics=metric)
+    print("Initialised CNN .....")
     return model
 
 
