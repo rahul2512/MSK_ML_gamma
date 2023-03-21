@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH -J CNNLSTM_6
+#SBATCH -J CNN_6
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1

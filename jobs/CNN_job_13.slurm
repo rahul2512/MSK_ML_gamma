@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH -J CNNLSTM_49
+#SBATCH -J CNN_13
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
@@ -9,5 +9,5 @@
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 1728 &
+python  ${path}/main.py 864 &
 wait
