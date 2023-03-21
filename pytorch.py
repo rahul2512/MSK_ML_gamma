@@ -625,14 +625,23 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
 def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=False):
     if model_class   == 'RNN':
         dim = 2
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, NN_variant =   hyper_val
     elif model_class == 'CNN':
         dim = 2
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride = hyper_val
+    elif model_class == 'convLSTM':
+        dim = 2
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride = hyper_val
+    elif model_class == 'CNNLSTM':
+        dim = 2
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, LSTM_units = hyper_val
     else:
         dim = 1 
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant =   hyper_val
+
     inp_dim = X_Train.shape[dim]
     out_dim = Y_Train.shape[1]
     t_dim = X_Train.shape[1]
-    opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant =   hyper_val
 
     if debug_mode == True:
         num_nodes=128
@@ -650,6 +659,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
     #inp_dim, out_dim, nbr_Hlayer, Neu_layer, activation, p_drop, lr, optim,loss,metric,kinit
     final_act = None
     loss = keras.losses.mean_squared_error
+
     if model_class == 'NN':
         model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LM':
@@ -659,8 +669,14 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
     elif model_class == 'RNN':
         model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
     elif model_class == 'CNN':
-        model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
-        
+        model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
+    elif model_class == 'CNNLSTM':
+        model = initiate_CNNLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride, LSTM_units)
+    elif model_class == 'convLSTM':
+        model = initiate_ConvLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
+        X_Train = np.reshape(X_Train, (X_Train.shape[0], X_Train.shape[1], X_Train.shape[2], 1))
+        X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], X_val.shape[2], 1))
+
     if debug_mode == True:
         history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
     else:

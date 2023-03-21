@@ -5,9 +5,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch.autograd import Variable
 from tensorflow import keras
 from keras.regularizers import l2
-from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D
+from keras.layers.convolutional import Conv1D, MaxPooling1D
 # from ann_visualizer.visualize import ann_viz;
 
 
@@ -153,16 +152,25 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
     print("Initialised logistic regression network")
     return model
 
-def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
+def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride):
     # https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
     # small number of filters in the first layer, such as 32 or 64, and gradually increase the number of filters in deeper layers. 
     # as initial layers capture low-level features, while the deeper layers capture higher-level features that are more complex and abstract.
-
     model = keras.Sequential()
-    model.add(Conv1D(filters=32, kernel_size=3, strides=3, activation=act, dropout = p_drop, input_shape=(t_dim, inp_dim)))
-    model.add(MaxPooling1D(pool_size=2))
+
+    #  (batch_size, timesteps, input_dim) -- input of conv1D layers
+    model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
+    model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+    # (batch_size, new_timesteps, filters), where new_timesteps is the length of the output sequence after applying the convolutional operation
+
+    for i in range(nbr_Hlayer-1): 
+        model.add(Conv1D(filters=2*int(units), kernel_size=int(filt_size), activation=act, padding = 'same'))
+        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+
     model.add(Flatten())
-    model.add(Dense(50, activation='relu'))
+
+    ## dropout can be used below but we are not using it here
+    model.add(Dense(50, activation=act))
     model.add(Dense(out_dim))
 
     try:
@@ -172,7 +180,76 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
 
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     print("Initialised CNN .....")
+    # print(model.summary())
     return model
+
+
+
+def initiate_CNNLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride, LSTM_units):
+    model = keras.Sequential()
+
+
+    if nbr_Hlayer == 1:
+        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
+        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+    
+        model.add(LSTM(units=LSTM_units, return_sequences=False))
+
+    elif nbr_Hlayer > 1:
+        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
+        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+        model.add(LSTM(units=LSTM_units, return_sequences=True))       
+        for i in range(nbr_Hlayer-2):
+            model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
+            model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
+            model.add(LSTM(units=LSTM_units, return_sequences=True))
+        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
+        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
+        model.add(LSTM(units=LSTM_units, return_sequences=False))
+            
+    model.add(Dense(out_dim))
+
+    try:
+        opt = optim(learning_rate=lr)
+    except:
+        opt = optim(lr=lr)
+
+    model.compile(loss=loss, optimizer=opt, metrics=metric)
+    print("initiate_CNNLSTM_model .....")
+    # print(model.summary())
+    return model
+
+
+
+def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride):
+    #https://medium.com/neuronio/an-introduction-to-convlstm-55c9025563a7
+    model = keras.Sequential()
+
+    if nbr_Hlayer == 1 :
+        model.add(ConvLSTM1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding='same', return_sequences=False, input_shape=(t_dim, inp_dim, 1)))
+        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+    elif nbr_Hlayer > 1 :
+        model.add(ConvLSTM1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding='same', return_sequences=True, input_shape=(t_dim, inp_dim)))
+        for i in range(nbr_Hlayer-2):
+            model.add(ConvLSTM1D(filters=int(units), kernel_size=int(filt_size), activation=act, padding = 'same', return_sequences=True))
+        model.add(ConvLSTM1D(filters=int(units), kernel_size=int(filt_size), activation=act, padding = 'same', return_sequences=False))
+    else:
+        sys.exit()
+
+#    model.add(Dense(50, activation=act))
+    model.add(Flatten())
+    model.add(Dense(out_dim))
+
+    try:
+        opt = optim(learning_rate=lr)
+    except:
+        opt = optim(lr=lr)
+
+    model.compile(loss=loss, optimizer=opt, metrics=metric)
+    print("Initialised CNN .....")
+    print(model.summary())
+    return model
+
 
 def mask():
     # masking layer in keras
@@ -208,28 +285,46 @@ def hyper_param_NN():
 
 
 def hyper_param_CNN():
-# epoch = 40
-# Adam, SGD, RMSprop
-# mse
-# relu, tanh, sigmoid
-# random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
     with open('hyperparam_CNN.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant','filt_size', file=f)
-        for optim in ['Adam', 'SGD']:
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', file=f)
+        for optim in ['Adam', 'SGD', 'RMSprop']:
             for kinit in ['glorot_normal']:
                 for batch_size in [64,128]:
                     for epoch in [50,100,200]:
                         for act in ['relu','tanh','sigmoid']:
-                            for H_layer in [1,2,3]:
+                            for H_layer in [1,2]:
                                 for metric in ['mse']:
                                     for loss in ['mse']:
                                         for lr in [0.001,0.005]:
-                                            for p in [0.1,0.2]:
+                                            for pool_size in [2]:
                                                 for num_nodes in [32,64]:
                                                     for reg in [0]:
                                                         for NN_variant in ['CNN']:
-                                                            for filt_size in [3,6]:
-                                                                print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, filt_size, file=f)
+                                                            for filt_size in [3]:
+                                                                for stride in [1,3]:
+                                                                    print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size,reg, NN_variant, filt_size, stride, file=f)
+    return None
+
+def hyper_param_CNNLSTM():
+    with open('hyperparam_CNNLSTM.txt', 'w') as f:
+        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', 'LSTM_units',file=f)
+        for optim in ['Adam', 'SGD', 'RMSprop']:
+            for kinit in ['glorot_normal']:
+                for batch_size in [64,128]:
+                    for epoch in [50,100,200]:
+                        for act in ['relu','tanh','sigmoid']:
+                            for H_layer in [1,2]:
+                                for metric in ['mse']:
+                                    for loss in ['mse']:
+                                        for lr in [0.001,0.005]:
+                                            for pool_size in [2]:
+                                                for num_nodes in [32,64]:
+                                                    for reg in [0]:
+                                                        for NN_variant in ['CNNLSTM']:
+                                                            for filt_size in [3]:
+                                                                for stride in [1,3]:
+                                                                    for LSTM_units in [128, 256]:
+                                                                        print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size,reg, NN_variant, filt_size, stride, LSTM_units, file=f)
     return None
 
 

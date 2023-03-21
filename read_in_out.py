@@ -427,6 +427,12 @@ class ML:
         elif what == 'CNN':
             self.data  = initiate_RNN_data(window_size=window)
             self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
+        elif what == 'CNNLSTM':
+            self.data  = initiate_RNN_data(window_size=window)
+            self.hyper = pd.read_csv('hyperparam_CNNLSTM.txt',delimiter='\s+')
+        elif what == 'convLSTM':
+            self.data  = initiate_RNN_data(window_size=window)
+            self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
 
         self.what = what
         self.exposed =  subject('exposed', self.data, self.hyper, self.what)
@@ -447,6 +453,10 @@ class ML_analysis:
             self.RNN = ML('RNN', window)
         if 'CNN' in data_kind:
             self.CNN = ML('CNN', window)
+        if 'CNNLSTM' in data_kind:
+            self.CNNLSTM = ML('CNNLSTM', window)
+        if 'convLSTM' in data_kind:
+            self.convLSTM = ML('convLSTM', window)
 
         self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
