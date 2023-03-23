@@ -251,10 +251,6 @@ def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, uni
     return model
 
 
-def mask():
-    # masking layer in keras
-    return None
-
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
 def hyper_param_NN():

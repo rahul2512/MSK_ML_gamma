@@ -461,3 +461,18 @@ class ML_analysis:
         self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
         self.feature = ['JA','JRF','JM','MF','MA']
+        
+
+#################################################
+#################################################
+# Functions to create missing marker data or adding noise into the data
+#################################################
+#################################################
+
+### During the experiments, some of the marker data is occulued and leads to missing input data
+### Here, we will first artifically and randomly create such data sets ..
+
+ 
+
+        
+        
