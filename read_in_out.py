@@ -472,7 +472,33 @@ class ML_analysis:
 ### During the experiments, some of the marker data is occulued and leads to missing input data
 ### Here, we will first artifically and randomly create such data sets ..
 
- 
+def intro_nan(data, prob_of_missing, number_of_miss):
+    ## 19 markers in the input data
+    markers = data.columns.shape[0]//3
+    # prob_of_missing i.e. how many frames should have missing markers
+    for i in data.index:
+        if np.random.binomial(1, prob_of_missing):
+            ## how many marker to miss
+            marker_index = np.random.choice(markers, number_of_miss, replace=False)
+            for m in marker_index:
+                marker_ind = np.arange(3*m,3*m+3)
+                data.loc[i][marker_ind] = [np.nan]*3
+    return data
 
+
+def create_artifical_input_data_with_missing_markers():
+    path = './Input/'
+    prob_of_missing = 0.1
+    number_of_miss = 1
+
+    for index in np.arange(1, 17, 1):
+        for trial in np.arange(1, 4, 1):
+            data = pd.read_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial)+'.txt',engine='python',delimiter=',',header=None)
+            data = intro_nan(data, prob_of_missing, number_of_miss)
+            data.to_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial) + '.' + 'miss.' + str(1) + '.txt',  sep=',', index=False, header=None)
+
+    return data
+
+data = create_artifical_input_data_with_missing_markers()
         
         
