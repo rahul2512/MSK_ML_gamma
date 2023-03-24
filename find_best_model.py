@@ -23,7 +23,7 @@ def estimate_validation_results(f):
 
 def mean_validation_results(f):
 	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)        
-        print(avg_train_mse)        
+	print(avg_train_mse)        
 
 def return_model_stat(f):
 	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)
