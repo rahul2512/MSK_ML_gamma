@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import os.path
 from pathlib import Path
-hyper =  pd.read_csv('hyperparam.txt',delimiter='\s+')
+
 
 def read_k_fold_data(f):
 	data = {}
@@ -23,16 +23,7 @@ def estimate_validation_results(f):
 
 def mean_validation_results(f):
 	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)        
-	print(avg_train_mse)        
-
-def return_model_stat(f):
-	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)
-	print('avg_train_mse',np.mean(avg_train_mse))
-	print('avg_val_mse',  np.mean(avg_val_mse))
-	print('avg_train_pc', np.mean(avg_train_pc))
-	print('avg_val_pc',   np.mean(avg_val_pc))
-	print('---------XXXXXXXXX---------XXXX--------XXXXXXXXXX--------')
-
+	return np.mean(avg_train_mse), np.mean(avg_val_mse), np.mean(avg_train_pc), np.mean(avg_val_pc)      
 
 ### total numer of hyperprmset space ---- 131220
 def run_final(which, subject, NN):
