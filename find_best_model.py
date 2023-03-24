@@ -21,14 +21,9 @@ def estimate_validation_results(f):
 	return avg_train_mse, avg_val_mse, avg_train_pc, avg_val_pc
 
 
-def return_model(f,criteria):
-	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)
-	if criteria == "avg_val_mse":
-		if np.mean(avg_val_mse) == 0:
-			return 1000
-		else:
-			return np.mean(avg_val_mse)
-
+def mean_validation_results(f):
+	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)        
+        print(avg_train_mse)        
 
 def return_model_stat(f):
 	avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)
@@ -44,9 +39,9 @@ def run_final(which, subject, NN):
 	count=0
 	start=1000
 	for i in range(9721):
-		f='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
+		f1='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
 		try:
-			tmp = return_model(f,"avg_val_mse")
+			tmp = mean_validation_results(f1,"avg_val_mse")
 			print(tmp)
 		except:
 			None
