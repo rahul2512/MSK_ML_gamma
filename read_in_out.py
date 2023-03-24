@@ -417,7 +417,7 @@ class ML:
 
         if what == 'NN':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv('hyperparam.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+')
         elif what == 'LM':
             self.data  = initiate_data()
             self.hyper = pd.read_csv('hyperparam_linear.txt',delimiter='\s+')

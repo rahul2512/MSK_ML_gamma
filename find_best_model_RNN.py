@@ -3,7 +3,7 @@ import pandas as pd
 import os.path
 #from pathlib import Path
 #from pytorch import create_final_model
-hyper =  pd.read_csv('hyperparam.txt',delimiter='\s+')
+hyper =  pd.read_csv('hyperparam_NN.txt',delimiter='\s+')
 
 def read_k_fold_data(f):
 	data = {}

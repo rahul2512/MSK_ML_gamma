@@ -25,6 +25,12 @@ def mean_validation_results(f):
     avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)        
     return [np.mean(avg_train_mse), np.mean(avg_val_mse), np.mean(avg_train_pc), np.mean(avg_val_pc)]      
 
+def mean_test_results(f):
+    avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)
+    return [np.mean(avg_val_mse), np.mean(avg_val_pc)]
+
+
+
 ### total numer of hyperprmset space ---- 131220
 def run_final(which, subject, NN):
     count=0
@@ -40,17 +46,34 @@ def run_final(which, subject, NN):
             df.loc[i][['avg_train_mse', 'avg_val_mse', 'avg_train_pc', 'avg_val_pc']] = mean_validation_results(f1)
         except:
             None
-#            print("index not found--", i )
-#            if tmp < start:
-#                print("model_index = ",i,start,which)
-#                start = tmp
-#                return_model_stat(f)
-#                count=count+1
-#                print("XXXXXXXX-----",count,"-------XXXXXXXX")
-#                if count>10:
-#                    train_final_model(i,which)
+
+        try:
+            df.loc[i][[ 'avg_test_mse', 'avg_test_pc']] = mean_test_results(f2)
+        except:
+            None
 
     return df
 
-df = run_final("JA",'exposed','NN')
+
+
+class stat:
+    def __init__(self, sub, NN):
+        self.JA  = run_final("JA",  sub, NN)
+        self.JM  = run_final("JM",  sub, NN)
+        self.JRF = run_final("JRF", sub, NN)
+        self.MA  = run_final("MA",  sub, NN)
+        self.MF  = run_final("MF",  sub, NN)
+
+class stat_CV:
+    def __init__(self,NN):
+        self.naive   = stat('naive',NN)
+        self.exposed = stat('exposed',NN)
+
+
+def compute_stat():
+    df = stat_CV("NN")
+
+    return df
+
+df = compute_stat()
 
