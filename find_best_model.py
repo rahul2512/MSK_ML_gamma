@@ -36,8 +36,8 @@ def run_final(which, subject, NN):
         f2='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.fm.txt'
         try:
             df.loc[i] = 7*np.nan
-            df.loc[i][col[0]]       = i 
-            df.loc[i][col[j] for j in [1,2,4,5]] = mean_validation_results(f1)
+            df.loc[i]['index']       = i 
+            df.loc[i][['avg_train_mse', 'avg_val_mse', 'avg_train_pc', 'avg_val_pc']] = mean_validation_results(f1)
         except:
             None
 #            print("index not found--", i )
