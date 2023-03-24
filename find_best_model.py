@@ -23,18 +23,21 @@ def estimate_validation_results(f):
 
 def mean_validation_results(f):
     avg_train_mse, avg_val_mse,  avg_train_pc, avg_val_pc = estimate_validation_results(f)        
-    return np.mean(avg_train_mse), np.mean(avg_val_mse), np.mean(avg_train_pc), np.mean(avg_val_pc)      
+    return [np.mean(avg_train_mse), np.mean(avg_val_mse), np.mean(avg_train_pc), np.mean(avg_val_pc)]      
 
 ### total numer of hyperprmset space ---- 131220
 def run_final(which, subject, NN):
     count=0
     start=1000
-    df = pd.DataFrame()
+    col = ['index' ,'avg_train_mse', 'avg_val_mse', 'avg_test_mse', 'avg_train_pc', 'avg_val_pc', 'avg_test_pc']
+    df = pd.DataFrame(columns = col)
     for i in range(9721):
         f1='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
+        f2='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.fm.txt'
         try:
-            tmp = mean_validation_results(f1)
-            print(tmp)
+            df.loc[i] = 7*np.nan
+            df.loc[i][col[0]]       = i 
+            df.loc[i][col[j] for j in [1,2,4,5]] = mean_validation_results(f1)
         except:
             None
 #            print("index not found--", i )
@@ -47,6 +50,7 @@ def run_final(which, subject, NN):
 #                if count>10:
 #                    train_final_model(i,which)
 
+    return df
 
-run_final("JA",'exposed','NN')
+df = run_final("JA",'exposed','NN')
 
