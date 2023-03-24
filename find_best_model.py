@@ -41,7 +41,7 @@ def run_final(which, subject, NN):
 	for i in range(9721):
 		f1='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
 		try:
-			tmp = mean_validation_results(f1,"avg_val_mse")
+			tmp = mean_validation_results(f1)
 			print(tmp)
 		except:
 			None
