@@ -2,19 +2,18 @@ import numpy as np
 import pandas as pd
 import os.path
 from pathlib import Path
-from pytorch import create_final_model
 hyper =  pd.read_csv('hyperparam.txt',delimiter='\s+')
 
 def read_k_fold_data(f):
 	data = {}
-	for i in range(4):
+	for i in range(3):
 		data[i] = pd.read_csv(f.replace('XXXX',str(i)),delimiter=' ',header=None)
 	return data
 
 def estimate_validation_results(f):
 	data = read_k_fold_data(f)
 	avg_train_mse, avg_val_mse, avg_train_pc, avg_val_pc = [], [], [], []
-	for i in range(4):
+	for i in range(3):
 		avg_train_mse.append(data[i].iloc[0,0])	
 		avg_val_mse.append(data[i].iloc[0,1])
 		avg_train_pc.append(data[i].iloc[1].mean())
@@ -40,24 +39,15 @@ def return_model_stat(f):
 	print('---------XXXXXXXXX---------XXXX--------XXXXXXXXXX--------')
 
 
-def train_final_model(hyper_arg,which):
-	hyper_val =  hyper.iloc[hyper_arg]
-	create_final_model(hyper_arg,hyper_val,which,pca=False)
-	return None
-
-
-
-
 ### total numer of hyperprmset space ---- 131220
-def run_final(which, subject):
+def run_final(which, subject, NN):
 	count=0
 	start=1000
-	for i in range(43740):
-		f='text_out/stat_NN_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
+	for i in range(9721):
+		f='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
 		try:
 			tmp = return_model(f,"avg_val_mse")
 			print(tmp)
-			input()
 		except:
 			None
 #			print("index not found--", i )
@@ -71,5 +61,5 @@ def run_final(which, subject):
 #					train_final_model(i,which)
 
 
-run_final("JRF",'naive')
+run_final("JA",'exposed','NN')
 
