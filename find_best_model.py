@@ -34,12 +34,12 @@ def mean_test_results(f):
 
 
 ### total numer of hyperprmset space ---- 131220
-def run_final(which, subject, NN):
-    count=0
-    start=1000
+def run_final(which, subject, NN, hyper):
     col = ['index' ,'avg_train_mse', 'avg_val_mse', 'avg_test_mse', 'avg_train_pc', 'avg_val_pc', 'avg_test_pc']
     df = pd.DataFrame(columns = col)
-    for i in range(9721):
+    ind = hyper.shape[0]
+    
+    for i in range(ind):
         f1='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.CV_XXXX.txt'
         f2='text_out/stat_'+NN+'_'+which+'_'+ subject+'.hv_'+str(i)+'.fm.txt'
         try:
@@ -58,27 +58,31 @@ def run_final(which, subject, NN):
 
 class stat:
     def __init__(self, sub, NN):
-        self.JA  = run_final("JA",  sub, NN)
-        self.JM  = run_final("JM",  sub, NN)
-        self.JRF = run_final("JRF", sub, NN)
-#        self.MA  = run_final("MA",  sub, NN)
-#        self.MF  = run_final("MF",  sub, NN)
-
-class stat_CV:
-    def __init__(self,NN):
-        self.naive   = stat('naive',NN)
-        self.exposed = stat('exposed',NN)
         if NN == 'NN':
-            self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+') 
+            self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+')
         elif NN == 'RNN':
             self.hyper = pd.read_csv('hyperparam_RNN.txt',delimiter='\s+')
         elif NN == 'CNN':
             self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
+        elif NN == 'LM':
+            self.hyper = pd.read_csv('hyperparam_LM.txt',delimiter='\s+')
+
+        self.JA  = run_final("JA",  sub, NN, self.hyper)
+        self.JM  = run_final("JM",  sub, NN, self.hyper)
+        self.JRF = run_final("JRF", sub, NN, self.hyper)
+#        self.MA  = run_final("MA",  sub, NN, self.hyper)
+#        self.MF  = run_final("MF",  sub, NN, self.hyper)
+
+class stat_CV:
+    def __init__(self,NN):
+        self.naive   = stat('naive',  NN)
+        self.exposed = stat('exposed',NN)
 
 def compute_stat():
 #    df = stat_CV("NN")
 #    df = stat_CV("RNN")
-    df = stat_CV("CNN")
+#    df = stat_CV("CNN")
+    df = stat_CV("LM")
     return df
 
 df = compute_stat()
