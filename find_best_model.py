@@ -75,3 +75,11 @@ def compute_stat():
     return df
 
 df = compute_stat()
+
+
+### Results for NN exposed and naive
+### JA -- 1080 , 1080
+### JRF -- 1118, 2164
+### JM -- 2809, 6778
+
+
