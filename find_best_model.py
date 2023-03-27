@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import os.path
 from pathlib import Path
-
+pd.options.display.float_format = lambda x: '{:.3f}'.format(x)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
 
 def read_k_fold_data(f):
     data = {}
@@ -54,26 +56,22 @@ def run_final(which, subject, NN):
 
     return df
 
-
-
 class stat:
     def __init__(self, sub, NN):
         self.JA  = run_final("JA",  sub, NN)
         self.JM  = run_final("JM",  sub, NN)
         self.JRF = run_final("JRF", sub, NN)
-        self.MA  = run_final("MA",  sub, NN)
-        self.MF  = run_final("MF",  sub, NN)
+#        self.MA  = run_final("MA",  sub, NN)
+#        self.MF  = run_final("MF",  sub, NN)
 
 class stat_CV:
     def __init__(self,NN):
         self.naive   = stat('naive',NN)
         self.exposed = stat('exposed',NN)
-
+        self.hyper = pd.read_csv('hyperparam_'+NN+'.txt',delimiter='\s+') 
 
 def compute_stat():
     df = stat_CV("NN")
-
     return df
 
 df = compute_stat()
-
