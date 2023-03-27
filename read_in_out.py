@@ -404,6 +404,7 @@ class subject:
         self.arch    =  None
         self.nparams =  []
         self.feature = ['JA','JRF','JM','MF','MA']
+        self.feature = ['JA','JRF','JM']
         self.NRMSE   =  {key: None for key in self.feature}
         self.RMSE    =  {key: None for key in self.feature}
         self.pc      =  {key: None for key in self.feature}
@@ -420,7 +421,7 @@ class ML:
             self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+')
         elif what == 'LM':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv('hyperparam_linear.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('hyperparam_LM.txt',delimiter='\s+')
         elif what == 'RNN':
             self.data  = initiate_RNN_data(window_size=window)
             self.hyper = pd.read_csv('hyperparam_RNN.txt',delimiter='\s+')
@@ -440,6 +441,7 @@ class ML:
         self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
         self.feature = ['JA','JRF','JM','MF','MA']
+        self.feature = ['JA','JRF','JM']
 
 class ML_analysis:
     def __init__(self, what, data_kind, window):
@@ -461,6 +463,7 @@ class ML_analysis:
         self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
         self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
         self.feature = ['JA','JRF','JM','MF','MA']
+        self.feature = ['JA','JRF','JM']
         
 
 #################################################

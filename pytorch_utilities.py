@@ -331,7 +331,7 @@ def hyper_param_LM():
 # mse
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('hyperparam_linear.txt', 'w') as f:
+    with open('hyperparam_LM.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', 'NN_variant', file=f)
         for optim in ['Adam', 'RMSprop', 'SGD']:
             for kinit in ['glorot_normal','random_normal', 'he_normal']:
