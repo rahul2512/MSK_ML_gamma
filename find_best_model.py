@@ -68,10 +68,17 @@ class stat_CV:
     def __init__(self,NN):
         self.naive   = stat('naive',NN)
         self.exposed = stat('exposed',NN)
-        self.hyper = pd.read_csv('hyperparam_'+NN+'.txt',delimiter='\s+') 
+        if NN == 'NN':
+            self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+') 
+        elif NN == 'RNN':
+            self.hyper = pd.read_csv('hyperparam_RNN.txt',delimiter='\s+')
+        elif NN == 'CNN':
+            self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
 
 def compute_stat():
-    df = stat_CV("NN")
+#    df = stat_CV("NN")
+#    df = stat_CV("RNN")
+    df = stat_CV("CNN")
     return df
 
 df = compute_stat()
@@ -81,5 +88,12 @@ df = compute_stat()
 ### JA -- 1080 , 1080
 ### JRF -- 1118, 2164
 ### JM -- 2809, 6778
+
+### Results for RNN exposed and naive
+### JA  -- (4335, 4969,  983), (2610,  871, 2807), (SimpleRNN, LSTM, GRU)
+### JRF -- (4767,  871,  983), (5016, 2062, 4274)
+### JM  -- (2553, 4549, 5150), (1071, 4780, 4331)
+
+### Results for CNN exposed and naive
 
 
