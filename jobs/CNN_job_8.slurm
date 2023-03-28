@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH -J CNN_8
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
 #SBATCH --time 72:00:00 # 12 hours
