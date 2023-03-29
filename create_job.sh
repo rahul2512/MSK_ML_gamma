@@ -3,12 +3,12 @@ rm jobs/CNN_job*slurm
 count=0
 for (( i=0; i<865; i+=1 )) 
 do
-index=$[count/72+1]
+index=$[count/24+1]
 count=$[count+1]
 echo "python " '${path}'"/main.py" ${i} "&" >> CNN_job_${index}.slurm
 done 
 
-for index in {1..13}
+for index in {1..37}
 do 
 touch tmp 
 cat heading.txt >> tmp
