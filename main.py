@@ -13,7 +13,7 @@ from barchart_err import barchart_error, barchart_params
 
 window = 20
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
-data_kind  =  ['CNN']
+data_kind  =  ['NN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
 # fm.LM.exposed.arg      = [11, 10, 8, 8,10]
@@ -21,10 +21,10 @@ fm = ML_analysis('final_model_list', data_kind, window)
 # fm.LM.exposed.arch     = ['LM']*5
 # fm.LM.naive.arch       = ['LM']*5
 
-# fm.NN.exposed.arg        = [7560, 2286,  375, 34147, 2254]
-# fm.NN.naive.arg          = [7077, 6591,  377, 30380, 7646]
-# fm.NN.exposed.arch       = ['NN']*5
-# fm.NN.naive.arch         = ['NN']*5
+fm.NN.exposed.arg        = [1080, 1118, 2809]
+fm.NN.naive.arg          = [1080, 2164, 6778]
+fm.NN.exposed.arch       = ['NN']*3
+fm.NN.naive.arch         = ['NN']*3
 
 # fm.RNN.exposed.arg       = [1252, 1836, 1537, 1489, 1416]
 # fm.RNN.exposed.arch      = ['BLSTM','LSTM','BLSTM','LSTM','LSTM']
@@ -32,6 +32,14 @@ fm = ML_analysis('final_model_list', data_kind, window)
 # fm.RNN.naive.arg         = [     52,     36,   694,  1037,  1934]  
 # fm.RNN.naive.arch        = ['BLSTM', 'LSTM', 'GRU', 'GRU', 'LSTM']
 
+
+def train_final_models(fm):
+    ## train final model with best-avg-validation accuracy
+    for d  in [fm.NN]:
+        for i in range(3):
+            specific(d.exposed,i)
+            specific(d.naive  ,i)
+    return None
 
 def compute_stat(fm):
     for D in [fm.LM, fm.NN, fm.RNN]:
@@ -69,5 +77,6 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-hyper_index = int(sys.argv[1])
-explore(fm.CNN, hyper_index)
+# hyper_index = int(sys.argv[1])
+# explore(fm.CNN, hyper_index)
+train_final_models(fm)
