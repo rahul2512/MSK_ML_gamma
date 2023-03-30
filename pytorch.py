@@ -28,91 +28,11 @@ RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
 feature_list = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
 feature_slist = ['JA','JRF','JM',  'MF', 'MA']
 
-
-def plot_MSK_data(fm):
-    for feature in fm.feature:
-        col_number = fm.NN.data.o1.numer_of_features[feature]
-        cols = fm.NN.data.o1.T1.columns[col_number]
-        sparse = 10
-        color = ['r','b','g','k','m']
-        std = fm.NN.data.subject_exposed(feature).std
-        if 'JRF' == feature:
-            fig, ax = plt.subplots(4,3,figsize=(8,6),sharex=True)
-            ax_list  = [ax[0,0], ax[0,1], ax[0,2], ax[1,0], ax[1,1], ax[1,2], ax[2,0], ax[2,1], ax[2,2], ax[3,0], ax[3,1], ax[3,2]]
-            ss,b_xlabel = 8,9
-            ylabel = [ 'Trunk \n Mediolateral', 'Trunk \n Proximodistal', 'Trunk \n Anteroposterior', 'Shoulder \n Mediolateral',
-                      'Shoulder \n Proximodistal', 'Shoulder \n Anteroposterior', 'Elbow \n Mediolateral', 'Elbow \n Proximodistal',
-                      'Elbow \n Anteroposterior', 'Wrist \n Mediolateral', 'Wrist \n Proximodistal', 'Wrist \n Anteroposterior']
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-        elif 'MF'  == feature:
-            fig, ax = plt.subplots(2,2,figsize=(4,3),sharex=True)
-            ax_list = [ax[0,0],ax[0,1],ax[1,0] ,ax[1,1]]
-            ss,b_xlabel = 7,1
-            ylabel = ['Pectoralis major \n (Clavicle)','Biceps Brachii','Deltoid (Medial)','Brachioradialis']
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-        elif 'MA' == feature:
-            fig, ax = plt.subplots(2,2,figsize=(4,3),sharex=True)
-            ax_list = [ax[0,0],ax[0,1],ax[1,0] ,ax[1,1]]
-            ss,b_xlabel = 7,1
-            ylabel = ['Pectoralis major \n (Clavicle)','Biceps Brachii','Deltoid (Medial)','Brachioradialis']
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-        elif 'JM' == feature:
-            fig, ax = plt.subplots(4,3,figsize=(8,6),sharex=True)
-            ax_list  = [ax[0,0], ax[0,1], ax[0,2], ax[1,0], ax[1,1], ax[1,2], ax[2,0], ax[2,1], ax[2,2],  ax[3,1]]
-            ax[3,0].remove()
-            ax[3,2].remove()
-            ss,b_xlabel = 8,7
-            ylabel = [ 'Trunk Flexion / \n Extension', 'Trunk Internal / \n External Rotation', 'Trunk Right / \n Left Bending',
-                      'Shoulder Flexion / \n Extension', 'Shoulder Abduction / \n Adduction', 'Shoulder Internal / \n External Rotation',
-                      'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
-            plot_list = ['(a)','(c)','(b)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-        elif 'JA' == feature:
-            new_order = [7,8,9,0,1,2,3,4,5,6]
-            cols = cols[new_order]
-            fig, ax = plt.subplots(4,3,figsize=(8,6),sharex=True)
-            ax_list  = [ax[0,0], ax[0,1], ax[0,2], ax[1,0], ax[1,1], ax[1,2], ax[2,0], ax[2,1], ax[2,2], ax[3,1]]
-            ax[3,0].remove()
-            ax[3,2].remove()
-    
-            ss,b_xlabel = 8,7
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)']    
-            ylabel = ['Trunk Forward / \n Backward Bending', 'Trunk Right / \n Left Bending', 'Trunk Internal / \n External Rotation',
-                      'Shoulder Flexion / \n Extension', 'Shoulder Abduction / \n Adduction', 'Shoulder Internal / \n External Rotation',
-                      'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
-        sub = ['Subject-1','Subject-2','Subject-3','Subject-4','Subject-5' ]
-        no_lab = ['_no_legend_']*5
-        lab = [sub,no_lab, no_lab]
-        for enum, axu in enumerate(ax_list):
-            for enum1, dsub in enumerate([fm.NN.data.o1,fm.NN.data.o2,fm.NN.data.o3,fm.NN.data.o4,fm.NN.data.o5]):
-                for enum2, dtri in enumerate([dsub.T1, dsub.T2, dsub.T3]):
-                    axu.plot(dtri[cols[enum]][::sparse].index,dtri[cols[enum]][::sparse], color=color[enum1],lw=0.2,label = lab[enum2][enum1])
-            axu.set_ylabel(ylabel[enum],fontsize=ss-1)
-            axu.tick_params(axis='x', labelsize=ss-1,   pad=2,length=3,width=0.5,direction= 'inout',which='major')
-            axu.tick_params(axis='x', labelsize=ss-1, pad=2, length=3,width=0.5,direction= 'inout',which='minor')
-            axu.tick_params(axis='y', labelsize=ss-1,   pad=2, length=3,width=0.5,direction= 'inout')
-
-        if feature in  ['JRF','JA','JM']:
-            ax[0,1].legend(fontsize=ss-1,loc = 'upper center',fancybox=True,ncol=5, frameon=True,framealpha=1, borderaxespad=-2.3)   
-            plt.tight_layout(h_pad = 0.1,w_pad = -8)
-        elif feature in  ['MA','MF']:
-            ax[0,1].legend(fontsize=ss-1,loc = 'upper right',fancybox=True,ncol=5, frameon=True,framealpha=1, borderaxespad=-2.3)   
-            plt.tight_layout(h_pad = 0.1,w_pad = -12)
-            
-        fig.savefig('./plots_out/MSK_data_'+feature+'.pdf',dpi=600)
-        plt.show()
-        plt.close()
-    return None
-
-
 def combined_plot(analysis_opt):
     # it plots the first trial and provides the statistics for each trial as well as average, std, iqr, min,max etc etc
     lll = len(analysis_opt.model_exposed_hyper_arg)
     save_name = analysis_opt.save_name
-
+    trial_ind = analysis_opt.trial_ind
     color_list = ['r','b']
     ls_list = ['-','-']
     lsk = '--'
@@ -131,57 +51,20 @@ def combined_plot(analysis_opt):
         data = analysis_opt.data[XX]
         window = analysis_opt.window_size[XX]
 
-        XE, YE = data.subject_exposed(feature).test_in, data.subject_exposed(feature).test_out
-        XN, YN = data.subject_naive(feature).test_in,   data.subject_naive(feature).test_out
-   
-        SCE = data.subject_exposed(feature).std
-        SCN = data.subject_naive(feature).std
+        XE, YE = data.subject_exposed(feature).test_in_list[trial_ind], data.subject_exposed(feature).test_out_list[trial_ind]
+        XN, YN = data.subject_naive(feature).test_in_list[trial_ind],   data.subject_naive(feature).test_out_list[trial_ind]
+        sub_col = data.subject_exposed(feature).sub_col
     
-        TE = data.subject_exposed(feature).time
-        TN = data.subject_naive(feature).time
+        SC = data.std_out[data.label[feature]]
+        TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
+        TN = np.linspace(0,1,YN.shape[0] + analysis_opt.window_size[XX])
 
         plot_subtitle = analysis_opt.plot_subtitle[XX]
 
-        NRMSE_list,  PC_list  = [],[]
-        NRMSE2_list, PC2_list = [],[]
-        RMSE_list, RMSE2_list = [], []
         YP1, YP2 = model1.predict(XE), model2.predict(XN)
-        YT1, YT2 = np.array(YE),np.array(YN)
-        a,b = np.shape(YT1)
-        a2,b2 = np.shape(YT2)
-        try:
-            SCE,SCN = SCE.to_numpy(),SCN.to_numpy()
-        except:
-            SCE,SCN = SCE,SCN
+        YT1, YT2 = np.array(YE), np.array(YN)
 
-        if 'MA' in feature:
-            SCE,SCN = SCE*100,SCN*100
-
-        YP1, YT1 = YP1*SCE, YT1*SCE
-        YP2, YT2 = YP2*SCN, YT2*SCN
-        #### the below loop is to set the time in terms of percentage of task
-
-        zero_entries = np.where(TE==0)
-        zero_entries = np.concatenate([zero_entries[0],np.array([a])])   #### adding last element
-    
-        zero_entries2 = np.where(TN==0)
-        zero_entries2 = np.concatenate([zero_entries2[0],np.array([a2])])   #### adding last element
-    
-        count,aa = -1,[]
-        for u in TE.to_numpy():
-            if u == 0:
-                count = count + 1
-            aa.append(u+count)
-    
-        count,bb = -1,[]
-        for v in TN.to_numpy():
-            if v==0:
-                count = count + 1
-            bb.append(v+count)
-
-        count=0
-
-        if 'JRF' in feature:
+        if 'JRF' == feature:
             if XX == 0 :
                 fig = plt.figure(figsize=(8,10.5))
                 gs1 = gridspec.GridSpec(700, 560)
@@ -222,54 +105,7 @@ def combined_plot(analysis_opt):
                       'Elbow \n Anteroposterior', 'Wrist \n Mediolateral', 'Wrist \n Proximodistal', 'Wrist \n Anteroposterior']
             plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
     
-        elif 'MF' in feature:
-            if XX == 0:
-                fig = plt.figure(figsize=(8,4))
-                gs1 = gridspec.GridSpec(215, 560)
-                gs1.update(left=0.07, right=0.98,top=0.84, bottom=0.15)
-                d1, d2 =10, 10
-                ax00 = plt.subplot(gs1[0:100 -d2    , 0+d1:100  ])
-                ax01 = plt.subplot(gs1[0:100 -d2   , 150+d1:250 ])
-                ax10 = plt.subplot(gs1[115+d2:215  , 0+d1:100 ])
-                ax11 = plt.subplot(gs1[115+d2:215  , 150+d1:250 ])
-        
-                ax02 = plt.subplot(gs1[0:100 -d2   , 310+d1:410 ])
-                ax03 = plt.subplot(gs1[0:100 -d2   , 460+d1:560 ])
-                ax12 = plt.subplot(gs1[115+d2:215  , 310+d1:410 ])
-                ax13 = plt.subplot(gs1[115+d2:215  , 460+d1:560 ])
-        
-                ax_list = [ax00,ax01,ax10 ,ax11]
-                ax_list2= [ ax02,ax03, ax12 ,ax13 ]
-
-            ss,b_xlabel = 8,1
-            ylabel = ['Pectoralis major \n (Clavicle)','Biceps Brachii','Deltoid (Medial)','Brachioradialis']
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-        elif 'MA' in feature:
-            if XX == 0:
-                fig = plt.figure(figsize=(8,4))
-                gs1 = gridspec.GridSpec(215, 560)
-                gs1.update(left=0.07, right=0.98,top=0.84, bottom=0.15)
-                d1, d2 =10, 10
-                ax00 = plt.subplot(gs1[0:100 -d2    , 0+d1:100  ])
-                ax01 = plt.subplot(gs1[0:100 -d2   , 150+d1:250 ])
-                ax10 = plt.subplot(gs1[115+d2:215  , 0+d1:100 ])
-                ax11 = plt.subplot(gs1[115+d2:215  , 150+d1:250 ])
-        
-                ax02 = plt.subplot(gs1[0:100 -d2   , 310+d1:410 ])
-                ax03 = plt.subplot(gs1[0:100 -d2   , 460+d1:560 ])
-                ax12 = plt.subplot(gs1[115+d2:215  , 310+d1:410 ])
-                ax13 = plt.subplot(gs1[115+d2:215  , 460+d1:560 ])
-        
-                ax_list = [ax00,ax01,ax10 ,ax11]
-                ax_list2= [ ax02,ax03, ax12 ,ax13 ]
-            ss,b_xlabel = 8,1
-            ylabel = ['Pectoralis major \n (Clavicle)','Biceps Brachii','Deltoid (Medial)','Brachioradialis']
-            plot_list = ['(a)','(b)','(c)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
-    
-    
-    
-        elif 'JM' in feature:
+        elif 'JM' == feature:
             if XX == 0:
                 fig = plt.figure(figsize=(8,8.25))
                 gs1 = gridspec.GridSpec(580, 560)
@@ -308,13 +144,13 @@ def combined_plot(analysis_opt):
                       'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
             plot_list = ['(a)','(c)','(b)','(d)','(e)','(f)','(g)','(h)','(i)','(j)','(k)','(l)']
     
-        elif 'JA' in feature:
+        elif 'JA' == feature:
             new_order = [7,8,9,0,1,2,3,4,5,6]
             YP1 = YP1[:,new_order]
             YP2 = YP2[:,new_order]
             YT1 = YT1[:,new_order]
             YT2 = YT2[:,new_order]
-            
+            SC = SC[[sub_col[i] for i in new_order]]            
             if XX == 0:
                 fig = plt.figure(figsize=(8,8.25))
                 gs1 = gridspec.GridSpec(580, 560)
@@ -351,88 +187,43 @@ def combined_plot(analysis_opt):
                       'Shoulder Flexion / \n Extension', 'Shoulder Abduction / \n Adduction', 'Shoulder Internal / \n External Rotation',
                       'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
     
-         ######following loop computes stats
-        for i in range(b):
-            count = 1   ## computing for all trials
-            for c in range(count+1):    ########## this loop is required to separate trials
-                if c < 2:
-                    
-                    ttmmpp = np.arange(zero_entries[c],zero_entries[c+1])
-            
-                    PC =  scipy.stats.pearsonr(YP1[ttmmpp,i],YT1[ttmmpp,i])[0]
-                    NRMSE =  mean_squared_error(YP1[ttmmpp,i], YT1[ttmmpp,i],squared=False)/SCE[i]
-                    NRMSE_list.append(NRMSE)
-                    RMSE =  mean_squared_error(YP1[ttmmpp,i], YT1[ttmmpp,i],squared=False)
-                    RMSE_list.append(RMSE)
-    
-                    PC_list.append(PC)
-    
-                ttmmpp2 = np.arange(zero_entries2[c],zero_entries2[c+1])
-                PC2  = scipy.stats.pearsonr(YP2[ttmmpp2,i],YT2[ttmmpp2,i])[0]
-                NRMSE2  =  mean_squared_error(YP2[ttmmpp2,i], YT2[ttmmpp2,i],squared=False)/SCN[i]
-                NRMSE2_list.append(NRMSE2)
-                RMSE2  =  mean_squared_error(YP2[ttmmpp2,i], YT2[ttmmpp2,i],squared=False)
-                RMSE2_list.append(RMSE2)
-                PC2_list.append(PC2)
-        NRMSE_list = np.around(NRMSE_list,2)
-        NRMSE2_list = np.around(NRMSE2_list,2)
-        RMSE_list = np.around(RMSE_list,2)
-        RMSE2_list = np.around(RMSE2_list,2)
-        PC_list  = np.around(PC_list,2)
-        PC2_list = np.around(PC2_list,2)
-        print("Printing statisics for ----", feature, "mean, std, max, min, iqr")
-        print(np.around(np.mean(PC_list),2),' (' ,  np.around(np.std(PC_list),2),') &' , np.around(np.max(PC_list),2),' & ' , np.around(np.min(PC_list),2),' & ' ,  np.around(scipy.stats.iqr(PC_list),2),' & ' , 'PC Exposed')
-        print(np.around(np.mean(NRMSE_list),2),' (' , np.around(np.std(NRMSE_list),2),') & ' , np.around(np.max(NRMSE_list),2),' & ' , np.around(np.min(NRMSE_list),2),' & ' ,  np.around(scipy.stats.iqr(NRMSE_list),2), 'NRMSE exposed')
-    
-        print(np.around(np.mean(PC2_list),2),'(' , np.around(np.std(PC2_list),2),') & ' , np.around(np.max(PC2_list),2),' & ' , np.around(np.min(PC2_list),2),' & ' ,  np.around(scipy.stats.iqr(PC2_list),2),' & ' , 'PC2 Naive')
-        print(np.around(np.mean(NRMSE2_list),2),' ( ' , np.around(np.std(NRMSE2_list),2),') & ' , np.around(np.max(NRMSE2_list),2),' & ' , np.around(np.min(NRMSE2_list),2),' & ' ,  np.around(scipy.stats.iqr(NRMSE2_list),2), 'NRMSE2 Naive')
-    
-        print("below printing RMSE with units")
-        print(np.around(np.mean(RMSE_list),2),'&' , np.around(np.std(RMSE_list),2),'& ' , np.around(np.max(RMSE_list),2),' & ' , np.around(np.min(RMSE_list),2),' & ' ,  np.around(scipy.stats.iqr(RMSE_list),2), 'RMSE_list exposed')
-        print(np.around(np.mean(RMSE2_list),2),'&' , np.around(np.std(RMSE2_list),2),' & ' , np.around(np.max(RMSE2_list),2),' & ' , np.around(np.min(RMSE2_list),2),' & ' ,  np.around(scipy.stats.iqr(RMSE2_list),2), 'NRMSE2 Naive')
-    
         sparse_plot=5
-        for i in range(b):
+        for i, _  in enumerate(sub_col):
             push_plot = 0
             count = 0   ## plotting first trial
-            for c in range(count+1):    ########## this loop is required to separate trials
-                ttmmpp = np.arange(zero_entries[c],zero_entries[c+1]) - window  ### to make the plot RNN compatible
-                ttmmpp2 = np.arange(zero_entries2[c],zero_entries2[c+1]) - window
-                if ax_list[i] == ax00:
-                    label1  = analysis_opt.legend_label[XX] #+ ' prediction'
-                    if label1 == 'NN':
-                        label1 = 'FFNN'
-                    if XX == 0:
-                        label2 = 'MSK'
-                else:
-                    label1, label2 = '_no_legend_', '_no_legend_'
-
+            if ax_list[i] == ax00:
+                label1  = analysis_opt.legend_label[XX] #+ ' prediction'
+                if label1 == 'NN':
+                    label1 = 'FFNN'
                 if XX == 0:
-                    ax_list[i].plot([aa[q] + push_plot for q in ttmmpp][window::sparse_plot] ,YT1[ttmmpp,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
-                ax_list[i].plot([aa[q] + push_plot for q in ttmmpp][window::sparse_plot] ,YP1[ttmmpp,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
+                    label2 = 'MSK'
+            else:
+                label1, label2 = '_no_legend_', '_no_legend_'
 
-                if XX == 0:
-                    ax_list2[i].plot([bb[q] + push_plot for q in ttmmpp2][window::sparse_plot] ,YT2[ttmmpp2,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
-                ax_list2[i].plot([bb[q] + push_plot for q in ttmmpp2][window::sparse_plot] ,YP2[ttmmpp2,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
+            if XX == 0:
+                ax_list[i].plot(TE[window::sparse_plot] ,YT1[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
+            ax_list[i].plot(TE[window::sparse_plot], YP1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
+            if XX == 0:
+                ax_list2[i].plot(TN[window::sparse_plot] ,YT2[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
+            ax_list2[i].plot(TN[window::sparse_plot] ,YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
-                Title =  scipy.stats.pearsonr(YP1[ttmmpp,i],YT1[ttmmpp,i])[0]
-                NRMSE  = mean_squared_error(YP1[ttmmpp,i], YT1[ttmmpp,i],squared=False)
+            Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
+            RMSE  = mean_squared_error(YP1[:,i], YT1[:,i],squared=False)
+
+            Title2  = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
+            RMSE2  = mean_squared_error(YP2[:,i], YT2[:,i],squared=False)
+
+            push_plot = push_plot + 0.1
     
-                Title2  = scipy.stats.pearsonr(YP2[ttmmpp2,i],YT2[ttmmpp2,i])[0]
-                NRMSE2  = mean_squared_error(YP2[ttmmpp2,i], YT2[ttmmpp2,i],squared=False)
+            NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
     
-                push_plot = push_plot + 0.1
-    
-            NRMSE,NRMSE2 = NRMSE/SCE[i],NRMSE2/SCN[i]
-    
-            push2 = 0.05
             ax_list[i].set_xlim(0,count+1)
             ax_list2[i].set_xlim(0,count+1)
-            ind = ['Trial '+str(i+1) for i in range(count+1)]
             Title = str(np.around(Title/(count+1),2))
             NRMSE = str(np.around(NRMSE/(count+1),2))
             Title2 = str(np.around(Title2/(count+1),2))
             NRMSE2 = str(np.around(NRMSE2/(count+1),2))
+
             if len(Title) == 3:
                 Title = Title+'0'
             if len(Title2) == 3:
@@ -444,6 +235,7 @@ def combined_plot(analysis_opt):
     
             Title = plot_list[i] + "  r = " + Title + ", NRMSE = " + NRMSE
             Title2 = plot_list[i] + "  r = " + Title2 + ", NRMSE = " + NRMSE2
+
             if plot_subtitle:
                 ax_list[i].text(-0.25, 1.1, Title, transform=ax_list[i].transAxes, size=ss)#,fontweight='bold')
                 ax_list2[i].text(-0.25, 1.1, Title2, transform=ax_list2[i].transAxes, size=ss)#,fontweight='bold')
@@ -497,17 +289,7 @@ def combined_plot(analysis_opt):
             ax00.legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
             ax00.text(0.9, 1.35, "(I) Subject-exposed", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
             ax00.text(4.35, 1.35, "(II) Subject-naive", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
-    
-        elif 'MF' in feature:
-            ax00.legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
-            ax00.text(0.94, 1.35, "(I) Subject-exposed", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
-            ax00.text(4.35, 1.35, "(II) Subject-naive", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
-    
-        elif 'MA' in feature:
-            ax00.legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
-            ax00.text(0.94, 1.35, "(I) Subject-exposed", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
-            ax00.text(4.35, 1.35, "(II) Subject-naive", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
-    
+        
         elif 'JRF' in feature:
             ax00.legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
             ax00.text(0.9, 1.35, "(I) Subject-exposed", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')

@@ -51,19 +51,20 @@ def compute_stat(fm):
 def plot_final_results(fm):
     analysis_opt = analysis_options()        
     analysis_opt.save_name = 'final'
+    analysis_opt.trial_ind = 2
     analysis_opt.plot_subtitle   = [False, True]
-    analysis_opt.legend_label   = ['RNN', 'NN']
-    analysis_opt.window_size = [0,10]
-    analysis_opt.data    = [fm.RNN.data,fm.NN.data]
+    analysis_opt.legend_label   = ['LM', 'NN']
+    analysis_opt.window_size = [0,0]
+    analysis_opt.data    = [fm.LM.data,fm.NN.data]
     
-    for i in range(5):    
+    for i in range(3):    
         analysis_opt.feature   = fm.feature[i]
 
-        analysis_opt.model_exposed_hyper_arg  = [fm.RNN.exposed.arg[i], fm.NN.exposed.arg[i]]
-        analysis_opt.model_naive_hyper_arg    = [fm.RNN.naive.arg[i], fm.NN.naive.arg[i]]
+        analysis_opt.model_exposed_hyper_arg  = [fm.LM.exposed.arg[i], fm.NN.exposed.arg[i]]
+        analysis_opt.model_naive_hyper_arg    = [fm.LM.naive.arg[i], fm.NN.naive.arg[i]]
         
-        analysis_opt.model_exposed_arch  = [fm.RNN.exposed.arch[i],fm.NN.exposed.arch[i]]
-        analysis_opt.model_naive_arch    = [fm.RNN.naive.arch[i],fm.NN.naive.arch[i]]
+        analysis_opt.model_exposed_arch  = [fm.LM.exposed.arch[i],fm.NN.exposed.arch[i]]
+        analysis_opt.model_naive_arch    = [fm.LM.naive.arch[i],fm.NN.naive.arch[i]]
 
         combined_plot(analysis_opt)
     return None
@@ -79,4 +80,5 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.CNN, hyper_index)
-fm = compute_stat(fm)
+# fm = compute_stat(fm)
+# plot_final_results(fm)
