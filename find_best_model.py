@@ -66,6 +66,8 @@ class stat:
             self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
         elif NN == 'LM':
             self.hyper = pd.read_csv('hyperparam_LM.txt',delimiter='\s+')
+        elif NN == 'CNNLSTM':
+            self.hyper = pd.read_csv('hyperparam_CNNLSTM.txt',delimiter='\s+')
 
         self.JA  = run_final("JA",  sub, NN, self.hyper)
         self.JM  = run_final("JM",  sub, NN, self.hyper)
@@ -83,9 +85,17 @@ def compute_stat():
 #    df = stat_CV("RNN")
 #    df = stat_CV("CNN")
     df = stat_CV("LM")
+#    df = stat_CV("CNNLSTM")
     return df
 
 df = compute_stat()
+JAE  = df.exposed.JA['avg_val_mse'].sort_values(ascending=False).dropna()
+JME  = df.exposed.JM['avg_val_mse'].sort_values(ascending=False).dropna()
+JRFE = df.exposed.JRF['avg_val_mse'].sort_values(ascending=False).dropna()
+
+JAN  = df.naive.JA['avg_val_mse'].sort_values(ascending=False).dropna()
+JMN  = df.naive.JM['avg_val_mse'].sort_values(ascending=False).dropna()
+JRFN = df.naive.JRF['avg_val_mse'].sort_values(ascending=False).dropna()
 
 
 ### Results for NN exposed and naive
@@ -98,6 +108,13 @@ df = compute_stat()
 ### JRF -- (4767,  871,  983), (5016, 2062, 4274)
 ### JM  -- (2553, 4549, 5150), (1071, 4780, 4331)
 
-### Results for CNN exposed and naive
+### Results for CNNLSTM exposed and naive
+### JA -- 387, 387 
+### JRF -- 1361, 1251
+### JM -- 1362, 907
 
+### Results for LM exposed and naive
+### JA -- 12, 12
+### JRF -- 12, 12
+### JM -- 12,12
 

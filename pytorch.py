@@ -521,77 +521,42 @@ def combined_plot(analysis_opt):
 
 
 def stat(fd, index):
-    feature = fd.feature[index]
-    
+    feature = fd.feature[index]   
     hyper_val_exp =  fd.arg[index]
     model_class_exp = fd.arch[index]
-    
-
+   
     model1 = load_model(fd.subject, feature, model_class_exp,   hyper_val_exp  )
     param = model1.count_params()
     data = fd.data
+    SCE = data.std_out[data.label[feature]]
+
     if fd.subject == 'exposed':
-        XE, YE = data.subject_exposed(feature).test_in, data.subject_exposed(feature).test_out
-        SCE = data.subject_exposed(feature).std
-        TE = data.subject_exposed(feature).time
+        tmp = data.subject_exposed(feature)
     elif fd.subject == 'naive':
-        XE, YE = data.subject_naive(feature).test_in, data.subject_naive(feature).test_out
-        SCE = data.subject_naive(feature).std
-        TE = data.subject_naive(feature).time
+        tmp = data.subject_naive(feature)
 
+    XE, YE = tmp.test_in_list, tmp.test_out_list
 
-    NRMSE_list,  PC_list, RMSE_list  = [],[], []
-    YP1 = model1.predict(XE)
-    YT1 = np.array(YE)
-    a,b = np.shape(YT1)
+    ntrials = len(XE)
+    sub_col = tmp.sub_col
+    df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
+    NRMSE, PC, RMSE  = copy.deepcopy(df), copy.deepcopy(df), copy.deepcopy(df)
 
-    try:
-        SCE = SCE.to_numpy()
-    except:
-        SCE = SCE
-
-    if 'MA' in feature:
-        SCE = SCE*100
-
-    YP1, YT1 = YP1*SCE, YT1*SCE
-
-    zero_entries = np.where(TE==0)
-    zero_entries = np.concatenate([zero_entries[0],np.array([a])])   #### adding last element
-
-
-    count,aa = -1,[]
-    for u in TE.to_numpy():
-        if u == 0:
-            count = count + 1
-        aa.append(u+count)
-
-    count=0
-
-    if 'JA' in feature:
-        new_order = [7,8,9,0,1,2,3,4,5,6]
-        YP1 = YP1[:,new_order]
-        YT1 = YT1[:,new_order]
-        
-
-     ######following loop computes stats
-    for i in range(b):
-        count = 1   ## computing for all trials
-        for c in range(count+1):    ########## this loop is required to separate trials
-            if c < 2:
+    for n in range(ntrials):
+        YP1 = model1.predict(XE[n])
+        YT1 = np.array(YE[n])
+    # if 'JA' in feature:
+    #     new_order = [7,8,9,0,1,2,3,4,5,6]
+    #     YP1 = YP1[:,new_order]
+    #     YT1 = YT1[:,new_order]      
+        for enum, col in enumerate(sub_col):
+                PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0]
+                NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
+                RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
                 
-                ttmmpp = np.arange(zero_entries[c],zero_entries[c+1])
-        
-                PC =  scipy.stats.pearsonr(YP1[ttmmpp,i],YT1[ttmmpp,i])[0]
-                NRMSE =  mean_squared_error(YP1[ttmmpp,i], YT1[ttmmpp,i],squared=False)/SCE[i]
-                NRMSE_list.append(NRMSE)
-                RMSE =  mean_squared_error(YP1[ttmmpp,i], YT1[ttmmpp,i],squared=False)
-                RMSE_list.append(RMSE)
-
-                PC_list.append(PC)
-
-    fd.NRMSE[feature] = NRMSE_list
-    fd.RMSE[feature]  = RMSE_list
-    fd.pc[feature]    = PC_list
+    fd.NRMSE[feature] = NRMSE
+    fd.RMSE[feature]  = RMSE
+    fd.pc[feature]    = PC
     fd.nparams.append(param)
     return fd
 

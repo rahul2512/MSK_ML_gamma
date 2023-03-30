@@ -5,7 +5,6 @@ import scipy.io as sio, sys
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-
 filters = pd.read_csv('./Output/frame_filters', header=None)
 Weight = pd.read_csv('./Output/Weight', header=None)
 Weight_moment = pd.read_csv('./Output/Weight_moment', header=None)
@@ -14,37 +13,29 @@ color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:br
          'deeppink','goldenrod','darkred','darkviolet']
 ls = ['-','--',':']
 
-#################################################
-# Some functions used later to handle data
-#################################################
+############################################
+## Some functions used later to handle data
+############################################
 
-def combine(d):
+def combine(d, how):
     if d.index in [1,2,3,4,8,12,13,14,15,16]:
-        u = pd.concat([d.T1,d.T2,d.T3])
+        ul = [d.T1,d.T2,d.T3]
     elif d.index in [6,9,11]:
-        u = d.T1
+        ul = [d.T1]
     elif d.index in [5,10]:
-        u = pd.concat([d.T1,d.T2])
+        ul = [d.T1,d.T2]
     elif d.index in [7]:
-        u = pd.concat([d.T1,d.T3])
+        ul = [d.T1,d.T3]
     else:
         print("unrecognised index")
         sys.exit()            
-    return u
 
-def combine_RNN(d):
-    if d.index in [1,2,3,4,8,12,13,14,15,16]:
-        u = np.concatenate([d.T1,d.T2,d.T3])
-    elif d.index in [6,9,11]:
-        u = d.T1
-    elif d.index in [5,10]:
-        u = np.concatenate([d.T1,d.T2])
-    elif d.index in [7]:
-        u = np.concatenate([d.T1,d.T3])
-    else:
-        print("unrecognised index")
-        sys.exit()            
-    return u
+    if how == 0:
+        u = pd.concat(ul)   
+    elif how ==1:
+        u = np.concatenate(ul)
+    return ul, u
+
 
 def transform_trial_into_windows(i1,o1,window_size):
     s0,s1 = i1.shape
@@ -60,8 +51,8 @@ def transform_subject_into_windows(i1,o1,window_size):
     i1.T1, o1.T1 = transform_trial_into_windows(i1.T1, o1.T1, window_size)
     i1.T2, o1.T2 = transform_trial_into_windows(i1.T2, o1.T2, window_size)
     i1.T3, o1.T3 = transform_trial_into_windows(i1.T3, o1.T3, window_size)
-    i1.all = combine_RNN(i1)
-    o1.all = combine(o1)
+    i1.all_list, i1.all = combine(i1,1)
+    o1.all_list, o1.all = combine(o1,0)
     return i1, o1
 
 def Muscle_process(Y,which):
@@ -102,7 +93,7 @@ class subject_in:
         self.T2[57] = np.linspace(0, 1, self.T2.shape[0])
         self.T3[57] = np.linspace(0, 1, self.T3.shape[0])
         
-        self.all = combine(self)
+        self.all_list, self.all = combine(self,0)
 
     def plot(self):
         for i in range(57):
@@ -156,7 +147,7 @@ class subject_out:
         self.weight_moment = Weight_moment.iloc[index-1][0]
         self.subject_scale = [1]*10 + [self.weight_moment]*10 + [self.weight]*12 + [1]*4 + [self.weight]*4
         self.T1, self.T2, self.T3 = self.T1/self.subject_scale, self.T2/self.subject_scale, self.T3/self.subject_scale
-        self.all = combine(self)
+        self.all_list, self.all = combine(self,0)
 
     def plot(self):
         for enum, lab in enumerate(self.col_labels):
@@ -210,6 +201,11 @@ class initiate_data:
         self.out_all = [self.o1.all, self.o2.all, self.o3.all, self.o4.all, self.o5.all, self.o6.all, self.o7.all, self.o8.all, 
                         self.o9.all, self.o10.all, self.o11.all, self.o12.all, self.o13.all, self.o14.all, self.o15.all, self.o16.all]
 
+        self.inp_all_list = [self.i1.all_list, self.i2.all_list, self.i3.all_list, self.i4.all_list, self.i5.all_list, self.i6.all_list, self.i7.all_list, self.i8.all_list, 
+                        self.i9.all_list, self.i10.all_list, self.i11.all_list, self.i12.all_list, self.i13.all_list, self.i14.all_list, self.i15.all_list, self.i16.all_list]
+        self.out_all_list = [self.o1.all_list, self.o2.all_list, self.o3.all_list, self.o4.all_list, self.o5.all_list, self.o6.all_list, self.o7.all_list, self.o8.all_list, 
+                        self.o9.all_list, self.o10.all_list, self.o11.all_list, self.o12.all_list, self.o13.all_list, self.o14.all_list, self.o15.all_list, self.o16.all_list]
+
         self.col_labels = self.o1.col_labels
         self.label = self.o1.label
         self.data_class = 'normal'
@@ -235,6 +231,7 @@ class initiate_data:
         cv.subject = 'naive'
         cv.data_class = self.data_class
         sub_col = self.label[feature]
+        cv.sub_col = sub_col
         scale = self.std_out[sub_col]
         scale = self.std_dummy[sub_col]
         ## held-out test data 2, 5, 9, 15
@@ -255,8 +252,10 @@ class initiate_data:
             cv.cv3['val_in']    = pd.concat([self.inp_all[i] for i in V3])
             cv.train_in         = pd.concat([self.inp_all[i] for i in shuffled])
             cv.test_in          = pd.concat([self.inp_all[i] for i in HO])
+            cv.test_in_list     = [self.inp_all_list[i] for i in HO]
+            cv.test_in_list     = [j for i in cv.test_in_list for j in i]  ## seperating each trials
 
-        elif self.data_class in ['RNN','CNN']:
+        elif self.data_class in ['RNN','CNN','CNNLSTM']:
             cv.cv1['train_in']  = np.concatenate([self.inp_all[i] for i in T1])
             cv.cv1['val_in']    = np.concatenate([self.inp_all[i] for i in V1])
             cv.cv2['train_in']  = np.concatenate([self.inp_all[i] for i in T2])
@@ -265,6 +264,11 @@ class initiate_data:
             cv.cv3['val_in']    = np.concatenate([self.inp_all[i] for i in V3])
             cv.train_in         = np.concatenate([self.inp_all[i] for i in shuffled])
             cv.test_in          = np.concatenate([self.inp_all[i] for i in HO])
+            cv.test_in_list     = [self.inp_all_list[i] for i in HO]
+            cv.test_in_list     = [j for i in cv.test_in_list for j in i]  ## seperating each trials
+        else:
+            print("incorrect data class")
+            sys.exit()
 
         cv.cv1['train_out'] = pd.concat([self.out_all[i] for i in T1])[sub_col]/scale 
         cv.cv1['val_out']   = pd.concat([self.out_all[i] for i in V1])[sub_col]/scale
@@ -276,6 +280,11 @@ class initiate_data:
         cv.train_out = pd.concat([self.out_all[i] for i in shuffled])[sub_col]/scale
         cv.test_out  = pd.concat([self.out_all[i] for i in HO])[sub_col]/scale
 
+        cv.test_out_list  = [self.out_all_list[i] for i in HO] #
+        cv.test_out_list  = [j[sub_col]/scale for i in cv.test_out_list for j in i]  ## seperating each trials
+
+        cv.time = cv.test_in[57]
+
         return cv 
 
     def subject_exposed(self, feature):
@@ -286,6 +295,7 @@ class initiate_data:
         sub_col = self.label[feature]
         scale = self.std_out[sub_col]
         scale = self.std_dummy[sub_col]
+        cv.sub_col = sub_col
 
         ## python indexing
         ## [0,1,2,3,7,11,12,13,14,15] -- T1, T2, T3
@@ -328,8 +338,9 @@ class initiate_data:
             cv.cv3['val_in']    = pd.concat(V3_in)
             cv.train_in         = pd.concat(train_in_list)
             cv.test_in          = pd.concat([self.inp[i].T1  for i in HO])
+            cv.test_in_list          = [self.inp[i].T1  for i in HO]
 
-        elif self.data_class in ['RNN','CNN']:
+        elif self.data_class in ['RNN','CNN','CNNLSTM']:
             cv.cv1['train_in']  = np.concatenate(T1_in)
             cv.cv1['val_in']    = np.concatenate(V1_in)
             cv.cv2['train_in']  = np.concatenate(T2_in)
@@ -338,6 +349,10 @@ class initiate_data:
             cv.cv3['val_in']    = np.concatenate(V3_in)
             cv.train_in         = np.concatenate(train_in_list)
             cv.test_in          = np.concatenate([self.inp[i].T1  for i in HO])
+            cv.test_in_list          = [self.inp[i].T1  for i in HO]
+        else:
+            print("incorrect data class")
+            sys.exit()
 
         cv.cv1['train_out'] = pd.concat(T1_out)[sub_col]/scale 
         cv.cv1['val_out']   = pd.concat(V1_out)[sub_col]/scale
@@ -348,8 +363,9 @@ class initiate_data:
 
         cv.train_out        = pd.concat(train_out_list)[sub_col]/scale
         cv.test_out         = pd.concat([self.out[i].T1 for i in HO])[sub_col]/scale         
+        cv.test_out_list    = [self.out[i].T1[sub_col]/scale for i in HO]         
         
-        # cv.time = cv.test_in['time']
+        cv.time = cv.test_in[57]
         return cv 
 
 
@@ -381,6 +397,10 @@ class initiate_RNN_data(initiate_data):
                         self.i9.all, self.i10.all, self.i11.all, self.i12.all, self.i13.all, self.i14.all, self.i15.all, self.i16.all]
         self.out_all = [self.o1.all, self.o2.all, self.o3.all, self.o4.all, self.o5.all, self.o6.all, self.o7.all, self.o8.all, 
                         self.o9.all, self.o10.all, self.o11.all, self.o12.all, self.o13.all, self.o14.all, self.o15.all, self.o16.all]
+        self.inp_all_list = [self.i1.all_list, self.i2.all_list, self.i3.all_list, self.i4.all_list, self.i5.all_list, self.i6.all_list, self.i7.all_list, self.i8.all_list, 
+                        self.i9.all_list, self.i10.all_list, self.i11.all_list, self.i12.all_list, self.i13.all_list, self.i14.all_list, self.i15.all_list, self.i16.all_list]
+        self.out_all_list = [self.o1.all_list, self.o2.all_list, self.o3.all_list, self.o4.all_list, self.o5.all_list, self.o6.all_list, self.o7.all_list, self.o8.all_list, 
+                        self.o9.all_list, self.o10.all_list, self.o11.all_list, self.o12.all_list, self.o13.all_list, self.o14.all_list, self.o15.all_list, self.o16.all_list]
 
 
 

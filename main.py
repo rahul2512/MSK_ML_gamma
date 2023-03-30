@@ -13,13 +13,13 @@ from barchart_err import barchart_error, barchart_params
 
 window = 20
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
-data_kind  =  ['NN']
+data_kind  =  ['NN','LM']
 fm = ML_analysis('final_model_list', data_kind, window)
 
-# fm.LM.exposed.arg      = [11, 10, 8, 8,10]
-# fm.LM.naive.arg        = [0, 0, 0, 2, 0]
-# fm.LM.exposed.arch     = ['LM']*5
-# fm.LM.naive.arch       = ['LM']*5
+fm.LM.exposed.arg      = [12, 12, 12]
+fm.LM.naive.arg        = [12, 12, 12]
+fm.LM.exposed.arch     = ['LM']*3
+fm.LM.naive.arch       = ['LM']*3
 
 fm.NN.exposed.arg        = [1080, 1118, 2809]
 fm.NN.naive.arg          = [1080, 2164, 6778]
@@ -35,15 +35,15 @@ fm.NN.naive.arch         = ['NN']*3
 
 def train_final_models(fm):
     ## train final model with best-avg-validation accuracy
-    for d  in [fm.NN]:
+    for d  in [fm.LM]:
         for i in range(3):
             specific(d.exposed,i)
             specific(d.naive  ,i)
     return None
 
 def compute_stat(fm):
-    for D in [fm.LM, fm.NN, fm.RNN]:
-        for i in range(5):
+    for D in [fm.LM, fm.NN]:
+        for i in range(3):
             D.exposed = stat(D.exposed,i)
             D.naive   = stat(D.naive,i)
     return fm
@@ -79,4 +79,4 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.CNN, hyper_index)
-train_final_models(fm)
+fm = compute_stat(fm)
