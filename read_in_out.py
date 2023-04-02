@@ -5,7 +5,6 @@ import scipy.io as sio, sys
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-filters = pd.read_csv('./Output/frame_filters', header=None)
 Weight = pd.read_csv('./Output/Weight', header=None)
 Weight_moment = pd.read_csv('./Output/Weight_moment', header=None)
 color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 
@@ -72,20 +71,21 @@ def Muscle_process(Y,which):
 
 
 def filt(d):
+    filters = pd.read_csv('./Output/'+d.add1+'frame_filters', header=None)
     d.filter = filters.iloc[d.index-1] 
     d.T1 = d.T1.iloc[d.filter[0]:d.filter[1]+1]
     d.T2 = d.T2.iloc[d.filter[2]:d.filter[3]+1]
     d.T3 = d.T3.iloc[d.filter[4]:d.filter[5]+1]
     return d
 
-
 #################################################
 # Classes to read data
 #################################################
 class subject_in:
-    def __init__(self,index):
+    def __init__(self, index, add1=''):
         self.index = index
-        self.path = './Input/'
+        self.add1 = add1
+        self.path = './Input/' + self.add1
         self.T1 = pd.read_csv(self.path+'Marker_input_Subject'+str(self.index)+'_RGF_1.txt',engine='python',delimiter=',',header=None)
         self.T2 = pd.read_csv(self.path+'Marker_input_Subject'+str(self.index)+'_RGF_2.txt',engine='python',delimiter=',',header=None)
         self.T3 = pd.read_csv(self.path+'Marker_input_Subject'+str(self.index)+'_RGF_3.txt',engine='python',delimiter=',',header=None)
@@ -110,9 +110,10 @@ class subject_in:
             input()
 
 class subject_out:
-    def __init__(self,index):
+    def __init__(self, index, add1=''):
         self.index = index
-        self.path = './Output/'
+        self.add1 = add1
+        self.path = './Output/' + self.add1
         self.order = feat_order
         self.label = {}
         self.label['JA'] = ['SFE',	'SAA',	'SIR',	'EFE',	'EPS',	'WFE'	,'WAA',	'TFE',	'TAA',	'TIR']
@@ -162,6 +163,12 @@ class subject_out:
             plt.show()
             plt.close()
             input()
+
+#################################################
+# Classes to read brace data and compare
+#################################################
+
+
 
 #################################################
 # Initialising data class
@@ -522,7 +529,7 @@ def create_artifical_input_data_with_missing_markers():
         for trial in np.arange(1, 4, 1):
             data = pd.read_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial)+'.txt',engine='python',delimiter=',',header=None)
             data = intro_nan(data, prob_of_missing, number_of_miss)
-            data.to_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial) + '.' + 'miss.' + str(1) + '.txt',  sep=',', index=False, header=None)
+            data.to_csv(path+'Miss_1_Marker_input_Subject'+str(index)+'_RGF_'+str(trial) + '.txt',  sep=',', index=False, header=None)
 
     return data
 
