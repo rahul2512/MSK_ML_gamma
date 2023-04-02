@@ -114,35 +114,35 @@ class subject_out:
         self.index = index
         self.add1 = add1
         self.path = './Output/' + self.add1
-        self.order = feat_order
+        self.order = feat_order[0:3]
         self.label = {}
         self.label['JA'] = ['SFE',	'SAA',	'SIR',	'EFE',	'EPS',	'WFE'	,'WAA',	'TFE',	'TAA',	'TIR']
         self.label['JM'] = ['SacrumPelvisFlexionExtensionMoment'	,'SacrumPelvisAxialMoment'	,'SacrumPelvisLateralMoment',	'GlenoHumeralFlexion'	,'GlenoHumeralAbduction',	
                          'GlenoHumeralExternalRotation'	,'ElbowFlexion',	'ElbowPronation',	'WristFlexion',	'WristAbduction']
         self.label['JRF'] = ['TML'	,'TPD'	,'TAP',	'GML',	'GPD',	'GAP',	'EML',	'EPD'	,'EAP',	'WML',	'WPD',	'WAP']
-        self.label['MA']  = ['MA1',	'MA2',	'MA3',	'MA4']
-        self.label['MF']  = ['MF1',	'MF2',	'MF3',	'MF4']
-        self.col_labels = self.label['JA'] + self.label['JM'] + self.label['JRF'] + self.label['MA'] + self.label['MF'] 
+        # self.label['MA']  = ['MA1',	'MA2',	'MA3',	'MA4']
+        # self.label['MF']  = ['MF1',	'MF2',	'MF3',	'MF4']
+        self.col_labels = self.label[self.order[0]] + self.label[self.order[1]] + self.label[self.order[2]]  #+ self.label['MA'] + self.label['MF'] 
         
         self.T1 = pd.concat([pd.read_csv(self.path+self.order[0]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),
                              pd.read_csv(self.path+self.order[1]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),
-                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),
-                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),self.order[3]),
-                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),self.order[4])
+                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None)#,
+#                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),self.order[3]),
+#                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_1.txt',engine='python',header=None),self.order[4])
                              ],axis=1)
 
         self.T2 = pd.concat([pd.read_csv(self.path+self.order[0]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),
                              pd.read_csv(self.path+self.order[1]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),
-                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),
-                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),self.order[3]),
-                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),self.order[4])
+                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None)#,
+#                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),self.order[3]),
+#                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_2.txt',engine='python',header=None),self.order[4])
                              ],axis=1)
 
         self.T3 = pd.concat([pd.read_csv(self.path+self.order[0]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),
                              pd.read_csv(self.path+self.order[1]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),
-                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),
-                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),self.order[3]),
-                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),self.order[4])
+                             pd.read_csv(self.path+self.order[2]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None)#,
+#                             Muscle_process(pd.read_csv(self.path+self.order[3]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),self.order[3]),
+#                             Muscle_process(pd.read_csv(self.path+self.order[4]+'_Subject' +str(self.index)+'_RGF_3.txt',engine='python',header=None),self.order[4])
                              ],axis=1)
 
         self.T1.columns, self.T2.columns, self.T3.columns = self.col_labels, self.col_labels, self.col_labels
@@ -150,7 +150,7 @@ class subject_out:
         self = filt(self)
         self.weight = Weight.iloc[index-1][0]
         self.weight_moment = Weight_moment.iloc[index-1][0]
-        self.subject_scale = [1]*10 + [self.weight_moment]*10 + [self.weight]*12 + [1]*4 + [self.weight]*4
+        self.subject_scale = [1]*10 + [self.weight_moment]*10 + [self.weight]*12 #+ [1]*4 + [self.weight]*4
         self.T1, self.T2, self.T3 = self.T1/self.subject_scale, self.T2/self.subject_scale, self.T3/self.subject_scale
         self.all_list, self.all = combine(self,0)
 
