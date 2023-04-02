@@ -1,9 +1,4 @@
-import torch as tr, keras, numpy as np, pandas as pd, sys
-from torch import nn, sigmoid, tanh,relu
-from torch.nn import Linear 
-from torch.utils.data import Dataset, DataLoader
-from torch.autograd import Variable
-from tensorflow import keras
+import keras, sys
 from keras.regularizers import l2
 from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D
 from keras.layers.convolutional import Conv1D, MaxPooling1D

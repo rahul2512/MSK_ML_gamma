@@ -1,5 +1,6 @@
 clear
-data = load('markers.mat');
+%data = load('markers.mat');
+data = load('markers_braced.mat');
 D = data.markers;
 S = {'Subject1' 'Subject2' 'Subject3' 'Subject4' 'Subject5' 'Subject6' 'Subject7' 'Subject8' 'Subject9' 'Subject10' 'Subject11' 'Subject12' 'Subject13' 'Subject14' 'Subject15' 'Subject16'};
 R = {'RGF_1' 'RGF_2' 'RGF_3'};
@@ -16,7 +17,9 @@ for i =1:16
              D.(S{i}).(R{j}).RSHO ...
              D.(S{i}).(R{j}).RUPA ...
              D.(S{i}).(R{j}).RELB D.(S{i}).(R{j}).RFRM D.(S{i}).(R{j}).RWRA D.(S{i}).(R{j}).RWRB D.(S{i}).(R{j}).RFIN D.(S{i}).(R{j}).RASI D.(S{i}).(R{j}).LPSI D.(S{i}).(R{j}).RPSI D.(S{i}).(R{j}).D1 D.(S{i}).(R{j}).D2 D.(S{i}).(R{j}).D3];
-        filename = append('Marker_input_' , S{i} ,  '_' ,  R{j} , '.txt')
+%        filename = append('Marker_input_' , S{i} ,  '_' ,  R{j} , '.txt')
+
+        filename = append('Braced_Marker_input_' , S{i} ,  '_' ,  R{j} , '.txt')
         writematrix(T, filename)
     end
 end

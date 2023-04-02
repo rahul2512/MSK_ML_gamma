@@ -12,6 +12,10 @@ color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:br
          'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan', 'k', 'teal',
          'deeppink','goldenrod','darkred','darkviolet']
 ls = ['-','--',':']
+feat_order     = ['JA','JM','JRF','MA','MF']
+feat_order_l   = ['Joint angles','Joint moments', 'Joint reaction forces', 'Muscle forces', 'Muscle activations']
+feat_order_l2  = ['Joint angles (degrees)','Joint moments (\\% Body Weight \\times Body Height )', 'Joint reaction forces (\\% Body Weight)', 'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
+feat_order_tmp = ['JA']*10 + ['JM']*10 + ['JRF']*12 + ['MF']*4 + ['MA']*4 
 
 ############################################
 ## Some functions used later to handle data
@@ -109,7 +113,7 @@ class subject_out:
     def __init__(self,index):
         self.index = index
         self.path = './Output/'
-        self.order = ['JA','JM','JRF','MA','MF']
+        self.order = feat_order
         self.label = {}
         self.label['JA'] = ['SFE',	'SAA',	'SIR',	'EFE',	'EPS',	'WFE'	,'WAA',	'TFE',	'TAA',	'TIR']
         self.label['JM'] = ['SacrumPelvisFlexionExtensionMoment'	,'SacrumPelvisAxialMoment'	,'SacrumPelvisLateralMoment',	'GlenoHumeralFlexion'	,'GlenoHumeralAbduction',	
@@ -153,7 +157,7 @@ class subject_out:
         for enum, lab in enumerate(self.col_labels):
             for enumc, T in enumerate([self.T1, self.T2, self.T3]):
                 plt.plot(np.linspace(0,1,len(T[lab])),T[lab],color=color[enumc])
-            plt.ylabel(lab)
+            plt.ylabel(feat_order_tmp[enum] + ' -- ' + lab)
             plt.xlabel('# Frames')
             plt.show()
             plt.close()
@@ -214,13 +218,13 @@ class initiate_data:
         self.std_dummy[self.col_labels] = np.ones(40)
 
     def plot(self):
-        for label  in self.col_labels:
+        for e, label  in enumerate(self.col_labels):
             fig,ax = plt.subplots()
             for enum,data in enumerate(self.out):
                 for enumls, T in enumerate([data.T1, data.T2, data.T3]):
                     plt.plot(np.linspace(0,1,len(T[label])),T[label],lw =1,color=color[enum],ls=ls[enumls])
             plt.xlabel('# Frames')
-            plt.ylabel(label)
+            plt.ylabel(feat_order_tmp[e] + ' -- ' + label)
             plt.show()
             plt.close()
             input()
@@ -423,16 +427,16 @@ class subject:
         self.arg     =  None
         self.arch    =  None
         self.nparams =  []
-        self.feature = ['JA','JRF','JM','MF','MA']
-        self.feature = ['JA','JRF','JM']
+        self.feature = feat_order
+        self.feature = feat_order[0:3]
+        self.feature_l   = feat_order_l
+        self.feature_l2  = feat_order_l2
         self.NRMSE   =  {key: None for key in self.feature}
         self.RMSE    =  {key: None for key in self.feature}
         self.pc      =  {key: None for key in self.feature}
         self.data    =  data
         self.hyper   = hyper        
-        self.feature_l   = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
-        self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
-
+        
 class ML:
     def __init__(self, what, window):
 
@@ -458,10 +462,10 @@ class ML:
         self.what = what
         self.exposed =  subject('exposed', self.data, self.hyper, self.what)
         self.naive   =  subject('naive'  , self.data, self.hyper, self.what)
-        self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
-        self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
-        self.feature = ['JA','JRF','JM','MF','MA']
-        self.feature = ['JA','JRF','JM']
+        self.feature = feat_order
+        self.feature = feat_order[0:3]
+        self.feature_l   = feat_order_l
+        self.feature_l2  = feat_order_l2
 
 class ML_analysis:
     def __init__(self, what, data_kind, window):
@@ -480,10 +484,10 @@ class ML_analysis:
         if 'convLSTM' in data_kind:
             self.convLSTM = ML('convLSTM', window)
 
-        self.feature_l  = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
-        self.feature_l2  = ['Joint angles (degrees)','Joint reaction forces (\\% Body Weight)','Joint moments (\\% Body Weight \\times Body Height )',  'Muscle forces (\\% Body Weight)', 'Muscle activations (\\%)']
-        self.feature = ['JA','JRF','JM','MF','MA']
-        self.feature = ['JA','JRF','JM']
+        self.feature = feat_order
+        self.feature = feat_order[0:3]
+        self.feature_l   = feat_order_l
+        self.feature_l2  = feat_order_l2
         
 
 #################################################

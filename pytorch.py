@@ -1,23 +1,14 @@
 from pytorch_utilities import *
 from read_in_out import analysis_options
 import pandas as pd
-from torchvision import transforms, datasets
-from torch.utils.data import TensorDataset, DataLoader
-import torch as tr, time
 import numpy as np
-import statsmodels.api as sm
-from tensorflow import keras
+import keras
 import seaborn as sns
 import matplotlib.pyplot as plt
-from fractions import Fraction
 import sys, copy
 import scipy
-from scipy import signal
 from sklearn.preprocessing import StandardScaler
-sc = StandardScaler()
 import random
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from matplotlib import gridspec
 from scipy.interpolate import interp1d
@@ -53,7 +44,7 @@ def combined_plot(analysis_opt):
         XE, YE = data.subject_exposed(feature).test_in_list[trial_ind], data.subject_exposed(feature).test_out_list[trial_ind]
         XN, YN = data.subject_naive(feature).test_in_list[trial_ind],   data.subject_naive(feature).test_out_list[trial_ind]
         sub_col = data.subject_exposed(feature).sub_col
-    
+        
         SC = data.std_out[data.label[feature]]
         TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
         TN = np.linspace(0,1,YN.shape[0] + analysis_opt.window_size[XX])
@@ -187,6 +178,7 @@ def combined_plot(analysis_opt):
                       'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
     
         sparse_plot=5
+        print(sub_col)
         for i, _  in enumerate(sub_col):
             push_plot = 0
             count = 0   ## plotting first trial
@@ -200,11 +192,11 @@ def combined_plot(analysis_opt):
                 label1, label2 = '_no_legend_', '_no_legend_'
 
             if XX == 0:
-                ax_list[i].plot(TE[window::sparse_plot] ,YT1[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
+                ax_list[i].plot( TE[window::sparse_plot], YT1[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
+                ax_list2[i].plot(TN[window::sparse_plot], YT2[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
+                
             ax_list[i].plot(TE[window::sparse_plot], YP1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
-            if XX == 0:
-                ax_list2[i].plot(TN[window::sparse_plot] ,YT2[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
-            ax_list2[i].plot(TN[window::sparse_plot] ,YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
+            ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
             Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
             RMSE  = mean_squared_error(YP1[:,i], YT1[:,i],squared=False)
@@ -294,8 +286,6 @@ def combined_plot(analysis_opt):
             ax00.text(0.9, 1.35, "(I) Subject-exposed", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
             ax00.text(4.35, 1.35, "(II) Subject-naive", transform=ax00.transAxes, size=ss+0.5,fontweight='bold')
     
-    # if scale_out == True:
-    #     feature = feature + '_scaled_out'
     fig.savefig('./plots_out/Both_sub'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
     plt.close()
 
