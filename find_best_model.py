@@ -105,13 +105,13 @@ JRFN = df.naive.JRF['avg_val_mse'].sort_values(ascending=False).dropna()
 
 ### Results for RNN exposed and naive
 ### JA  -- (4335, 4969,  983), (2610,  871, 2807), (SimpleRNN, LSTM, GRU)
-### JRF -- (4767,  871,  983), (5016, 2062, 4274)
 ### JM  -- (2553, 4549, 5150), (1071, 4780, 4331)
+### JRF -- (4767,  871,  983), (5016, 2062, 4274)
 
 ### Results for CNNLSTM exposed and naive
 ### JA -- 387, 387 
-### JRF -- 1361, 1251
 ### JM -- 1362, 907
+### JRF -- 1361, 1251
 
 ### Results for LM exposed and naive
 ### JA -- 12, 12

@@ -8,28 +8,40 @@ from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_a
 window = 20
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
-#data_kind  =  ['CNN']
+data_kind  =  ['RNN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
 should = 1
 
 if should:
-    fm.LM.exposed.arg      = [12, 12, 12]
-    fm.LM.naive.arg        = [12, 12, 12]
-    fm.LM.exposed.arch     = ['LM']*3
-    fm.LM.naive.arch       = ['LM']*3
+    # fm.LM.exposed.arg      = [12, 12, 12]
+    # fm.LM.naive.arg        = [12, 12, 12]
+    # fm.LM.exposed.arch     = ['LM']*3
+    # fm.LM.naive.arch       = ['LM']*3
 
-    fm.NN.exposed.arg        = [1080, 2809, 1118 ]
-    fm.NN.naive.arg          = [1080, 6778, 2164]
-    fm.NN.exposed.arch       = ['NN']*3
-    fm.NN.naive.arch         = ['NN']*3
+    # fm.NN.exposed.arg        = [1080, 2809, 1118]
+    # fm.NN.naive.arg          = [1080, 6778, 2164]
+    # fm.NN.exposed.arch       = ['NN']*3
+    # fm.NN.naive.arch         = ['NN']*3
 
-    # fm.RNN.exposed.arg       = [1252, 1836, 1537, 1489, 1416]
-    # fm.RNN.exposed.arch      = ['BLSTM','LSTM','BLSTM','LSTM','LSTM']
+    fm.VRNN = fm.RNN 
+    fm.LSTM = fm.RNN 
+    fm.GRU  = fm.RNN 
+    
+    fm.VRNN.exposed.arg       = [4335, 2553, 4767]
+    fm.VRNN.naive.arg         = [2610, 1071, 5016] 
+    fm.VRNN.exposed.arch      = ['RNN']*3
+    fm.VRNN.naive.arch        = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
-    # fm.RNN.naive.arg         = [     52,     36,   694,  1037,  1934]  
-    # fm.RNN.naive.arch        = ['BLSTM', 'LSTM', 'GRU', 'GRU', 'LSTM']
+    fm.LSTM.exposed.arg       = [4969, 4549, 871]
+    fm.LSTM.naive.arg         = [871, 4780, 2062]
+    fm.LSTM.exposed.arch      = ['RNN']*3
+    fm.LSTM.naive.arch        = ['RNN']*3   
 
+    fm.GRU.exposed.arg        = [983 , 5150, 983]
+    fm.GRU.naive.arg          = [2807, 4331, 4274]
+    fm.GRU.exposed.arch       = ['RNN']*3
+    fm.GRU.naive.arch         = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
 def train_final_models(fm):
     ## train final model with best-avg-validation accuracy
