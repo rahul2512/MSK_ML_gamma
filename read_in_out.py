@@ -187,7 +187,6 @@ def compare_braced_input_data():
             input()
     return None
 
-
 def compare_braced_output_data():
     for i in range(11):
         u = subject_out(i+1)
@@ -202,7 +201,6 @@ def compare_braced_output_data():
             plt.close()
             input()
     return None
-
 
 #################################################
 # Initialising data class
