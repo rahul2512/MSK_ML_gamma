@@ -167,7 +167,38 @@ class subject_out:
 #################################################
 # Classes to read brace data and compare
 #################################################
+def compare_braced_input_data():
+    for i in range(11):
+        u = subject_in(i+1)
+        b = subject_in(i+1, 'Braced_')
+        for t in range(19):
+            for enum, (d1, d2) in enumerate(zip([u.T1, u.T2, u.T3], [b.T1, b.T2, b.T3])):
+                plt.plot(d1[57], d1[t*3+0],color=color[enum])
+                plt.plot(d1[57], d1[t*3+1],color=color[enum])
+                plt.plot(d1[57], d1[t*3+2],color=color[enum])
+                plt.plot(d2[57], d2[t*3+0],color=color[enum], ls = '--')
+                plt.plot(d2[57], d2[t*3+1],color=color[enum], ls = '--')
+                plt.plot(d2[57], d2[t*3+2],color=color[enum], ls = '--')
+            plt.title("Subject " + str(i+1) + "   Marker" + str(t+1))
+            plt.show()
+            plt.close()
+            input()
+    return None
 
+
+def compare_braced_output_data():
+    for i in range(11):
+        u = subject_out(i+1)
+        b = subject_out(i+1, 'Braced_')
+        for enum, t in enumerate(u.col_labels):
+            for enum, (d1, d2) in enumerate(zip([u.T1, u.T2, u.T3], [b.T1, b.T2, b.T3])):
+                plt.plot(np.linspace(0,1,len(d1[t])), d1[t],color=color[enum])
+                plt.plot(np.linspace(0,1,len(d2[t])), d2[t],color=color[enum], ls = '--')
+            plt.title("Subject " + str(i+1) + "   " + t)
+            plt.show()
+            plt.close()
+            input()
+    return None
 
 
 #################################################
