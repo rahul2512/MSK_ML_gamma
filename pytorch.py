@@ -511,7 +511,7 @@ def print_tables(d):
                       '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
         print('\n \n')
         
-        print('& \\multicolumn{15}{c}{\\textbf{\\textit{', title[enumsub] ,'settings}}}   \\\\')
+        print('& \\multicolumn{15}{c}{\\textbf{Optimal hyperparameters for \\textit{', title[enumsub] ,'settings}}}   \\\\')
         for enum, h in enumerate(sub.feature):
             pc = pd.concat([sub.pc[h][col]    for col in sub.pc[h].columns],    axis=0, ignore_index=True)
             nr = pd.concat([sub.NRMSE[h][col] for col in sub.NRMSE[h].columns], axis=0, ignore_index=True)
