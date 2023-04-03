@@ -1,14 +1,8 @@
-import numpy as np, time
-import pandas as pd, keras
-import os.path
-
-from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs 
-from pytorch import RNN_models,  feature_slist, feature_list, print_optimal_results, stat, specific_CV, specific, print_SI_table1, print_SI_table2, explore
-from pytorch import print_SI_table3
-from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
-import matplotlib.pyplot as plt
-import sys
+import numpy as np, time, keras, os.path, pandas as pd, sys, matplotlib.pyplot as plt
 from barchart_err import barchart_error, barchart_params
+from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs 
+from pytorch import RNN_models,  feature_slist, feature_list, stat, specific_CV, specific, explore, print_tables
+from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 #feat_order     = ['JA','JM','JRF','MA','MF']
 
 window = 20
@@ -85,4 +79,6 @@ def avg_stat(fm):
 # hyper_index = int(sys.argv[1])
 # explore(fm.CNN, hyper_index)
 fm = compute_stat(fm)
-plot_final_results(fm)
+#plot_final_results(fm)
+print_tables(fm.NN)
+print_tables(fm.LM)

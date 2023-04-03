@@ -254,7 +254,7 @@ class initiate_data:
         self.data_class = 'normal'
         self.std_out = pd.concat(self.out_all).std()
         self.std_dummy = copy.deepcopy(self.std_out)
-        self.std_dummy[self.col_labels] = np.ones(40)
+        self.std_dummy[self.col_labels] = np.ones(32)
 
     def plot(self):
         for e, label  in enumerate(self.col_labels):

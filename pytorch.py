@@ -498,9 +498,28 @@ def check_interpolation(data):
         time.sleep(1)
     return None
 
-def print_table_NN(hyper, h, extra):
-    print(extra, '&', hyper.iloc[h]['kinit'], '&', hyper.iloc[h]['optim'], '&',hyper.iloc[h]['batch_size'], '&',hyper.iloc[h]['epoch'], '&',hyper.iloc[h]['act'], '&',hyper.iloc[h]['num_nodes'], 
-          '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
+
+def print_tables(d):
+    print(d.what, 'results')
+    hyper = d.hyper
+    for sub in [d.exposed, d.naive]:
+        for enum, h in enumerate(sub.arg):
+            if d.what == 'NN':
+                print(d.feature_l[enum], '&', hyper.iloc[h]['kinit'], '&', hyper.iloc[h]['optim'], '&',hyper.iloc[h]['batch_size'], '&',hyper.iloc[h]['epoch'], '&',hyper.iloc[h]['act'], '&',hyper.iloc[h]['num_nodes'], 
+                      '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
+        print('\n \n')
+        
+        for enum, h in enumerate(sub.feature):
+            pc = pd.concat([sub.pc[h][col]    for col in sub.pc[h].columns],    axis=0, ignore_index=True)
+            nr = pd.concat([sub.NRMSE[h][col] for col in sub.NRMSE[h].columns], axis=0, ignore_index=True)
+            rm = pd.concat([sub.RMSE[h][col]  for col in sub.RMSE[h].columns],  axis=0, ignore_index=True)
+            a, b = '&', '\\\\'
+            print(pc.mean().round(2), a, pc.std().round(2), a, pc.max().round(2), a, pc.min().round(2), a, (pc.quantile(0.75) - pc.quantile(0.25)).round(2), a, 
+                  nr.mean().round(2), a, nr.std().round(2), a, nr.max().round(2), a, nr.min().round(2), a, (nr.quantile(0.75) - nr.quantile(0.25)).round(2), a, 
+                  rm.mean().round(2), a, rm.std().round(2), a, rm.max().round(2), a, rm.min().round(2), a, (rm.quantile(0.75) - rm.quantile(0.25)).round(2), b                              
+                  )
+        print('\n \n')
+        
     return None
 
 def print_table_RNN(hyper, h, extra):
@@ -508,33 +527,7 @@ def print_table_RNN(hyper, h, extra):
           '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
     return None
 
-def print_optimal_results(fm):
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    print("\\multicolumn{10}{c}{\\textbf{Optimal hyperparameters in \\textit{subject-exposed}  settings}}   \\\\")
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    for i in range(5):
-        print_table_NN(fm.NN.hyper, fm.NN.exposed.arg[i],   fm.NN.feature_l[i] )
-    print('\n')
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    print("\\multicolumn{10}{c}{\\textbf{Optimal hyperparameters in \\textit{subject-naive}  settings}}   \\\\")
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    for i in range(5):
-        print_table_NN(fm.NN.hyper, fm.NN.naive.arg[i],   fm.NN.feature_l[i] )
-
-    print('\n')
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    print("\\multicolumn{10}{c}{\\textbf{Optimal hyperparameters in \\textit{subject-exposed}  settings}}   \\\\")
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    for i in range(5):
-        print_table_RNN(fm.RNN.hyper, fm.RNN.exposed.arg[i],   fm.RNN.feature_l[i]  + ' & ' + fm.RNN.exposed.arch[i] )
-    print('\n')
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    print("\\multicolumn{10}{c}{\\textbf{Optimal hyperparameters in \\textit{subject-naive}  settings}}   \\\\")
-    print("\\multicolumn{10}{c}{} \\\\[-0.7em]")
-    for i in range(5):
-        print_table_RNN(fm.RNN.hyper, fm.RNN.naive.arg[i],   fm.RNN.feature_l[i]  + ' & ' + fm.RNN.naive.arch[i] )
-    
-    
+ 
 
 
 def specific_CV(data, feat, model_class, hyper_arg):
