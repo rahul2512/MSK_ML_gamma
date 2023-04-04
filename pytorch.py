@@ -642,3 +642,52 @@ def explore(data, hyper_arg):
                     model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 except:
                     None
+
+
+
+###############################################################################
+###############################################################################
+#####   Given a data set and a model, it computes the statistics
+###############################################################################
+###############################################################################
+def stat_new_data(fm, data):
+    feature = fd.feature[index]   
+    hyper_val_exp =  fd.arg[index]
+    model_class_exp = fd.arch[index]
+   
+    model1 = load_model(fd.subject, feature, model_class_exp,   hyper_val_exp  )
+    param = model1.count_params()
+    data = fd.data
+    SCE = data.std_out[data.label[feature]]
+
+    if fd.subject == 'exposed':
+        tmp = data.subject_exposed(feature)
+    elif fd.subject == 'naive':
+        tmp = data.subject_naive(feature)
+
+    XE, YE = tmp.test_in_list, tmp.test_out_list
+
+    ntrials = len(XE)
+    sub_col = tmp.sub_col
+    df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
+    NRMSE, PC, RMSE  = copy.deepcopy(df), copy.deepcopy(df), copy.deepcopy(df)
+
+    for n in range(ntrials):
+        YP1 = model1.predict(XE[n])
+        YT1 = np.array(YE[n])
+    # if 'JA' in feature:
+    #     new_order = [7,8,9,0,1,2,3,4,5,6]
+    #     YP1 = YP1[:,new_order]
+    #     YT1 = YT1[:,new_order]      
+        for enum, col in enumerate(sub_col):
+                PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0]
+                NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
+                RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
+                
+    fd.NRMSE[feature] = NRMSE
+    fd.RMSE[feature]  = RMSE
+    fd.pc[feature]    = PC
+    fd.nparams.append(param)
+    return fd
+
+

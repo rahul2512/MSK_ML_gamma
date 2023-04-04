@@ -1,6 +1,6 @@
 import numpy as np, time, keras, os.path, pandas as pd, sys, matplotlib.pyplot as plt
 from barchart_err import barchart_error, barchart_params
-from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs 
+from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs, stat_new_data
 from pytorch import RNN_models,  feature_slist, feature_list, stat, specific_CV, specific, explore, print_tables
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 #feat_order     = ['JA','JM','JRF','MA','MF']
@@ -19,33 +19,33 @@ if should:
     # fm.LM.exposed.arch     = ['LM']*3
     # fm.LM.naive.arch       = ['LM']*3
 
-    # fm.NN.exposed.arg        = [1080, 2809, 1118]
-    # fm.NN.naive.arg          = [1080, 6778, 2164]
-    # fm.NN.exposed.arch       = ['NN']*3
-    # fm.NN.naive.arch         = ['NN']*3
+    fm.NN.exposed.arg        = [1080, 2809, 1118]
+    fm.NN.naive.arg          = [1080, 6778, 2164]
+    fm.NN.exposed.arch       = ['NN']*3
+    fm.NN.naive.arch         = ['NN']*3
 
-    fm.VRNN = fm.RNN 
-    fm.LSTM = fm.RNN 
-    fm.GRU  = fm.RNN 
+    # fm.VRNN = fm.RNN 
+    # fm.LSTM = fm.RNN 
+    # fm.GRU  = fm.RNN 
     
-    fm.VRNN.exposed.arg       = [4335, 2553, 4767]
-    fm.VRNN.naive.arg         = [2610, 1071, 5016] 
-    fm.VRNN.exposed.arch      = ['RNN']*3
-    fm.VRNN.naive.arch        = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
+    # fm.VRNN.exposed.arg       = [4335, 2553, 4767]
+    # fm.VRNN.naive.arg         = [2610, 1071, 5016] 
+    # fm.VRNN.exposed.arch      = ['RNN']*3
+    # fm.VRNN.naive.arch        = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
-    fm.LSTM.exposed.arg       = [4969, 4549, 871]
-    fm.LSTM.naive.arg         = [871, 4780, 2062]
-    fm.LSTM.exposed.arch      = ['RNN']*3
-    fm.LSTM.naive.arch        = ['RNN']*3   
+    # fm.LSTM.exposed.arg       = [4969, 4549, 871]
+    # fm.LSTM.naive.arg         = [871, 4780, 2062]
+    # fm.LSTM.exposed.arch      = ['RNN']*3
+    # fm.LSTM.naive.arch        = ['RNN']*3   
 
-    fm.GRU.exposed.arg        = [983 , 5150, 983]
-    fm.GRU.naive.arg          = [2807, 4331, 4274]
-    fm.GRU.exposed.arch       = ['RNN']*3
-    fm.GRU.naive.arch         = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
+    # fm.GRU.exposed.arg        = [983 , 5150, 983]
+    # fm.GRU.naive.arg          = [2807, 4331, 4274]
+    # fm.GRU.exposed.arch       = ['RNN']*3
+    # fm.GRU.naive.arch         = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
-def train_final_models(fm):
+def train_final_models(D):
     ## train final model with best-avg-validation accuracy
-    for d  in [fm.LM]:
+    for d  in D:
         for i in range(3):
             specific(d.exposed,i)
             specific(d.naive  ,i)
@@ -90,7 +90,12 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.CNN, hyper_index)
-fm = compute_stat(fm)
+#train_final_models([fm.VRNN])
+
+b = initiate_data('Braced_')
+stat_new_data(fm, b)
+
+# fm = compute_stat(fm)
 #plot_final_results(fm)
-print_tables(fm.NN)
-print_tables(fm.LM)
+# print_tables(fm.NN)
+# print_tables(fm.LM)
