@@ -23,6 +23,7 @@ if should:
     fm.NN.naive.arg          = [1080, 6778, 2164]
     fm.NN.exposed.arch       = ['NN']*3
     fm.NN.naive.arch         = ['NN']*3
+    fm.NN.exposed_unseen     = fm.NN.exposed
 
     # fm.VRNN = fm.RNN 
     # fm.LSTM = fm.RNN 
@@ -51,11 +52,16 @@ def train_final_models(D):
             specific(d.naive  ,i)
     return None
 
-def compute_stat(fm):
-    for D in [fm.LM, fm.NN]:
+def compute_stat(f):
+    for D in f:
         for i in range(3):
             D.exposed = stat(D.exposed,i)
             D.naive   = stat(D.naive,i)
+            try:
+                D.exposed_unseen.subject = 'exposed_unseen'
+                D.exposed_unseen = stat(D.exposed_unseen, i)
+            except:
+                None
     return fm
 
 def plot_final_results(fm):
@@ -88,14 +94,18 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
+
 # hyper_index = int(sys.argv[1])
 # explore(fm.CNN, hyper_index)
-#train_final_models([fm.VRNN])
+# train_final_models([fm.LM])
 
-b = initiate_data('Braced_')
-stat_new_data(fm.NN, b)
 
-# fm = compute_stat(fm)
+fm = compute_stat([fm.NN])
 #plot_final_results(fm)
 # print_tables(fm.NN)
-# print_tables(fm.LM)
+print_tables(fm.NN)
+
+
+# b = initiate_data('Braced_')
+# b = stat_new_data(fm.NN, b)
+# print_tables(b)

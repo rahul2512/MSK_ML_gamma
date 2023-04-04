@@ -364,7 +364,7 @@ class initiate_data:
         ## held-out test data 
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
         HO = [0,1,2,3,7,11,12,13,14,15]  #Trial1, python indexing
-        rem1 = [5,8,10]  #super held-out test data 
+        rem1 = [5,8,10]  #super held-out test data
         rem2 = [4,9]
         rem3 = [6]
 
@@ -396,6 +396,7 @@ class initiate_data:
             cv.train_in         = pd.concat(train_in_list)
             cv.test_in          = pd.concat([self.inp[i].T1  for i in HO])
             cv.test_in_list          = [self.inp[i].T1  for i in HO]
+            cv.super_test_in_list    = [self.inp[i].T1  for i in rem1]
 
         elif self.data_class in ['RNN','CNN','CNNLSTM']:
             cv.cv1['train_in']  = np.concatenate(T1_in)
@@ -418,9 +419,10 @@ class initiate_data:
         cv.cv3['train_out'] = pd.concat(T3_out)[sub_col]/scale 
         cv.cv3['val_out']   = pd.concat(V3_out)[sub_col]/scale
 
-        cv.train_out        = pd.concat(train_out_list)[sub_col]/scale
-        cv.test_out         = pd.concat([self.out[i].T1 for i in HO])[sub_col]/scale         
-        cv.test_out_list    = [self.out[i].T1[sub_col]/scale for i in HO]         
+        cv.train_out           = pd.concat(train_out_list)[sub_col]/scale
+        cv.test_out            = pd.concat([self.out[i].T1 for i in HO])[sub_col]/scale         
+        cv.test_out_list       = [self.out[i].T1[sub_col]/scale for i in HO]         
+        cv.super_test_out_list = [self.out[i].T1[sub_col]/scale for i in rem1]
         
         cv.time = cv.test_in[57]
         return cv 
@@ -518,8 +520,8 @@ class ML:
             self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
 
         self.what = what
-        self.exposed =  subject('exposed', self.data, self.hyper, self.what)
-        self.naive   =  subject('naive'  , self.data, self.hyper, self.what)
+        self.exposed        =  subject('exposed', self.data, self.hyper, self.what)
+        self.naive          =  subject('naive'  , self.data, self.hyper, self.what)
         self.feature = feat_order
         self.feature = feat_order[0:3]
         self.feature_l   = feat_order_l

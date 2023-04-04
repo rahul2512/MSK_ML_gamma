@@ -296,18 +296,23 @@ def stat(fd, index):
     hyper_val_exp =  fd.arg[index]
     model_class_exp = fd.arch[index]
    
-    model1 = load_model(fd.subject, feature, model_class_exp,   hyper_val_exp  )
-    param = model1.count_params()
     data = fd.data
     SCE = data.std_out[data.label[feature]]
 
     if fd.subject == 'exposed':
         tmp = data.subject_exposed(feature)
+        XE, YE = tmp.test_in_list, tmp.test_out_list
+        model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
     elif fd.subject == 'naive':
         tmp = data.subject_naive(feature)
+        XE, YE = tmp.test_in_list, tmp.test_out_list
+        model1 = load_model('naive', feature, model_class_exp,   hyper_val_exp  )
+    elif fd.subject == 'exposed_unseen':
+        tmp = data.subject_exposed(feature)
+        XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
+        model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
 
-    XE, YE = tmp.test_in_list, tmp.test_out_list
-
+    param = model1.count_params()
     ntrials = len(XE)
     sub_col = tmp.sub_col
     df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
@@ -500,18 +505,19 @@ def check_interpolation(data):
 
 
 def print_tables(d):
-    title = ['Subject-exposed','Subject-naive']
-    print(d.what, 'results')
+    title = ['Subject-exposed model','Subject-naive model', 'Subject-exposed model for unseen data']
+    print(d.what, 'results \n')
     hyper = d.hyper
     
-    for enumsub, sub in enumerate([d.exposed, d.naive]):
+    for enumsub, sub in enumerate([d.exposed, d.naive, d.exposed_unseen]):
+        print(title[enumsub], '\n')
         for enum, h in enumerate(sub.arg):
             if d.what == 'NN':
                 print(d.feature_l[enum], '&', hyper.iloc[h]['kinit'], '&', hyper.iloc[h]['optim'], '&',hyper.iloc[h]['batch_size'], '&',hyper.iloc[h]['epoch'], '&',hyper.iloc[h]['act'], '&',hyper.iloc[h]['num_nodes'], 
                       '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
         print('\n \n')
         
-        print('& \\multicolumn{15}{c}{\\textbf{Optimal hyperparameters for \\textit{', title[enumsub] ,'settings}}}   \\\\')
+        print('& \\multicolumn{15}{c}{\\textbf{Optimal hyperparameters for \\textit{', title[enumsub] ,'}}}   \\\\')
         for enum, h in enumerate(sub.feature):
             pc = pd.concat([sub.pc[h][col]    for col in sub.pc[h].columns],    axis=0, ignore_index=True)
             nr = pd.concat([sub.NRMSE[h][col] for col in sub.NRMSE[h].columns], axis=0, ignore_index=True)
@@ -526,7 +532,7 @@ def print_tables(d):
             if enumsub ==0:
                 print('\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}')
 
-#        print('\n \n')
+        print('\n \n')
         
     return None
 
@@ -650,46 +656,45 @@ def explore(data, hyper_arg):
 #####   Given a data set and a model, it computes the statistics
 ###############################################################################
 ###############################################################################
+
 def stat_new_data(fd, data):
-    
-    for enum, feat in enumerate(fd.feature):
+    data.exposed = fd.exposed
+    data.naive   = fd.naive
+    data.what  = fd.what
+    data.hyper = fd.hyper
+    data.feature_l = fd.feature_l
+    for enumf, feat in enumerate(fd.feature):
         for sub in [fd.exposed, fd.naive]:
-            hyper_val_exp =  sub.arg[enum]
-            model_class_exp = sub.arch[enum]
+            hyper_val_exp =  sub.arg[enumf]
+            model_class_exp = sub.arch[enumf]
             
             model1 = load_model(sub.subject, feat, model_class_exp,   hyper_val_exp  )
-
-            data = fd.data
-            SCE = data.std_out[data.label[feat]]
+            col_labels = data.label[feat]
+            SCE = fd.data.std_out[col_labels]
         
-            if sub.subject == 'exposed':
-                tmp = data.subject_exposed(feat)
-            elif sub.subject == 'naive':
-                tmp = data.subject_naive(feat)
-        
-            XE, YE = tmp.test_in_list, tmp.test_out_list
-        
+            XE, YE = [j for i in data.inp_all_list for j in i], [j[col_labels] for i in data.out_all_list for j in i]
             ntrials = len(XE)
-            sub_col = tmp.sub_col
-            df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
+            df = pd.DataFrame(index = np.arange(ntrials),columns=col_labels)
             NRMSE, PC, RMSE  = copy.deepcopy(df), copy.deepcopy(df), copy.deepcopy(df)
         
             for n in range(ntrials):
-                YP1 = model1.predict(XE[n])
-                YT1 = np.array(YE[n])
-            # if 'JA' in feature:
-            #     new_order = [7,8,9,0,1,2,3,4,5,6]
-            #     YP1 = YP1[:,new_order]
-            #     YT1 = YT1[:,new_order]      
-                for enum, col in enumerate(sub_col):
-                        PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0]
-                        NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
-                        RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
+                
+                YP = model1.predict(XE[n])
+                YT = np.array(YE[n])
+                for enum, col in enumerate(col_labels):
+                        PC[col].loc[n]    =  scipy.stats.pearsonr(YP[:,enum],YT[:,enum])[0]
+                        NRMSE[col].loc[n] =  mean_squared_error(  YP[:,enum],YT[:,enum],squared=False)/SCE[col]
+                        RMSE[col].loc[n]  =  mean_squared_error(  YP[:,enum],YT[:,enum],squared=False)
                         
-            fd.NRMSE[feature] = NRMSE
-            fd.RMSE[feature]  = RMSE
-            fd.pc[feature]    = PC
-
-    return fd
+            if sub.subject == 'exposed':
+                data.exposed.NRMSE[feat] = NRMSE
+                data.exposed.RMSE[feat]  = RMSE
+                data.exposed.pc[feat]    = PC
+            elif sub.subject == 'naive':
+                data.naive.NRMSE[feat]   = NRMSE
+                data.naive.RMSE[feat]    = RMSE
+                data.naive.pc[feat]      = PC
+                
+    return data
 
 
