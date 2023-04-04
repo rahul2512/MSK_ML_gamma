@@ -427,8 +427,8 @@ class initiate_data:
 
 
 class initiate_RNN_data(initiate_data):
-    def __init__(self, window_size):
-        initiate_data.__init__(self)
+    def __init__(self, window_size, add1=''):
+        initiate_data.__init__(self, add1)
         self.data_class = 'RNN'
         self.window = window_size
         self.i1, self.o1 = transform_subject_into_windows(self.i1, self.o1, window_size)
@@ -442,26 +442,31 @@ class initiate_RNN_data(initiate_data):
         self.i9, self.o9 = transform_subject_into_windows(self.i9, self.o9, window_size)
         self.i10, self.o10 = transform_subject_into_windows(self.i10, self.o10, window_size)
         self.i11, self.o11 = transform_subject_into_windows(self.i11, self.o11, window_size)
-        self.i12, self.o12 = transform_subject_into_windows(self.i12, self.o12, window_size)
-        self.i13, self.o13 = transform_subject_into_windows(self.i13, self.o13, window_size)
-        self.i14, self.o14 = transform_subject_into_windows(self.i14, self.o14, window_size)
-        self.i15, self.o15 = transform_subject_into_windows(self.i15, self.o15, window_size)
-        self.i16, self.o16 = transform_subject_into_windows(self.i16, self.o16, window_size)
-        self.inp = [self.i1, self.i2, self.i3, self.i4, self.i5, self.i6, self.i7, self.i8, self.i9, self.i10, self.i11, self.i12, self.i13, self.i14, self.i15, self.i16]
-        self.out = [self.o1, self.o2, self.o3, self.o4, self.o5, self.o6, self.o7, self.o8, self.o9, self.o10, self.o11, self.o12, self.o13, self.o14, self.o15, self.o16]
 
+        self.inp     = [self.i1, self.i2, self.i3, self.i4, self.i5, self.i6, self.i7, self.i8, self.i9, self.i10, self.i11] 
+        self.out     = [self.o1, self.o2, self.o3, self.o4, self.o5, self.o6, self.o7, self.o8, self.o9, self.o10, self.o11] 
         self.inp_all = [self.i1.all, self.i2.all, self.i3.all, self.i4.all, self.i5.all, self.i6.all, self.i7.all, self.i8.all, 
-                        self.i9.all, self.i10.all, self.i11.all, self.i12.all, self.i13.all, self.i14.all, self.i15.all, self.i16.all]
+                        self.i9.all, self.i10.all, self.i11.all]  
         self.out_all = [self.o1.all, self.o2.all, self.o3.all, self.o4.all, self.o5.all, self.o6.all, self.o7.all, self.o8.all, 
-                        self.o9.all, self.o10.all, self.o11.all, self.o12.all, self.o13.all, self.o14.all, self.o15.all, self.o16.all]
+                        self.o9.all, self.o10.all, self.o11.all]  
         self.inp_all_list = [self.i1.all_list, self.i2.all_list, self.i3.all_list, self.i4.all_list, self.i5.all_list, self.i6.all_list, self.i7.all_list, self.i8.all_list, 
-                        self.i9.all_list, self.i10.all_list, self.i11.all_list, self.i12.all_list, self.i13.all_list, self.i14.all_list, self.i15.all_list, self.i16.all_list]
+                        self.i9.all_list, self.i10.all_list, self.i11.all_list] 
         self.out_all_list = [self.o1.all_list, self.o2.all_list, self.o3.all_list, self.o4.all_list, self.o5.all_list, self.o6.all_list, self.o7.all_list, self.o8.all_list, 
-                        self.o9.all_list, self.o10.all_list, self.o11.all_list, self.o12.all_list, self.o13.all_list, self.o14.all_list, self.o15.all_list, self.o16.all_list]
+                        self.o9.all_list, self.o10.all_list, self.o11.all_list] 
 
+        if add1 != 'Braced_':
+            self.i12, self.o12 = transform_subject_into_windows(self.i12, self.o12, window_size)
+            self.i13, self.o13 = transform_subject_into_windows(self.i13, self.o13, window_size)
+            self.i14, self.o14 = transform_subject_into_windows(self.i14, self.o14, window_size)
+            self.i15, self.o15 = transform_subject_into_windows(self.i15, self.o15, window_size)
+            self.i16, self.o16 = transform_subject_into_windows(self.i16, self.o16, window_size)
 
-
-
+            self.inp     += [self.i12, self.i13, self.i14, self.i15, self.i16]
+            self.out     += [self.o12, self.o13, self.o14, self.o15, self.o16]
+            self.inp_all += [self.i12.all, self.i13.all, self.i14.all, self.i15.all, self.i16.all]
+            self.out_all += [self.o12.all, self.o13.all, self.o14.all, self.o15.all, self.o16.all]
+            self.inp_all_list += [self.i12.all_list, self.i13.all_list, self.i14.all_list, self.i15.all_list, self.i16.all_list]
+            self.out_all_list += [self.o12.all_list, self.o13.all_list, self.o14.all_list, self.o15.all_list, self.o16.all_list]
 
 
 #################################################

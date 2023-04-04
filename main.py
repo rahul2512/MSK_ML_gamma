@@ -8,7 +8,7 @@ from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_a
 window = 20
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
-data_kind  =  ['RNN']
+data_kind  =  ['NN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
 should = 1
@@ -93,7 +93,7 @@ def avg_stat(fm):
 #train_final_models([fm.VRNN])
 
 b = initiate_data('Braced_')
-stat_new_data(fm, b)
+stat_new_data(fm.NN, b)
 
 # fm = compute_stat(fm)
 #plot_final_results(fm)
