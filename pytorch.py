@@ -13,10 +13,19 @@ from sklearn.metrics import mean_squared_error
 from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
+from keras import backend as K
+from keras.utils import custom_object_scope
+
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
 feature_list = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
 feature_slist = ['JA','JRF','JM',  'MF', 'MA']
+# Define custom RMSE loss function
+def rmse(y_true, y_pred):
+    return K.sqrt(K.mean(K.square(y_pred - y_true)))
+
+from keras.utils import get_custom_objects
+get_custom_objects().update({'rmse': rmse})
 
 def combined_plot(analysis_opt):
     # it plots the first trial and provides the statistics for each trial as well as average, std, iqr, min,max etc etc
@@ -178,7 +187,6 @@ def combined_plot(analysis_opt):
                       'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
     
         sparse_plot=5
-        print(sub_col)
         for i, _  in enumerate(sub_col):
             push_plot = 0
             count = 0   ## plotting first trial
@@ -363,23 +371,29 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
         model.save('./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.h5')
     return None
 
-def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=False):
+def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=False):
     if model_class   == 'RNN':
         dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, NN_variant =   hyper_val
+        NN_variant, opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, norm_out =   hyper_val
     elif model_class == 'CNN':
         dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride = hyper_val
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
     elif model_class == 'convLSTM':
         dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride = hyper_val
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
     elif model_class == 'CNNLSTM':
         dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, LSTM_units = hyper_val
-    else:
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, LSTM_units, norm_out = hyper_val
+    elif model_class   == 'NN':
         dim = 1 
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant =   hyper_val
-
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
+    elif model_class   == 'LM':
+        dim = 1 
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
+    else:
+        print('unrecog model description')
+        sys.exit()
+        
     inp_dim = X_Train.shape[dim]
     out_dim = Y_Train.shape[1]
     t_dim = X_Train.shape[1]
@@ -399,7 +413,11 @@ def run_NN(X_Train, Y_Train, X_val, Y_val,hyper_val,model_class, debug_mode=Fals
         optim = keras.optimizers.SGD
     #inp_dim, out_dim, nbr_Hlayer, Neu_layer, activation, p_drop, lr, optim,loss,metric,kinit
     final_act = None
-    loss = keras.losses.mean_squared_error
+
+    if loss == 'mse':
+        loss = keras.losses.mean_squared_error
+    elif loss == 'rmse':
+        loss = rmse
 
     if model_class == 'NN':
         model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
@@ -631,14 +649,14 @@ def print_SI_table3(fm):
 def explore(data, hyper_arg):
     
     hyper_val =  data.hyper.iloc[hyper_arg]
-
+    norm_out = hyper_val['norm_out']
     for label in data.feature:
-        tmp_data1 = data.data.subject_exposed(label)
-        tmp_data2 = data.data.subject_naive(label)
+        tmp_data1 = data.data.subject_exposed(label, norm_out)
+        tmp_data2 = data.data.subject_naive(label, norm_out)
     
         for model_class in [data.what]:
             for Data in [tmp_data1,tmp_data2]:
-                #model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
+                model = run_final_model(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 try:
                     model = run_cross_valid(Data,hyper_arg,hyper_val,model_class,save_model=False)        
                 except:

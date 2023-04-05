@@ -1,55 +1,145 @@
-optim kinit batch_size epoch act num_nodes H_layer metric loss lr p regularizer_val NN_variant
-Adam glorot_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam glorot_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam glorot_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-Adam glorot_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam glorot_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam glorot_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam random_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-Adam he_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop glorot_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop random_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-RMSprop he_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD glorot_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD random_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 64 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 64 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 64 200 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 256 50 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 256 100 linear 200 0 mse mse 0.001 0 0 LM
-SGD he_normal 256 200 linear 200 0 mse mse 0.001 0 0 LM
+optim kinit batch_size epoch act num_nodes H_layer metric loss lr p regularizer_val NN_variant norm_out
+Adam glorot_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam glorot_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam glorot_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam glorot_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam glorot_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam glorot_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam glorot_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam glorot_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam glorot_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam random_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam random_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam random_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam random_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+Adam he_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+Adam he_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+Adam he_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+Adam he_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD glorot_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD glorot_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD glorot_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD glorot_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD random_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD random_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD random_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD random_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 64 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 64 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 64 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 64 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 64 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 64 200 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 256 50 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 256 50 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 256 100 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 256 100 linear 200 0 rmse rmse 0.001 0 0 LM 1
+SGD he_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 0
+SGD he_normal 256 200 linear 200 0 rmse mse 0.001 0 0 LM 1
+SGD he_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 0
+SGD he_normal 256 200 linear 200 0 rmse rmse 0.001 0 0 LM 1

@@ -8,22 +8,23 @@ from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_a
 window = 20
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
-data_kind  =  ['NN']
+data_kind  =  ['RNN']
 fm = ML_analysis('final_model_list', data_kind, window)
 
-should = 1
+should = 0
 
 if should:
-    # fm.LM.exposed.arg      = [12, 12, 12]
-    # fm.LM.naive.arg        = [12, 12, 12]
-    # fm.LM.exposed.arch     = ['LM']*3
-    # fm.LM.naive.arch       = ['LM']*3
+    fm.LM.exposed.arg      = [12, 12, 12]
+    fm.LM.naive.arg        = [12, 12, 12]
+    fm.LM.exposed.arch     = ['LM']*3
+    fm.LM.naive.arch       = ['LM']*3
+    fm.LM.exposed_unseen     = fm.LM.exposed
 
-    fm.NN.exposed.arg        = [1080, 2809, 1118]
-    fm.NN.naive.arg          = [1080, 6778, 2164]
-    fm.NN.exposed.arch       = ['NN']*3
-    fm.NN.naive.arch         = ['NN']*3
-    fm.NN.exposed_unseen     = fm.NN.exposed
+    # fm.NN.exposed.arg        = [1080, 2809, 1118]
+    # fm.NN.naive.arg          = [1080, 6778, 2164]
+    # fm.NN.exposed.arch       = ['NN']*3
+    # fm.NN.naive.arch         = ['NN']*3
+    # fm.NN.exposed_unseen     = fm.NN.exposed
 
     # fm.VRNN = fm.RNN 
     # fm.LSTM = fm.RNN 
@@ -94,17 +95,15 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-
 # hyper_index = int(sys.argv[1])
-# explore(fm.CNN, hyper_index)
+explore(fm.RNN, 1)
 # train_final_models([fm.LM])
+# fm = compute_stat([fm.LM])
+# print_tables(fm.LM)
 
-
-fm = compute_stat([fm.NN])
+# fm = compute_stat([fm.NN])
 #plot_final_results(fm)
 # print_tables(fm.NN)
-print_tables(fm.NN)
-
 
 # b = initiate_data('Braced_')
 # b = stat_new_data(fm.NN, b)

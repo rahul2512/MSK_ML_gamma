@@ -282,15 +282,20 @@ class initiate_data:
             plt.close()
             input()
 
-    def subject_naive(self,feature):
+    def subject_naive(self,feature, norm_out):
         cv = cv_data()
         cv.feature = feature
         cv.subject = 'naive'
         cv.data_class = self.data_class
         sub_col = self.label[feature]
         cv.sub_col = sub_col
-        scale = self.std_out[sub_col]
-        scale = self.std_dummy[sub_col]
+        ## normalize the outputs features
+        if int(norm_out):
+            scale = self.std_out[sub_col]
+            print('Normalizing outputs')
+        else:
+            scale = self.std_dummy[sub_col]
+            print('Crude outputs')
         ## held-out test data 2, 5, 9, 15
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
         HO = [1, 4, 8, 14]  #python indexing
@@ -344,14 +349,20 @@ class initiate_data:
 
         return cv 
 
-    def subject_exposed(self, feature):
+    def subject_exposed(self, feature, norm_out):
         cv = cv_data()
         cv.feature = feature
         cv.subject = 'exposed'
         cv.data_class = self.data_class
         sub_col = self.label[feature]
-        scale = self.std_out[sub_col]
-        scale = self.std_dummy[sub_col]
+
+        if int(norm_out):
+            scale = self.std_out[sub_col]
+            print('Normalizing outputs')
+        else:
+            scale = self.std_dummy[sub_col]
+            print('Crude outputs')
+
         cv.sub_col = sub_col
 
         ## python indexing
