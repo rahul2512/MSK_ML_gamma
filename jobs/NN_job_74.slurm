@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_74
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 2628 &
-python  ${path}/main.py 2629 &
-python  ${path}/main.py 2630 &
-python  ${path}/main.py 2631 &
-python  ${path}/main.py 2632 &
-python  ${path}/main.py 2633 &
-python  ${path}/main.py 2634 &
-python  ${path}/main.py 2635 &
-python  ${path}/main.py 2636 &
-python  ${path}/main.py 2637 &
-python  ${path}/main.py 2638 &
-python  ${path}/main.py 2639 &
-python  ${path}/main.py 2640 &
-python  ${path}/main.py 2641 &
-python  ${path}/main.py 2642 &
-python  ${path}/main.py 2643 &
-python  ${path}/main.py 2644 &
-python  ${path}/main.py 2645 &
-python  ${path}/main.py 2646 &
-python  ${path}/main.py 2647 &
-python  ${path}/main.py 2648 &
-python  ${path}/main.py 2649 &
-python  ${path}/main.py 2650 &
-python  ${path}/main.py 2651 &
-python  ${path}/main.py 2652 &
-python  ${path}/main.py 2653 &
-python  ${path}/main.py 2654 &
-python  ${path}/main.py 2655 &
-python  ${path}/main.py 2656 &
-python  ${path}/main.py 2657 &
-python  ${path}/main.py 2658 &
-python  ${path}/main.py 2659 &
-python  ${path}/main.py 2660 &
-python  ${path}/main.py 2661 &
-python  ${path}/main.py 2662 &
-python  ${path}/main.py 2663 &
+python  ${path}/main.py 5256 &
+python  ${path}/main.py 5257 &
+python  ${path}/main.py 5258 &
+python  ${path}/main.py 5259 &
+python  ${path}/main.py 5260 &
+python  ${path}/main.py 5261 &
+python  ${path}/main.py 5262 &
+python  ${path}/main.py 5263 &
+python  ${path}/main.py 5264 &
+python  ${path}/main.py 5265 &
+python  ${path}/main.py 5266 &
+python  ${path}/main.py 5267 &
+python  ${path}/main.py 5268 &
+python  ${path}/main.py 5269 &
+python  ${path}/main.py 5270 &
+python  ${path}/main.py 5271 &
+python  ${path}/main.py 5272 &
+python  ${path}/main.py 5273 &
+python  ${path}/main.py 5274 &
+python  ${path}/main.py 5275 &
+python  ${path}/main.py 5276 &
+python  ${path}/main.py 5277 &
+python  ${path}/main.py 5278 &
+python  ${path}/main.py 5279 &
+python  ${path}/main.py 5280 &
+python  ${path}/main.py 5281 &
+python  ${path}/main.py 5282 &
+python  ${path}/main.py 5283 &
+python  ${path}/main.py 5284 &
+python  ${path}/main.py 5285 &
+python  ${path}/main.py 5286 &
+python  ${path}/main.py 5287 &
+python  ${path}/main.py 5288 &
+python  ${path}/main.py 5289 &
+python  ${path}/main.py 5290 &
+python  ${path}/main.py 5291 &
+python  ${path}/main.py 5292 &
+python  ${path}/main.py 5293 &
+python  ${path}/main.py 5294 &
+python  ${path}/main.py 5295 &
+python  ${path}/main.py 5296 &
+python  ${path}/main.py 5297 &
+python  ${path}/main.py 5298 &
+python  ${path}/main.py 5299 &
+python  ${path}/main.py 5300 &
+python  ${path}/main.py 5301 &
+python  ${path}/main.py 5302 &
+python  ${path}/main.py 5303 &
+python  ${path}/main.py 5304 &
+python  ${path}/main.py 5305 &
+python  ${path}/main.py 5306 &
+python  ${path}/main.py 5307 &
+python  ${path}/main.py 5308 &
+python  ${path}/main.py 5309 &
+python  ${path}/main.py 5310 &
+python  ${path}/main.py 5311 &
+python  ${path}/main.py 5312 &
+python  ${path}/main.py 5313 &
+python  ${path}/main.py 5314 &
+python  ${path}/main.py 5315 &
+python  ${path}/main.py 5316 &
+python  ${path}/main.py 5317 &
+python  ${path}/main.py 5318 &
+python  ${path}/main.py 5319 &
+python  ${path}/main.py 5320 &
+python  ${path}/main.py 5321 &
+python  ${path}/main.py 5322 &
+python  ${path}/main.py 5323 &
+python  ${path}/main.py 5324 &
+python  ${path}/main.py 5325 &
+python  ${path}/main.py 5326 &
+python  ${path}/main.py 5327 &
 wait

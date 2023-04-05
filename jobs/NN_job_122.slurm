@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_122
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 4356 &
-python  ${path}/main.py 4357 &
-python  ${path}/main.py 4358 &
-python  ${path}/main.py 4359 &
-python  ${path}/main.py 4360 &
-python  ${path}/main.py 4361 &
-python  ${path}/main.py 4362 &
-python  ${path}/main.py 4363 &
-python  ${path}/main.py 4364 &
-python  ${path}/main.py 4365 &
-python  ${path}/main.py 4366 &
-python  ${path}/main.py 4367 &
-python  ${path}/main.py 4368 &
-python  ${path}/main.py 4369 &
-python  ${path}/main.py 4370 &
-python  ${path}/main.py 4371 &
-python  ${path}/main.py 4372 &
-python  ${path}/main.py 4373 &
-python  ${path}/main.py 4374 &
-python  ${path}/main.py 4375 &
-python  ${path}/main.py 4376 &
-python  ${path}/main.py 4377 &
-python  ${path}/main.py 4378 &
-python  ${path}/main.py 4379 &
-python  ${path}/main.py 4380 &
-python  ${path}/main.py 4381 &
-python  ${path}/main.py 4382 &
-python  ${path}/main.py 4383 &
-python  ${path}/main.py 4384 &
-python  ${path}/main.py 4385 &
-python  ${path}/main.py 4386 &
-python  ${path}/main.py 4387 &
-python  ${path}/main.py 4388 &
-python  ${path}/main.py 4389 &
-python  ${path}/main.py 4390 &
-python  ${path}/main.py 4391 &
+python  ${path}/main.py 8712 &
+python  ${path}/main.py 8713 &
+python  ${path}/main.py 8714 &
+python  ${path}/main.py 8715 &
+python  ${path}/main.py 8716 &
+python  ${path}/main.py 8717 &
+python  ${path}/main.py 8718 &
+python  ${path}/main.py 8719 &
+python  ${path}/main.py 8720 &
+python  ${path}/main.py 8721 &
+python  ${path}/main.py 8722 &
+python  ${path}/main.py 8723 &
+python  ${path}/main.py 8724 &
+python  ${path}/main.py 8725 &
+python  ${path}/main.py 8726 &
+python  ${path}/main.py 8727 &
+python  ${path}/main.py 8728 &
+python  ${path}/main.py 8729 &
+python  ${path}/main.py 8730 &
+python  ${path}/main.py 8731 &
+python  ${path}/main.py 8732 &
+python  ${path}/main.py 8733 &
+python  ${path}/main.py 8734 &
+python  ${path}/main.py 8735 &
+python  ${path}/main.py 8736 &
+python  ${path}/main.py 8737 &
+python  ${path}/main.py 8738 &
+python  ${path}/main.py 8739 &
+python  ${path}/main.py 8740 &
+python  ${path}/main.py 8741 &
+python  ${path}/main.py 8742 &
+python  ${path}/main.py 8743 &
+python  ${path}/main.py 8744 &
+python  ${path}/main.py 8745 &
+python  ${path}/main.py 8746 &
+python  ${path}/main.py 8747 &
+python  ${path}/main.py 8748 &
+python  ${path}/main.py 8749 &
+python  ${path}/main.py 8750 &
+python  ${path}/main.py 8751 &
+python  ${path}/main.py 8752 &
+python  ${path}/main.py 8753 &
+python  ${path}/main.py 8754 &
+python  ${path}/main.py 8755 &
+python  ${path}/main.py 8756 &
+python  ${path}/main.py 8757 &
+python  ${path}/main.py 8758 &
+python  ${path}/main.py 8759 &
+python  ${path}/main.py 8760 &
+python  ${path}/main.py 8761 &
+python  ${path}/main.py 8762 &
+python  ${path}/main.py 8763 &
+python  ${path}/main.py 8764 &
+python  ${path}/main.py 8765 &
+python  ${path}/main.py 8766 &
+python  ${path}/main.py 8767 &
+python  ${path}/main.py 8768 &
+python  ${path}/main.py 8769 &
+python  ${path}/main.py 8770 &
+python  ${path}/main.py 8771 &
+python  ${path}/main.py 8772 &
+python  ${path}/main.py 8773 &
+python  ${path}/main.py 8774 &
+python  ${path}/main.py 8775 &
+python  ${path}/main.py 8776 &
+python  ${path}/main.py 8777 &
+python  ${path}/main.py 8778 &
+python  ${path}/main.py 8779 &
+python  ${path}/main.py 8780 &
+python  ${path}/main.py 8781 &
+python  ${path}/main.py 8782 &
+python  ${path}/main.py 8783 &
 wait

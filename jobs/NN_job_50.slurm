@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_50
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 1764 &
-python  ${path}/main.py 1765 &
-python  ${path}/main.py 1766 &
-python  ${path}/main.py 1767 &
-python  ${path}/main.py 1768 &
-python  ${path}/main.py 1769 &
-python  ${path}/main.py 1770 &
-python  ${path}/main.py 1771 &
-python  ${path}/main.py 1772 &
-python  ${path}/main.py 1773 &
-python  ${path}/main.py 1774 &
-python  ${path}/main.py 1775 &
-python  ${path}/main.py 1776 &
-python  ${path}/main.py 1777 &
-python  ${path}/main.py 1778 &
-python  ${path}/main.py 1779 &
-python  ${path}/main.py 1780 &
-python  ${path}/main.py 1781 &
-python  ${path}/main.py 1782 &
-python  ${path}/main.py 1783 &
-python  ${path}/main.py 1784 &
-python  ${path}/main.py 1785 &
-python  ${path}/main.py 1786 &
-python  ${path}/main.py 1787 &
-python  ${path}/main.py 1788 &
-python  ${path}/main.py 1789 &
-python  ${path}/main.py 1790 &
-python  ${path}/main.py 1791 &
-python  ${path}/main.py 1792 &
-python  ${path}/main.py 1793 &
-python  ${path}/main.py 1794 &
-python  ${path}/main.py 1795 &
-python  ${path}/main.py 1796 &
-python  ${path}/main.py 1797 &
-python  ${path}/main.py 1798 &
-python  ${path}/main.py 1799 &
+python  ${path}/main.py 3528 &
+python  ${path}/main.py 3529 &
+python  ${path}/main.py 3530 &
+python  ${path}/main.py 3531 &
+python  ${path}/main.py 3532 &
+python  ${path}/main.py 3533 &
+python  ${path}/main.py 3534 &
+python  ${path}/main.py 3535 &
+python  ${path}/main.py 3536 &
+python  ${path}/main.py 3537 &
+python  ${path}/main.py 3538 &
+python  ${path}/main.py 3539 &
+python  ${path}/main.py 3540 &
+python  ${path}/main.py 3541 &
+python  ${path}/main.py 3542 &
+python  ${path}/main.py 3543 &
+python  ${path}/main.py 3544 &
+python  ${path}/main.py 3545 &
+python  ${path}/main.py 3546 &
+python  ${path}/main.py 3547 &
+python  ${path}/main.py 3548 &
+python  ${path}/main.py 3549 &
+python  ${path}/main.py 3550 &
+python  ${path}/main.py 3551 &
+python  ${path}/main.py 3552 &
+python  ${path}/main.py 3553 &
+python  ${path}/main.py 3554 &
+python  ${path}/main.py 3555 &
+python  ${path}/main.py 3556 &
+python  ${path}/main.py 3557 &
+python  ${path}/main.py 3558 &
+python  ${path}/main.py 3559 &
+python  ${path}/main.py 3560 &
+python  ${path}/main.py 3561 &
+python  ${path}/main.py 3562 &
+python  ${path}/main.py 3563 &
+python  ${path}/main.py 3564 &
+python  ${path}/main.py 3565 &
+python  ${path}/main.py 3566 &
+python  ${path}/main.py 3567 &
+python  ${path}/main.py 3568 &
+python  ${path}/main.py 3569 &
+python  ${path}/main.py 3570 &
+python  ${path}/main.py 3571 &
+python  ${path}/main.py 3572 &
+python  ${path}/main.py 3573 &
+python  ${path}/main.py 3574 &
+python  ${path}/main.py 3575 &
+python  ${path}/main.py 3576 &
+python  ${path}/main.py 3577 &
+python  ${path}/main.py 3578 &
+python  ${path}/main.py 3579 &
+python  ${path}/main.py 3580 &
+python  ${path}/main.py 3581 &
+python  ${path}/main.py 3582 &
+python  ${path}/main.py 3583 &
+python  ${path}/main.py 3584 &
+python  ${path}/main.py 3585 &
+python  ${path}/main.py 3586 &
+python  ${path}/main.py 3587 &
+python  ${path}/main.py 3588 &
+python  ${path}/main.py 3589 &
+python  ${path}/main.py 3590 &
+python  ${path}/main.py 3591 &
+python  ${path}/main.py 3592 &
+python  ${path}/main.py 3593 &
+python  ${path}/main.py 3594 &
+python  ${path}/main.py 3595 &
+python  ${path}/main.py 3596 &
+python  ${path}/main.py 3597 &
+python  ${path}/main.py 3598 &
+python  ${path}/main.py 3599 &
 wait

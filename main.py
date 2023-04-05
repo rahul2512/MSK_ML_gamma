@@ -5,11 +5,15 @@ from pytorch import RNN_models,  feature_slist, feature_list, stat, specific_CV,
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 #feat_order     = ['JA','JM','JRF','MA','MF']
 
-window = 20
+window = 10
+#window=20 when CNN
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
-data_kind  =  ['RNN']
+
+data_kind  =  ['LM']
 fm = ML_analysis('final_model_list', data_kind, window)
+hyper_index = int(sys.argv[1])
+explore(fm.LM, hyper_index)
 
 should = 0
 
@@ -95,8 +99,8 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-hyper_index = int(sys.argv[1])
-explore(fm.RNN, hyper_index)
+#hyper_index = int(sys.argv[1])
+#explore(fm.LM, hyper_index)
 # train_final_models([fm.LM])
 # fm = compute_stat([fm.LM])
 # print_tables(fm.LM)

@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_7
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 216 &
-python  ${path}/main.py 217 &
-python  ${path}/main.py 218 &
-python  ${path}/main.py 219 &
-python  ${path}/main.py 220 &
-python  ${path}/main.py 221 &
-python  ${path}/main.py 222 &
-python  ${path}/main.py 223 &
-python  ${path}/main.py 224 &
-python  ${path}/main.py 225 &
-python  ${path}/main.py 226 &
-python  ${path}/main.py 227 &
-python  ${path}/main.py 228 &
-python  ${path}/main.py 229 &
-python  ${path}/main.py 230 &
-python  ${path}/main.py 231 &
-python  ${path}/main.py 232 &
-python  ${path}/main.py 233 &
-python  ${path}/main.py 234 &
-python  ${path}/main.py 235 &
-python  ${path}/main.py 236 &
-python  ${path}/main.py 237 &
-python  ${path}/main.py 238 &
-python  ${path}/main.py 239 &
-python  ${path}/main.py 240 &
-python  ${path}/main.py 241 &
-python  ${path}/main.py 242 &
-python  ${path}/main.py 243 &
-python  ${path}/main.py 244 &
-python  ${path}/main.py 245 &
-python  ${path}/main.py 246 &
-python  ${path}/main.py 247 &
-python  ${path}/main.py 248 &
-python  ${path}/main.py 249 &
-python  ${path}/main.py 250 &
-python  ${path}/main.py 251 &
+python  ${path}/main.py 432 &
+python  ${path}/main.py 433 &
+python  ${path}/main.py 434 &
+python  ${path}/main.py 435 &
+python  ${path}/main.py 436 &
+python  ${path}/main.py 437 &
+python  ${path}/main.py 438 &
+python  ${path}/main.py 439 &
+python  ${path}/main.py 440 &
+python  ${path}/main.py 441 &
+python  ${path}/main.py 442 &
+python  ${path}/main.py 443 &
+python  ${path}/main.py 444 &
+python  ${path}/main.py 445 &
+python  ${path}/main.py 446 &
+python  ${path}/main.py 447 &
+python  ${path}/main.py 448 &
+python  ${path}/main.py 449 &
+python  ${path}/main.py 450 &
+python  ${path}/main.py 451 &
+python  ${path}/main.py 452 &
+python  ${path}/main.py 453 &
+python  ${path}/main.py 454 &
+python  ${path}/main.py 455 &
+python  ${path}/main.py 456 &
+python  ${path}/main.py 457 &
+python  ${path}/main.py 458 &
+python  ${path}/main.py 459 &
+python  ${path}/main.py 460 &
+python  ${path}/main.py 461 &
+python  ${path}/main.py 462 &
+python  ${path}/main.py 463 &
+python  ${path}/main.py 464 &
+python  ${path}/main.py 465 &
+python  ${path}/main.py 466 &
+python  ${path}/main.py 467 &
+python  ${path}/main.py 468 &
+python  ${path}/main.py 469 &
+python  ${path}/main.py 470 &
+python  ${path}/main.py 471 &
+python  ${path}/main.py 472 &
+python  ${path}/main.py 473 &
+python  ${path}/main.py 474 &
+python  ${path}/main.py 475 &
+python  ${path}/main.py 476 &
+python  ${path}/main.py 477 &
+python  ${path}/main.py 478 &
+python  ${path}/main.py 479 &
+python  ${path}/main.py 480 &
+python  ${path}/main.py 481 &
+python  ${path}/main.py 482 &
+python  ${path}/main.py 483 &
+python  ${path}/main.py 484 &
+python  ${path}/main.py 485 &
+python  ${path}/main.py 486 &
+python  ${path}/main.py 487 &
+python  ${path}/main.py 488 &
+python  ${path}/main.py 489 &
+python  ${path}/main.py 490 &
+python  ${path}/main.py 491 &
+python  ${path}/main.py 492 &
+python  ${path}/main.py 493 &
+python  ${path}/main.py 494 &
+python  ${path}/main.py 495 &
+python  ${path}/main.py 496 &
+python  ${path}/main.py 497 &
+python  ${path}/main.py 498 &
+python  ${path}/main.py 499 &
+python  ${path}/main.py 500 &
+python  ${path}/main.py 501 &
+python  ${path}/main.py 502 &
+python  ${path}/main.py 503 &
 wait

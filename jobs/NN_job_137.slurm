@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_137
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 4896 &
-python  ${path}/main.py 4897 &
-python  ${path}/main.py 4898 &
-python  ${path}/main.py 4899 &
-python  ${path}/main.py 4900 &
-python  ${path}/main.py 4901 &
-python  ${path}/main.py 4902 &
-python  ${path}/main.py 4903 &
-python  ${path}/main.py 4904 &
-python  ${path}/main.py 4905 &
-python  ${path}/main.py 4906 &
-python  ${path}/main.py 4907 &
-python  ${path}/main.py 4908 &
-python  ${path}/main.py 4909 &
-python  ${path}/main.py 4910 &
-python  ${path}/main.py 4911 &
-python  ${path}/main.py 4912 &
-python  ${path}/main.py 4913 &
-python  ${path}/main.py 4914 &
-python  ${path}/main.py 4915 &
-python  ${path}/main.py 4916 &
-python  ${path}/main.py 4917 &
-python  ${path}/main.py 4918 &
-python  ${path}/main.py 4919 &
-python  ${path}/main.py 4920 &
-python  ${path}/main.py 4921 &
-python  ${path}/main.py 4922 &
-python  ${path}/main.py 4923 &
-python  ${path}/main.py 4924 &
-python  ${path}/main.py 4925 &
-python  ${path}/main.py 4926 &
-python  ${path}/main.py 4927 &
-python  ${path}/main.py 4928 &
-python  ${path}/main.py 4929 &
-python  ${path}/main.py 4930 &
-python  ${path}/main.py 4931 &
+python  ${path}/main.py 9792 &
+python  ${path}/main.py 9793 &
+python  ${path}/main.py 9794 &
+python  ${path}/main.py 9795 &
+python  ${path}/main.py 9796 &
+python  ${path}/main.py 9797 &
+python  ${path}/main.py 9798 &
+python  ${path}/main.py 9799 &
+python  ${path}/main.py 9800 &
+python  ${path}/main.py 9801 &
+python  ${path}/main.py 9802 &
+python  ${path}/main.py 9803 &
+python  ${path}/main.py 9804 &
+python  ${path}/main.py 9805 &
+python  ${path}/main.py 9806 &
+python  ${path}/main.py 9807 &
+python  ${path}/main.py 9808 &
+python  ${path}/main.py 9809 &
+python  ${path}/main.py 9810 &
+python  ${path}/main.py 9811 &
+python  ${path}/main.py 9812 &
+python  ${path}/main.py 9813 &
+python  ${path}/main.py 9814 &
+python  ${path}/main.py 9815 &
+python  ${path}/main.py 9816 &
+python  ${path}/main.py 9817 &
+python  ${path}/main.py 9818 &
+python  ${path}/main.py 9819 &
+python  ${path}/main.py 9820 &
+python  ${path}/main.py 9821 &
+python  ${path}/main.py 9822 &
+python  ${path}/main.py 9823 &
+python  ${path}/main.py 9824 &
+python  ${path}/main.py 9825 &
+python  ${path}/main.py 9826 &
+python  ${path}/main.py 9827 &
+python  ${path}/main.py 9828 &
+python  ${path}/main.py 9829 &
+python  ${path}/main.py 9830 &
+python  ${path}/main.py 9831 &
+python  ${path}/main.py 9832 &
+python  ${path}/main.py 9833 &
+python  ${path}/main.py 9834 &
+python  ${path}/main.py 9835 &
+python  ${path}/main.py 9836 &
+python  ${path}/main.py 9837 &
+python  ${path}/main.py 9838 &
+python  ${path}/main.py 9839 &
+python  ${path}/main.py 9840 &
+python  ${path}/main.py 9841 &
+python  ${path}/main.py 9842 &
+python  ${path}/main.py 9843 &
+python  ${path}/main.py 9844 &
+python  ${path}/main.py 9845 &
+python  ${path}/main.py 9846 &
+python  ${path}/main.py 9847 &
+python  ${path}/main.py 9848 &
+python  ${path}/main.py 9849 &
+python  ${path}/main.py 9850 &
+python  ${path}/main.py 9851 &
+python  ${path}/main.py 9852 &
+python  ${path}/main.py 9853 &
+python  ${path}/main.py 9854 &
+python  ${path}/main.py 9855 &
+python  ${path}/main.py 9856 &
+python  ${path}/main.py 9857 &
+python  ${path}/main.py 9858 &
+python  ${path}/main.py 9859 &
+python  ${path}/main.py 9860 &
+python  ${path}/main.py 9861 &
+python  ${path}/main.py 9862 &
+python  ${path}/main.py 9863 &
 wait

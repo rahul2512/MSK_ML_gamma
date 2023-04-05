@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_3
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 72 &
-python  ${path}/main.py 73 &
-python  ${path}/main.py 74 &
-python  ${path}/main.py 75 &
-python  ${path}/main.py 76 &
-python  ${path}/main.py 77 &
-python  ${path}/main.py 78 &
-python  ${path}/main.py 79 &
-python  ${path}/main.py 80 &
-python  ${path}/main.py 81 &
-python  ${path}/main.py 82 &
-python  ${path}/main.py 83 &
-python  ${path}/main.py 84 &
-python  ${path}/main.py 85 &
-python  ${path}/main.py 86 &
-python  ${path}/main.py 87 &
-python  ${path}/main.py 88 &
-python  ${path}/main.py 89 &
-python  ${path}/main.py 90 &
-python  ${path}/main.py 91 &
-python  ${path}/main.py 92 &
-python  ${path}/main.py 93 &
-python  ${path}/main.py 94 &
-python  ${path}/main.py 95 &
-python  ${path}/main.py 96 &
-python  ${path}/main.py 97 &
-python  ${path}/main.py 98 &
-python  ${path}/main.py 99 &
-python  ${path}/main.py 100 &
-python  ${path}/main.py 101 &
-python  ${path}/main.py 102 &
-python  ${path}/main.py 103 &
-python  ${path}/main.py 104 &
-python  ${path}/main.py 105 &
-python  ${path}/main.py 106 &
-python  ${path}/main.py 107 &
+python  ${path}/main.py 144 &
+python  ${path}/main.py 145 &
+python  ${path}/main.py 146 &
+python  ${path}/main.py 147 &
+python  ${path}/main.py 148 &
+python  ${path}/main.py 149 &
+python  ${path}/main.py 150 &
+python  ${path}/main.py 151 &
+python  ${path}/main.py 152 &
+python  ${path}/main.py 153 &
+python  ${path}/main.py 154 &
+python  ${path}/main.py 155 &
+python  ${path}/main.py 156 &
+python  ${path}/main.py 157 &
+python  ${path}/main.py 158 &
+python  ${path}/main.py 159 &
+python  ${path}/main.py 160 &
+python  ${path}/main.py 161 &
+python  ${path}/main.py 162 &
+python  ${path}/main.py 163 &
+python  ${path}/main.py 164 &
+python  ${path}/main.py 165 &
+python  ${path}/main.py 166 &
+python  ${path}/main.py 167 &
+python  ${path}/main.py 168 &
+python  ${path}/main.py 169 &
+python  ${path}/main.py 170 &
+python  ${path}/main.py 171 &
+python  ${path}/main.py 172 &
+python  ${path}/main.py 173 &
+python  ${path}/main.py 174 &
+python  ${path}/main.py 175 &
+python  ${path}/main.py 176 &
+python  ${path}/main.py 177 &
+python  ${path}/main.py 178 &
+python  ${path}/main.py 179 &
+python  ${path}/main.py 180 &
+python  ${path}/main.py 181 &
+python  ${path}/main.py 182 &
+python  ${path}/main.py 183 &
+python  ${path}/main.py 184 &
+python  ${path}/main.py 185 &
+python  ${path}/main.py 186 &
+python  ${path}/main.py 187 &
+python  ${path}/main.py 188 &
+python  ${path}/main.py 189 &
+python  ${path}/main.py 190 &
+python  ${path}/main.py 191 &
+python  ${path}/main.py 192 &
+python  ${path}/main.py 193 &
+python  ${path}/main.py 194 &
+python  ${path}/main.py 195 &
+python  ${path}/main.py 196 &
+python  ${path}/main.py 197 &
+python  ${path}/main.py 198 &
+python  ${path}/main.py 199 &
+python  ${path}/main.py 200 &
+python  ${path}/main.py 201 &
+python  ${path}/main.py 202 &
+python  ${path}/main.py 203 &
+python  ${path}/main.py 204 &
+python  ${path}/main.py 205 &
+python  ${path}/main.py 206 &
+python  ${path}/main.py 207 &
+python  ${path}/main.py 208 &
+python  ${path}/main.py 209 &
+python  ${path}/main.py 210 &
+python  ${path}/main.py 211 &
+python  ${path}/main.py 212 &
+python  ${path}/main.py 213 &
+python  ${path}/main.py 214 &
+python  ${path}/main.py 215 &
 wait

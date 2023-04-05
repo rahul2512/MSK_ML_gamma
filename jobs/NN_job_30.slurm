@@ -1,48 +1,84 @@
 #!/bin/bash -l
 #SBATCH -J NN_30
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=72
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem=128G
 #SBATCH --time 72:00:00 # 12 hours
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=rs25.iitr@gmail.com
 
 path='/work/lcvmm/rsharma/MSK/MSK_ML_gamma/'
-python  ${path}/main.py 1044 &
-python  ${path}/main.py 1045 &
-python  ${path}/main.py 1046 &
-python  ${path}/main.py 1047 &
-python  ${path}/main.py 1048 &
-python  ${path}/main.py 1049 &
-python  ${path}/main.py 1050 &
-python  ${path}/main.py 1051 &
-python  ${path}/main.py 1052 &
-python  ${path}/main.py 1053 &
-python  ${path}/main.py 1054 &
-python  ${path}/main.py 1055 &
-python  ${path}/main.py 1056 &
-python  ${path}/main.py 1057 &
-python  ${path}/main.py 1058 &
-python  ${path}/main.py 1059 &
-python  ${path}/main.py 1060 &
-python  ${path}/main.py 1061 &
-python  ${path}/main.py 1062 &
-python  ${path}/main.py 1063 &
-python  ${path}/main.py 1064 &
-python  ${path}/main.py 1065 &
-python  ${path}/main.py 1066 &
-python  ${path}/main.py 1067 &
-python  ${path}/main.py 1068 &
-python  ${path}/main.py 1069 &
-python  ${path}/main.py 1070 &
-python  ${path}/main.py 1071 &
-python  ${path}/main.py 1072 &
-python  ${path}/main.py 1073 &
-python  ${path}/main.py 1074 &
-python  ${path}/main.py 1075 &
-python  ${path}/main.py 1076 &
-python  ${path}/main.py 1077 &
-python  ${path}/main.py 1078 &
-python  ${path}/main.py 1079 &
+python  ${path}/main.py 2088 &
+python  ${path}/main.py 2089 &
+python  ${path}/main.py 2090 &
+python  ${path}/main.py 2091 &
+python  ${path}/main.py 2092 &
+python  ${path}/main.py 2093 &
+python  ${path}/main.py 2094 &
+python  ${path}/main.py 2095 &
+python  ${path}/main.py 2096 &
+python  ${path}/main.py 2097 &
+python  ${path}/main.py 2098 &
+python  ${path}/main.py 2099 &
+python  ${path}/main.py 2100 &
+python  ${path}/main.py 2101 &
+python  ${path}/main.py 2102 &
+python  ${path}/main.py 2103 &
+python  ${path}/main.py 2104 &
+python  ${path}/main.py 2105 &
+python  ${path}/main.py 2106 &
+python  ${path}/main.py 2107 &
+python  ${path}/main.py 2108 &
+python  ${path}/main.py 2109 &
+python  ${path}/main.py 2110 &
+python  ${path}/main.py 2111 &
+python  ${path}/main.py 2112 &
+python  ${path}/main.py 2113 &
+python  ${path}/main.py 2114 &
+python  ${path}/main.py 2115 &
+python  ${path}/main.py 2116 &
+python  ${path}/main.py 2117 &
+python  ${path}/main.py 2118 &
+python  ${path}/main.py 2119 &
+python  ${path}/main.py 2120 &
+python  ${path}/main.py 2121 &
+python  ${path}/main.py 2122 &
+python  ${path}/main.py 2123 &
+python  ${path}/main.py 2124 &
+python  ${path}/main.py 2125 &
+python  ${path}/main.py 2126 &
+python  ${path}/main.py 2127 &
+python  ${path}/main.py 2128 &
+python  ${path}/main.py 2129 &
+python  ${path}/main.py 2130 &
+python  ${path}/main.py 2131 &
+python  ${path}/main.py 2132 &
+python  ${path}/main.py 2133 &
+python  ${path}/main.py 2134 &
+python  ${path}/main.py 2135 &
+python  ${path}/main.py 2136 &
+python  ${path}/main.py 2137 &
+python  ${path}/main.py 2138 &
+python  ${path}/main.py 2139 &
+python  ${path}/main.py 2140 &
+python  ${path}/main.py 2141 &
+python  ${path}/main.py 2142 &
+python  ${path}/main.py 2143 &
+python  ${path}/main.py 2144 &
+python  ${path}/main.py 2145 &
+python  ${path}/main.py 2146 &
+python  ${path}/main.py 2147 &
+python  ${path}/main.py 2148 &
+python  ${path}/main.py 2149 &
+python  ${path}/main.py 2150 &
+python  ${path}/main.py 2151 &
+python  ${path}/main.py 2152 &
+python  ${path}/main.py 2153 &
+python  ${path}/main.py 2154 &
+python  ${path}/main.py 2155 &
+python  ${path}/main.py 2156 &
+python  ${path}/main.py 2157 &
+python  ${path}/main.py 2158 &
+python  ${path}/main.py 2159 &
 wait

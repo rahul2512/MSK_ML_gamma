@@ -14,7 +14,6 @@ from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 from keras import backend as K
-from keras.utils import custom_object_scope
 
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
