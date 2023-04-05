@@ -95,8 +95,8 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-# hyper_index = int(sys.argv[1])
-explore(fm.RNN, 1)
+hyper_index = int(sys.argv[1])
+explore(fm.RNN, hyper_index)
 # train_final_models([fm.LM])
 # fm = compute_stat([fm.LM])
 # print_tables(fm.LM)
