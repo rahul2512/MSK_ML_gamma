@@ -19,8 +19,8 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
-    fm.LM.exposed.arg      = [12, 12, 12]
-    fm.LM.naive.arg        = [12, 12, 12]
+    fm.LM.exposed.arg      = [43, 43, 43]
+    fm.LM.naive.arg        = [43, 43, 43]
     fm.LM.exposed.arch     = ['LM']*3
     fm.LM.naive.arch       = ['LM']*3
     fm.LM.exposed_unseen     = fm.LM.exposed
@@ -52,7 +52,7 @@ if should:
 
 def train_final_models(D):
     ## train final model with best-avg-validation accuracy
-    for d  in D:
+    for d in D:
         for i in range(3):
             specific(d.exposed,i)
             specific(d.naive  ,i)
@@ -102,11 +102,11 @@ def avg_stat(fm):
 
 #hyper_index = int(sys.argv[1])
 #explore(fm.LM, hyper_index)
-# train_final_models([fm.LM])
+train_final_models([fm.LM])
 # fm = compute_stat([fm.LM])
 # print_tables(fm.LM)
 
-learning_curve(fm.LM)
+#learning_curve(fm.LM)
 
 # fm = compute_stat([fm.NN])
 #plot_final_results(fm)
