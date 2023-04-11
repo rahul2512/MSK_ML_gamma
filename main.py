@@ -1,8 +1,9 @@
-import numpy as np, time, keras, os.path, pandas as pd, sys, matplotlib.pyplot as plt
-from barchart_err import barchart_error, barchart_params
-from pytorch import run_final_model, run_cross_valid, check_interpolation, combined_plot, save_outputs, stat_new_data
-from pytorch import RNN_models,  feature_slist, feature_list, stat, specific_CV, specific, explore, print_tables
+import numpy as np, os.path, pandas as pd, sys, matplotlib.pyplot as plt
+#from barchart_err import barchart_error, barchart_params
+from pytorch import run_final_model, run_cross_valid, combined_plot, save_outputs, stat_new_data
+from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, learning_curve
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
+
 #feat_order     = ['JA','JM','JRF','MA','MF']
 
 window = 10
@@ -12,10 +13,10 @@ data_kind  =  ['NN','LM']
 
 data_kind  =  ['LM']
 fm = ML_analysis('final_model_list', data_kind, window)
-hyper_index = int(sys.argv[1])
-explore(fm.LM, hyper_index)
+# hyper_index = int(sys.argv[1])
+# explore(fm.LM, hyper_index)
 
-should = 0
+should = 1
 
 if should:
     fm.LM.exposed.arg      = [12, 12, 12]
@@ -104,6 +105,8 @@ def avg_stat(fm):
 # train_final_models([fm.LM])
 # fm = compute_stat([fm.LM])
 # print_tables(fm.LM)
+
+learning_curve(fm.LM)
 
 # fm = compute_stat([fm.NN])
 #plot_final_results(fm)

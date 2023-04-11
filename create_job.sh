@@ -1,5 +1,5 @@
-model="LM"
-ncpu=72
+model="RNN"
+ncpu=36
 ##  1270080 total number of hyp
 filename="hyperparam_""${model}"".txt"
 linecount=$(wc -l < "$filename")

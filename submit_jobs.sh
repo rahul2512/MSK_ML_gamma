@@ -1,6 +1,6 @@
-for i in {1..2}
+for i in {1..288}
 do 
-echo "LM_jobs_submitting" ${i}
-sbatch jobs/LM_job_${i}.slurm 
-sleep 25
+echo "RNN_jobs_submitting" ${i}
+sbatch jobs/RNN_job_${i}.slurm 
+sleep 100
 done
