@@ -42,6 +42,7 @@ def combined_plot(analysis_opt):
         hyper_val_naive = analysis_opt.model_naive_hyper_arg[XX]
         model_class_exp = analysis_opt.model_exposed_arch[XX]
         model_class_naive = analysis_opt.model_naive_arch[XX]
+        norm_out = hyper_val_exp['norm_out']
 
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
         model2 = load_model('naive'  , feature, model_class_naive, hyper_val_naive)
@@ -49,9 +50,9 @@ def combined_plot(analysis_opt):
         data = analysis_opt.data[XX]
         window = analysis_opt.window_size[XX]
 
-        XE, YE = data.subject_exposed(feature).test_in_list[trial_ind], data.subject_exposed(feature).test_out_list[trial_ind]
-        XN, YN = data.subject_naive(feature).test_in_list[trial_ind],   data.subject_naive(feature).test_out_list[trial_ind]
-        sub_col = data.subject_exposed(feature).sub_col
+        XE, YE  = data.subject_exposed(feature, norm_out).test_in_list[trial_ind], data.subject_exposed(feature, norm_out).test_out_list[trial_ind]
+        XN, YN  = data.subject_naive(  feature, norm_out).test_in_list[trial_ind],   data.subject_naive(  feature, norm_out).test_out_list[trial_ind]
+        sub_col = data.subject_exposed(feature, norm_out).sub_col
         
         SC = data.std_out[data.label[feature]]
         TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
@@ -301,21 +302,22 @@ def combined_plot(analysis_opt):
 def stat(fd, index):
     feature = fd.feature[index]   
     hyper_val_exp =  fd.arg[index]
+    norm_out = fd.hyper.loc[hyper_val_exp]['norm_out']
     model_class_exp = fd.arch[index]
    
     data = fd.data
     SCE = data.std_out[data.label[feature]]
 
     if fd.subject == 'exposed':
-        tmp = data.subject_exposed(feature)
+        tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.test_in_list, tmp.test_out_list
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
     elif fd.subject == 'naive':
-        tmp = data.subject_naive(feature)
+        tmp = data.subject_naive(feature, norm_out)
         XE, YE = tmp.test_in_list, tmp.test_out_list
         model1 = load_model('naive', feature, model_class_exp,   hyper_val_exp  )
     elif fd.subject == 'exposed_unseen':
-        tmp = data.subject_exposed(feature)
+        tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
 
@@ -455,7 +457,7 @@ def run_final_model(data,hyper_arg,hyper_val,model_class, save_model=True):
         save_name_old = '.fm'
         save_outputs(model,hyper_arg, data, save_name_old, save_model, model_class)
     except:
-        print("this index is creating problem in saving --- ",hyper_arg,hyper_val, data.feature)
+        print("this index is creating problem in saving --- ",hyper_arg, hyper_val, data.feature)
     return model
 
 def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
@@ -558,30 +560,16 @@ def print_table_RNN(hyper, h, extra):
           '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
     return None
 
- 
-
-
-def specific_CV(data, feat, model_class, hyper_arg):
-    subject = data.subject
-    hyper   = data.hyper
-    hyper_val =  hyper.iloc[hyper_arg]
-
-    if subject == 'exposed':
-        data = data.subject_exposed(feat)
-    elif subject == 'naive':
-        data = data.subject_naive(feat)
-    model = run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False)
-
-
 def specific(fm, index):
     hyper_arg   = fm.arg[index]
     hyper_val   = fm.hyper.iloc[hyper_arg]
     model_class = fm.arch[index]
     feat        = fm.feature[index]
+    norm_out    = hyper_val['norm_out']
     if fm.subject == 'exposed':
-        d = fm.data.subject_exposed(feat)
+        d = fm.data.subject_exposed(feat, norm_out)
     elif fm.subject == 'naive':
-        d = fm.data.subject_naive(feat)
+        d = fm.data.subject_naive(feat, norm_out)
     model = run_final_model(d,hyper_arg,hyper_val,model_class,save_model=True)
     return model
 
@@ -713,5 +701,44 @@ def stat_new_data(fd, data):
                 data.naive.pc[feat]      = PC
                 
     return data
+
+
+##############################################################################
+##############################################################################
+#### learning curve
+##############################################################################
+##############################################################################
+
+def learning_curve(fm):
+    res = analysis_options("results for learning curve -- note only for naive models")
+    res.model = fm.what
+    res.subject = 'naive'
+    rand = np.arange(5)
+    res.RMSE = {}
+
+    for enumf, feat in enumerate(fm.feature):
+        hyper_arg = fm.naive.arg[enumf]
+        model_class = fm.naive.arch[enumf]
+        hyper_val = fm.hyper.loc[hyper_arg]
+        norm_out  = hyper_val['norm_out']
+        data = fm.data.subject_naive(feat,norm_out)
+        nsub = len(data.train_in_list)
+        res.RMSE[feat] = pd.DataFrame(index = np.arange(1, nsub), columns=rand)
+        for r in rand:
+            for n in np.arange(1,nsub):
+                try:
+                    X = pd.concat(data.train_in_list[0:n])
+                except:
+                    X = np.concatenate(data.train_in_list[0:n])                
+                Y = pd.concat(data.train_out_list[0:n])
+    
+                model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class)
+                res.RMSE[feat][r].loc[n] = model.evaluate(data.test_in, data.test_out, verbose=2)[1]
+        print(res.RMSE[feat])
+        input()
+        
+
+    return fm
+
 
 

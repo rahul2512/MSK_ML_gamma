@@ -312,7 +312,8 @@ class initiate_data:
             cv.cv2['val_in']    = pd.concat([self.inp_all[i] for i in V2])
             cv.cv3['train_in']  = pd.concat([self.inp_all[i] for i in T3])
             cv.cv3['val_in']    = pd.concat([self.inp_all[i] for i in V3])
-            cv.train_in         = pd.concat([self.inp_all[i] for i in shuffled])
+            cv.train_in_list    = [self.inp_all[i] for i in shuffled]
+            cv.train_in         = pd.concat(cv.train_in_list)
             cv.test_in          = pd.concat([self.inp_all[i] for i in HO])
             cv.test_in_list     = [self.inp_all_list[i] for i in HO]
             cv.test_in_list     = [j for i in cv.test_in_list for j in i]  ## seperating each trials
@@ -324,7 +325,8 @@ class initiate_data:
             cv.cv2['val_in']    = np.concatenate([self.inp_all[i] for i in V2])
             cv.cv3['train_in']  = np.concatenate([self.inp_all[i] for i in T3])
             cv.cv3['val_in']    = np.concatenate([self.inp_all[i] for i in V3])
-            cv.train_in         = np.concatenate([self.inp_all[i] for i in shuffled])
+            cv.train_in_list    = [self.inp_all[i] for i in shuffled]
+            cv.train_in         = np.concatenate(cv.train_in_list)
             cv.test_in          = np.concatenate([self.inp_all[i] for i in HO])
             cv.test_in_list     = [self.inp_all_list[i] for i in HO]
             cv.test_in_list     = [j for i in cv.test_in_list for j in i]  ## seperating each trials
@@ -339,7 +341,9 @@ class initiate_data:
         cv.cv3['train_out'] = pd.concat([self.out_all[i] for i in T3])[sub_col]/scale 
         cv.cv3['val_out']   = pd.concat([self.out_all[i] for i in V3])[sub_col]/scale
 
-        cv.train_out = pd.concat([self.out_all[i] for i in shuffled])[sub_col]/scale
+        cv.train_out_list = [self.out_all[i][sub_col] for i in shuffled]
+        cv.train_out = pd.concat(cv.train_out_list)[sub_col]/scale
+
         cv.test_out  = pd.concat([self.out_all[i] for i in HO])[sub_col]/scale
 
         cv.test_out_list  = [self.out_all_list[i] for i in HO] #
@@ -379,8 +383,13 @@ class initiate_data:
         rem2 = [4,9]
         rem3 = [6]
 
-        train_in_list  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
-        train_out_list = [self.out[i].T2 for i in HO] + [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
+        cv.train_in_list  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
+        cv.train_out_list = [self.out[i].T2[sub_col] for i in HO] 
+        + [self.out[i].T3[sub_col] for i in HO] 
+        + [self.out[i].T1[sub_col] for i in rem2] 
+        + [self.out[i].T2[sub_col] for i in rem2] 
+        + [self.out[i].T1[sub_col] for i in rem3] 
+        + [self.out[i].T3[sub_col] for i in rem3] 
 
         T1_in  = [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
         T1_out = [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
@@ -404,7 +413,7 @@ class initiate_data:
             cv.cv2['val_in']    = pd.concat(V2_in)
             cv.cv3['train_in']  = pd.concat(T3_in)
             cv.cv3['val_in']    = pd.concat(V3_in)
-            cv.train_in         = pd.concat(train_in_list)
+            cv.train_in         = pd.concat(cv.train_in_list)
             cv.test_in          = pd.concat([self.inp[i].T1  for i in HO])
             cv.test_in_list          = [self.inp[i].T1  for i in HO]
             cv.super_test_in_list    = [self.inp[i].T1  for i in rem1]
@@ -416,7 +425,7 @@ class initiate_data:
             cv.cv2['val_in']    = np.concatenate(V2_in)
             cv.cv3['train_in']  = np.concatenate(T3_in)
             cv.cv3['val_in']    = np.concatenate(V3_in)
-            cv.train_in         = np.concatenate(train_in_list)
+            cv.train_in         = np.concatenate(cv.train_in_list)
             cv.test_in          = np.concatenate([self.inp[i].T1  for i in HO])
             cv.test_in_list          = [self.inp[i].T1  for i in HO]
         else:
@@ -430,7 +439,7 @@ class initiate_data:
         cv.cv3['train_out'] = pd.concat(T3_out)[sub_col]/scale 
         cv.cv3['val_out']   = pd.concat(V3_out)[sub_col]/scale
 
-        cv.train_out           = pd.concat(train_out_list)[sub_col]/scale
+        cv.train_out           = pd.concat(cv.train_out_list)[sub_col]/scale
         cv.test_out            = pd.concat([self.out[i].T1 for i in HO])[sub_col]/scale         
         cv.test_out_list       = [self.out[i].T1[sub_col]/scale for i in HO]         
         cv.super_test_out_list = [self.out[i].T1[sub_col]/scale for i in rem1]
