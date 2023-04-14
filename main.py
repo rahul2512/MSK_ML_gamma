@@ -103,11 +103,10 @@ def avg_stat(fm):
 #hyper_index = int(sys.argv[1])
 #explore(fm.LM, hyper_index)
 train_final_models([fm.LM])
-# fm = compute_stat([fm.LM])
-# print_tables(fm.LM)
+fm = compute_stat([fm.LM])
+print_tables(fm.LM)
 
 #learning_curve(fm.LM)
-
 # fm = compute_stat([fm.NN])
 #plot_final_results(fm)
 # print_tables(fm.NN)

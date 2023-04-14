@@ -384,12 +384,7 @@ class initiate_data:
         rem3 = [6]
 
         cv.train_in_list  = [self.inp[i].T2 for i in HO] + [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
-        cv.train_out_list = [self.out[i].T2[sub_col] for i in HO] 
-        + [self.out[i].T3[sub_col] for i in HO] 
-        + [self.out[i].T1[sub_col] for i in rem2] 
-        + [self.out[i].T2[sub_col] for i in rem2] 
-        + [self.out[i].T1[sub_col] for i in rem3] 
-        + [self.out[i].T3[sub_col] for i in rem3] 
+        cv.train_out_list = [self.out[i].T2[sub_col] for i in HO] + [self.out[i].T3[sub_col] for i in HO]   + [self.out[i].T1[sub_col] for i in rem2]  + [self.out[i].T2[sub_col] for i in rem2] + [self.out[i].T1[sub_col] for i in rem3] + [self.out[i].T3[sub_col] for i in rem3] 
 
         T1_in  = [self.inp[i].T3 for i in HO] + [self.inp[i].T1 for i in rem2] + [self.inp[i].T2 for i in rem2] + [self.inp[i].T1 for i in rem3] + [self.inp[i].T3 for i in rem3] 
         T1_out = [self.out[i].T3 for i in HO] + [self.out[i].T1 for i in rem2] + [self.out[i].T2 for i in rem2] + [self.out[i].T1 for i in rem3] + [self.out[i].T3 for i in rem3] 
