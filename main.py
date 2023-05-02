@@ -11,7 +11,7 @@ window = 10
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
 
-data_kind  =  ['LM']
+data_kind  =  ['NN']
 fm = ML_analysis('final_model_list', data_kind, window)
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
@@ -19,17 +19,22 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
-    fm.LM.exposed.arg      = [43, 43, 43]
-    fm.LM.naive.arg        = [43, 43, 43]
-    fm.LM.exposed.arch     = ['LM']*3
-    fm.LM.naive.arch       = ['LM']*3
-    fm.LM.exposed_unseen     = fm.LM.exposed
+    # fm.LM.exposed.arg      = [43, 43, 43]
+    # fm.LM.naive.arg        = [43, 43, 43]
+    # fm.LM.exposed.arch     = ['LM']*3
+    # fm.LM.naive.arch       = ['LM']*3
+    # fm.LM.exposed_unseen     = fm.LM.exposed
 
-    # fm.NN.exposed.arg        = [1080, 2809, 1118]
-    # fm.NN.naive.arg          = [1080, 6778, 2164]
-    # fm.NN.exposed.arch       = ['NN']*3
-    # fm.NN.naive.arch         = ['NN']*3
-    # fm.NN.exposed_unseen     = fm.NN.exposed
+
+### JA -- 2003, 4011
+### JM -- 2809, 8365
+### JRF -- 2003, 3903
+
+    fm.NN.exposed.arg        = [2003, 2809, 2003]
+    fm.NN.naive.arg          = [4011, 8365, 3903]
+    fm.NN.exposed.arch       = ['NN']*3
+    fm.NN.naive.arch         = ['NN']*3
+    fm.NN.exposed_unseen     = fm.NN.exposed
 
     # fm.VRNN = fm.RNN 
     # fm.LSTM = fm.RNN 
@@ -102,9 +107,9 @@ def avg_stat(fm):
 
 #hyper_index = int(sys.argv[1])
 #explore(fm.LM, hyper_index)
-train_final_models([fm.LM])
-fm = compute_stat([fm.LM])
-print_tables(fm.LM)
+# train_final_models([fm.NN])
+# fm = compute_stat([fm.NN])
+# print_tables(fm.NN)
 
 #learning_curve(fm.LM)
 # fm = compute_stat([fm.NN])

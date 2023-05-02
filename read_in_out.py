@@ -601,6 +601,32 @@ def create_artifical_input_data_with_missing_markers():
 
     return data
 
+
 #data = create_artifical_input_data_with_missing_markers()
         
-        
+def continuous_noise(t):
+    l = np.shape(t)[0]
+    ### need to pick a maximum values for A, w, Phi  
+    A = 10
+    w = 2*np.pi*6   ## 6Hz 
+    phi = 2*np.pi
+    tmpA = A*np.random.rand(l)
+    tmpw = w*np.random.rand(l)
+    tmpp = phi*np.random.rand(l)
+    # np.sin(np.pi/2) = 1 ---> input is radian
+    f = tmpA*np.sin(tmpw*t+tmpp)
+    return f 
+
+def add_noise_to_trial(T_in):
+    T = copy.deepcopy(T_in)
+    time_col = T.columns[-1]
+    samples = T.shape[0]
+    for col in T.columns[:-1]:
+        cn = continuous_noise(T[time_col])
+        offset = np.random.normal(0, 2, 1) #https://www.mdpi.com/2075-1729/12/6/819#B15-life-12-00819
+        T[col] = T[col] + cn + np.full(samples, offset)
+        plt.plot(cn)
+        plt.show()
+        plt.close()
+    return T
+       
