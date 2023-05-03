@@ -143,7 +143,6 @@ def initiate_ax(feature):
         ylabel = ['Trunk Forward / \n Backward Bending', 'Trunk Right / \n Left Bending', 'Trunk Internal / \n External Rotation',
                   'Shoulder Flexion / \n Extension', 'Shoulder Abduction / \n Adduction', 'Shoulder Internal / \n External Rotation',
                   'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
-
     return fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list 
 
 def combined_plot(analysis_opt):
