@@ -11,7 +11,7 @@ window = 10
 data_kind  =  ['LM', 'NN', 'RNN', 'CNN', 'CNNLSTM', 'convLSTM']
 data_kind  =  ['NN','LM']
 
-data_kind  =  ['NN']
+#data_kind  =  ['LM']
 fm = ML_analysis('final_model_list', data_kind, window)
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
@@ -19,11 +19,11 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
-    # fm.LM.exposed.arg      = [43, 43, 43]
-    # fm.LM.naive.arg        = [43, 43, 43]
-    # fm.LM.exposed.arch     = ['LM']*3
-    # fm.LM.naive.arch       = ['LM']*3
-    # fm.LM.exposed_unseen     = fm.LM.exposed
+    fm.LM.exposed.arg      = [43, 43, 43]
+    fm.LM.naive.arg        = [43, 43, 43]
+    fm.LM.exposed.arch     = ['LM']*3
+    fm.LM.naive.arch       = ['LM']*3
+    fm.LM.exposed_unseen     = fm.LM.exposed
 
 
 ### JA -- 2003, 4011
@@ -83,6 +83,7 @@ def plot_final_results(fm):
     analysis_opt.legend_label   = ['LM', 'NN']
     analysis_opt.window_size = [0,0]
     analysis_opt.data    = [fm.LM.data,fm.NN.data]
+    analysis_opt.hyper    = [fm.LM.hyper,fm.NN.hyper]
     
     for i in range(3):
         analysis_opt.feature   = fm.feature[i]
@@ -113,7 +114,7 @@ def avg_stat(fm):
 
 #learning_curve(fm.LM)
 # fm = compute_stat([fm.NN])
-#plot_final_results(fm)
+plot_final_results(fm)
 # print_tables(fm.NN)
 
 # b = initiate_data('Braced_')

@@ -629,4 +629,5 @@ def add_noise_to_trial(T_in):
         plt.show()
         plt.close()
     return T
+
        
