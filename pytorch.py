@@ -424,8 +424,11 @@ def combined_plot_noise(analysis_opt):
             ax_list2[i].set_xticks(np.array(minor_ticks[2::5])+0.0005,minor=False)
             ax_list2[i].set_ylabel(ylabel[i],fontsize=ss)
             # ax_list2[i].yaxis.set_label_coords(-0.28,0.5)
-    
+
+#################################################################################
 ###########################above code is untouched and below it plots the noisy data
+#################################################################################
+
         samples = 100
         M1 = np.zeros((samples,YP1.shape[0],YP1.shape[1]))
         M2 = np.zeros((samples,YP2.shape[0],YP2.shape[1]))
@@ -438,14 +441,17 @@ def combined_plot_noise(analysis_opt):
                 YPN2 = YPN2[:,new_order]
             M1[samp] =  YPN1
             M2[samp] =  YPN2
-        M1_std = np.std(M1,axis=0)
-        M2_std = np.std(M2,axis=0)
+        M1_mean, M1_std = np.mean(M1,axis=0), np.std(M1,axis=0)
+        M2_mean, M2_std = np.mean(M2,axis=0), np.std(M2,axis=0)
+
         alpha=0.2
         for i, _  in enumerate(sub_col):
             mu1, sigma1 = YP1[:,i][window::sparse_plot], M1_std[:,i][window::sparse_plot]                
             mu2, sigma2 = YP2[:,i][window::sparse_plot], M2_std[:,i][window::sparse_plot]                
             ax_list[i].fill_between( TE[window::sparse_plot], mu1+sigma1, mu1-sigma1, facecolor=color_list[XX], alpha=alpha)
             ax_list2[i].fill_between(TN[window::sparse_plot], mu2+sigma2, mu2-sigma2, facecolor=color_list[XX], alpha=alpha)
+            ax_list[i].plot( TE[window::sparse_plot], M1_mean[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label='_no_legend_')   ### np.arange(a)
+            ax_list2[i].plot(TN[window::sparse_plot], M2_mean[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
         ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)            
     fig.savefig('./plots_out/Both_sub_noise'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
