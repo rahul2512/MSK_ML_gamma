@@ -426,26 +426,30 @@ def combined_plot_noise(analysis_opt):
             # ax_list2[i].yaxis.set_label_coords(-0.28,0.5)
     
 ###########################above code is untouched and below it plots the noisy data
-        alpha = 0.05
-        for noo in range(100):
+        samples = 100
+        M1 = np.zeros((samples,YP1.shape[0],YP1.shape[1]))
+        M2 = np.zeros((samples,YP2.shape[0],YP2.shape[1]))
+        for samp in range(samples):
             XEN, XNN = add_noise_to_trial(XE), add_noise_to_trial(XN)
             YPN1, YPN2 = model1.predict(XEN), model2.predict(XNN)
             if 'JA' == feature:
                 new_order = [7,8,9,0,1,2,3,4,5,6]
                 YPN1 = YPN1[:,new_order]
                 YPN2 = YPN2[:,new_order]
-            for i, _  in enumerate(sub_col):
-                ax_list[i].plot(TE[window::sparse_plot], YPN1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.4,label='_no_legend_',alpha=alpha)   ### np.arange(a)
-                ax_list2[i].plot(TN[window::sparse_plot], YPN2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.4,label ='_no_legend_', alpha=alpha)#,label=label1)   ### np.arange(a)
+            M1[samp] =  YPN1
+            M2[samp] =  YPN2
+        M1_std = np.std(M1,axis=0)
+        M2_std = np.std(M2,axis=0)
+        alpha=0.2
+        for i, _  in enumerate(sub_col):
+            mu1, sigma1 = YP1[:,i][window::sparse_plot], M1_std[:,i][window::sparse_plot]                
+            mu2, sigma2 = YP2[:,i][window::sparse_plot], M2_std[:,i][window::sparse_plot]                
+            ax_list[i].fill_between( TE[window::sparse_plot], mu1+sigma1, mu1-sigma1, facecolor=color_list[XX], alpha=alpha)
+            ax_list2[i].fill_between(TN[window::sparse_plot], mu2+sigma2, mu2-sigma2, facecolor=color_list[XX], alpha=alpha)
 
-
-        ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)
-            
+        ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)            
     fig.savefig('./plots_out/Both_sub_noise'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
     plt.close()
-
-
-
 
 
 def stat(fd, index):
