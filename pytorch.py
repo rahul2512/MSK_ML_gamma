@@ -429,7 +429,7 @@ def combined_plot_noise(analysis_opt):
 ###########################above code is untouched and below it plots the noisy data
 #################################################################################
 
-        samples = 100
+        samples = 300
         M1 = np.zeros((samples,YP1.shape[0],YP1.shape[1]))
         M2 = np.zeros((samples,YP2.shape[0],YP2.shape[1]))
         for samp in range(samples):
@@ -456,7 +456,6 @@ def combined_plot_noise(analysis_opt):
         ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)            
     fig.savefig('./plots_out/Both_sub_noise'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
     plt.close()
-
 
 def stat(fd, index):
     feature = fd.feature[index]   

@@ -107,7 +107,7 @@ def plot_noise_results(fm):
     analysis_opt.data    = [fm.NN.data]
     analysis_opt.hyper    = [fm.NN.hyper]
     
-    for i in range(1):
+    for i in range(3):
         analysis_opt.feature   = fm.feature[i]
 
         analysis_opt.model_exposed_hyper_arg  = [ fm.NN.exposed.arg[i]]
