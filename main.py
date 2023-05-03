@@ -1,7 +1,7 @@
 import numpy as np, os.path, pandas as pd, sys, matplotlib.pyplot as plt
 #from barchart_err import barchart_error, barchart_params
 from pytorch import run_final_model, run_cross_valid, combined_plot, save_outputs, stat_new_data
-from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, learning_curve
+from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, combined_plot_noise, learning_curve
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 
 #feat_order     = ['JA','JM','JRF','MA','MF']
@@ -97,6 +97,29 @@ def plot_final_results(fm):
         combined_plot(analysis_opt)
     return None
 
+def plot_noise_results(fm):
+    analysis_opt = analysis_options()        
+    analysis_opt.save_name = 'final'
+    analysis_opt.trial_ind = 2
+    analysis_opt.plot_subtitle   = [True]
+    analysis_opt.legend_label   = ['NN']
+    analysis_opt.window_size = [0]
+    analysis_opt.data    = [fm.NN.data]
+    analysis_opt.hyper    = [fm.NN.hyper]
+    
+    for i in range(1):
+        analysis_opt.feature   = fm.feature[i]
+
+        analysis_opt.model_exposed_hyper_arg  = [ fm.NN.exposed.arg[i]]
+        analysis_opt.model_naive_hyper_arg    = [ fm.NN.naive.arg[i]]
+        
+        analysis_opt.model_exposed_arch  = [fm.NN.exposed.arch[i]]
+        analysis_opt.model_naive_arch    = [fm.NN.naive.arch[i]]
+
+        combined_plot_noise(analysis_opt)
+    return None
+
+
 def avg_stat(fm):
     for j in [fm.LM.exposed, fm.LM.naive, fm.NN.exposed,fm.NN.naive,fm.RNN.exposed,fm.RNN.naive]:
         a,b = [],[]
@@ -114,7 +137,7 @@ def avg_stat(fm):
 
 #learning_curve(fm.LM)
 # fm = compute_stat([fm.NN])
-plot_final_results(fm)
+plot_noise_results(fm)
 # print_tables(fm.NN)
 
 # b = initiate_data('Braced_')

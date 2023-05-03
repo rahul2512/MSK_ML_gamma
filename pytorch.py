@@ -1,5 +1,5 @@
 from pytorch_utilities import *
-from read_in_out import analysis_options
+from read_in_out import analysis_options, add_noise_to_trial
 import pandas as pd
 import numpy as np
 import keras
@@ -145,6 +145,42 @@ def initiate_ax(feature):
                   'Elbow Flexion / \n Extension', 'Elbow Pronation / \n Supination', 'Wrist Flexion / \n Extension', 'Wrist Radial / \n Ulnar Deviation']
     return fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list 
 
+def end_ax(ax_list,ax_list2, feature, ss):
+
+    if 'JM' in feature:
+        ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
+        ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
+        ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
+
+    elif 'JA' in feature:
+        ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
+        ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
+        ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
+
+    elif 'JRF' in feature:
+        ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
+        ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
+        ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')   
+
+    for axl in [ax_list, ax_list2]:
+        for ax in axl: 
+            ax.tick_params(axis='x', labelsize=ss,   pad=14,length=3,width=0.5,direction= 'inout',which='major')
+            ax.tick_params(axis='x', labelsize=ss-1, pad=2, length=3,width=0.5,direction= 'inout',which='minor')
+            ax.tick_params(axis='y', labelsize=ss,   pad=3, length=3,width=0.5,direction= 'inout')
+
+    percent = ['0%','25%','50%','75%','100%']
+    for axx1,axx2 in zip(ax_list[0:len(ax_list)-2], ax_list2[0:len(ax_list2)-2]):
+        axx1.set_xticklabels([],fontsize=ss,minor=False)
+        axx2.set_xticklabels([],fontsize=ss,minor=False)
+
+    for axl in [ax_list[-2:], ax_list2[-2:]]:
+        for ax in axl:
+            ax.set_xticklabels([],fontsize=ss,minor=False)
+            ax.set_xticklabels(percent,fontsize=ss,minor=True,rotation=45)
+            ax.set_xlabel("% of task completion",fontsize=ss)
+   
+    return ax_list, ax_list2
+
 def combined_plot(analysis_opt):
     # it plots the first trial and provides the statistics for each trial as well as average, std, iqr, min,max etc etc
     lll = len(analysis_opt.model_exposed_hyper_arg)
@@ -154,7 +190,6 @@ def combined_plot(analysis_opt):
     ls_list = ['-','-']
     lsk = '--'
     for XX in range(lll):
-                    
         feature = analysis_opt.feature 
         hyper_val_exp =  analysis_opt.model_exposed_hyper_arg[XX]
         hyper_val_naive = analysis_opt.model_naive_hyper_arg[XX]
@@ -164,7 +199,6 @@ def combined_plot(analysis_opt):
         data = analysis_opt.data[XX]
         window = analysis_opt.window_size[XX]
         norm_out = hyper.iloc[hyper_val_exp]['norm_out']
-        print(norm_out)
 
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
         model2 = load_model('naive'  , feature, model_class_naive, hyper_val_naive)
@@ -224,12 +258,12 @@ def combined_plot(analysis_opt):
     
             NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
     
-            ax_list[i].set_xlim(0,count+1)
-            ax_list2[i].set_xlim(0,count+1)
-            Title = str(np.around(Title/(count+1),2))
-            NRMSE = str(np.around(NRMSE/(count+1),2))
-            Title2 = str(np.around(Title2/(count+1),2))
-            NRMSE2 = str(np.around(NRMSE2/(count+1),2))
+            ax_list[i].set_xlim(0,1)
+            ax_list2[i].set_xlim(0,1)
+            Title = str(np.around(Title,2))
+            NRMSE = str(np.around(NRMSE,2))
+            Title2 = str(np.around(Title2,2))
+            NRMSE2 = str(np.around(NRMSE2,2))
 
             if len(Title) == 3:
                 Title = Title+'0'
@@ -248,7 +282,6 @@ def combined_plot(analysis_opt):
                 ax_list2[i].text(-0.25, 1.1, Title2, transform=ax_list2[i].transAxes, size=ss)#,fontweight='bold')
 
             minor_ticks = []
-            percent = ['0%','25%','50%','75%','100%']
             push3 = 0
             for sn in range(count+1):
                 for sn1 in np.arange(sn,sn+1.25,0.25):
@@ -266,44 +299,152 @@ def combined_plot(analysis_opt):
             ax_list2[i].set_ylabel(ylabel[i],fontsize=ss)
             # ax_list2[i].yaxis.set_label_coords(-0.28,0.5)
     
-            for axx1,axx2 in zip(ax_list[0:len(ax_list)-2], ax_list2[0:len(ax_list2)-2]):
-                axx1.set_xticklabels([],fontsize=ss,minor=False)
-                axx2.set_xticklabels([],fontsize=ss,minor=False)
     
-            for axx1,axx2 in zip(ax_list[-2:], ax_list2[-2:]):
-                axx1.set_xticklabels([],fontsize=ss,minor=False)
-                axx1.set_xticklabels(percent*(count+1),fontsize=ss,minor=True,rotation=45)
-                axx1.set_xlabel("% of task completion",fontsize=ss)
-    
-                axx2.set_xticklabels([],fontsize=ss,minor=False)
-                axx2.set_xticklabels(percent*(count+1),fontsize=ss,minor=True,rotation=45)
-                axx2.set_xlabel("% of task completion",fontsize=ss)
-    
-            ax_list[i].tick_params(axis='x', labelsize=ss,   pad=14,length=3,width=0.5,direction= 'inout',which='major')
-            ax_list[i].tick_params(axis='x', labelsize=ss-1, pad=2, length=3,width=0.5,direction= 'inout',which='minor')
-            ax_list[i].tick_params(axis='y', labelsize=ss,   pad=3, length=3,width=0.5,direction= 'inout')
-    
-            ax_list2[i].tick_params(axis='x', labelsize=ss,   pad=14,length=3,width=0.5,direction= 'inout',which='major')
-            ax_list2[i].tick_params(axis='x', labelsize=ss-1, pad=2, length=3,width=0.5,direction= 'inout',which='minor')
-            ax_list2[i].tick_params(axis='y', labelsize=ss,   pad=3, length=3,width=0.5,direction= 'inout')
-    
-        if 'JM' in feature:
-            ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
-            ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-            ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-    
-        elif 'JA' in feature:
-            ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
-            ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-            ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-        
-        elif 'JRF' in feature:
-            ax_list[0].legend(fontsize=ss-1,loc='upper center',fancybox=True,ncol=3, frameon=True,framealpha=1, bbox_to_anchor=(3.2, 1.5))
-            ax_list[0].text(0.9, 1.35, "(I) Subject-exposed", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-            ax_list[0].text(4.35, 1.35, "(II) Subject-naive", transform=ax_list[0].transAxes, size=ss+0.5,fontweight='bold')
-    
+        ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)
+            
     fig.savefig('./plots_out/Both_sub'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
     plt.close()
+
+
+
+def combined_plot_noise(analysis_opt):
+    # it plots the first trial and provides the statistics for each trial as well as average, std, iqr, min,max etc etc
+    lll = len(analysis_opt.model_exposed_hyper_arg)
+    save_name = analysis_opt.save_name
+    trial_ind = analysis_opt.trial_ind
+    color_list = ['r','b']
+    ls_list = ['-','-']
+    lsk = '--'
+    for XX in range(lll):
+        feature = analysis_opt.feature 
+        hyper_val_exp =  analysis_opt.model_exposed_hyper_arg[XX]
+        hyper_val_naive = analysis_opt.model_naive_hyper_arg[XX]
+        model_class_exp = analysis_opt.model_exposed_arch[XX]
+        model_class_naive = analysis_opt.model_naive_arch[XX]
+        hyper = analysis_opt.hyper[XX]
+        data = analysis_opt.data[XX]
+        window = analysis_opt.window_size[XX]
+        norm_out = hyper.iloc[hyper_val_exp]['norm_out']
+
+        model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
+        model2 = load_model('naive'  , feature, model_class_naive, hyper_val_naive)
+
+
+        XE, YE  = data.subject_exposed(feature, norm_out).test_in_list[trial_ind], data.subject_exposed(feature, norm_out).test_out_list[trial_ind]
+        XN, YN  = data.subject_naive(  feature, norm_out).test_in_list[trial_ind],   data.subject_naive(  feature, norm_out).test_out_list[trial_ind]
+        sub_col = data.subject_exposed(feature, norm_out).sub_col
+        
+        SC = data.std_out[data.label[feature]]
+        TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
+        TN = np.linspace(0,1,YN.shape[0] + analysis_opt.window_size[XX])
+
+        plot_subtitle = analysis_opt.plot_subtitle[XX]
+
+        YP1, YP2 = model1.predict(XE), model2.predict(XN)
+        YT1, YT2 = np.array(YE), np.array(YN)
+
+        if XX == 0:
+            fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
+
+        if 'JA' == feature:
+            new_order = [7,8,9,0,1,2,3,4,5,6]
+            YP1 = YP1[:,new_order]
+            YP2 = YP2[:,new_order]
+            YT1 = YT1[:,new_order]
+            YT2 = YT2[:,new_order]
+            SC = SC[[sub_col[i] for i in new_order]]            
+    
+        sparse_plot=5
+        for i, _  in enumerate(sub_col):
+            push_plot = 0
+            count = 0   ## plotting first trial
+            if ax_list[i] == ax_list[0]:
+                label1  = analysis_opt.legend_label[XX] #+ ' prediction'
+                if label1 == 'NN':
+                    label1 = 'FFNN'
+                if XX == 0:
+                    label2 = 'MSK'
+            else:
+                label1, label2 = '_no_legend_', '_no_legend_'
+
+            if XX == 0:
+                ax_list[i].plot( TE[window::sparse_plot], YT1[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
+                ax_list2[i].plot(TN[window::sparse_plot], YT2[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
+                
+            ax_list[i].plot(TE[window::sparse_plot], YP1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
+            ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
+
+            Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
+            RMSE  = mean_squared_error(YP1[:,i], YT1[:,i],squared=False)
+
+            Title2  = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
+            RMSE2  = mean_squared_error(YP2[:,i], YT2[:,i],squared=False)
+
+            push_plot = push_plot + 0.1
+    
+            NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
+    
+            ax_list[i].set_xlim(0,1)
+            ax_list2[i].set_xlim(0,1)
+            Title = str(np.around(Title,2))
+            NRMSE = str(np.around(NRMSE,2))
+            Title2 = str(np.around(Title2,2))
+            NRMSE2 = str(np.around(NRMSE2,2))
+
+            if len(Title) == 3:
+                Title = Title+'0'
+            if len(Title2) == 3:
+                Title2 = Title2+'0'
+            if len(NRMSE) == 3:
+                NRMSE = NRMSE+'0'
+            if len(NRMSE2) == 3:
+                NRMSE2 = NRMSE2+'0'
+    
+            Title = plot_list[i] + "  r = " + Title + ", NRMSE = " + NRMSE
+            Title2 = plot_list[i] + "  r = " + Title2 + ", NRMSE = " + NRMSE2
+
+            if plot_subtitle:
+                ax_list[i].text(-0.25, 1.1, Title, transform=ax_list[i].transAxes, size=ss)#,fontweight='bold')
+                ax_list2[i].text(-0.25, 1.1, Title2, transform=ax_list2[i].transAxes, size=ss)#,fontweight='bold')
+
+            minor_ticks = []
+            push3 = 0
+            for sn in range(count+1):
+                for sn1 in np.arange(sn,sn+1.25,0.25):
+                    minor_ticks.append(sn1+push3)
+                push3=push3+0.1
+    
+            ax_list[i].set_xticks(minor_ticks ,minor=True)
+            ax_list[i].set_xticks(np.array(minor_ticks[2::5])+0.0005,minor=False)
+    
+            ax_list[i].set_ylabel(ylabel[i],fontsize=ss)
+            # ax_list[i].yaxis.set_label_coords(-0.28,0.5)
+    
+            ax_list2[i].set_xticks(minor_ticks ,minor=True)
+            ax_list2[i].set_xticks(np.array(minor_ticks[2::5])+0.0005,minor=False)
+            ax_list2[i].set_ylabel(ylabel[i],fontsize=ss)
+            # ax_list2[i].yaxis.set_label_coords(-0.28,0.5)
+    
+###########################above code is untouched and below it plots the noisy data
+        alpha = 0.05
+        for noo in range(100):
+            XEN, XNN = add_noise_to_trial(XE), add_noise_to_trial(XN)
+            YPN1, YPN2 = model1.predict(XEN), model2.predict(XNN)
+            if 'JA' == feature:
+                new_order = [7,8,9,0,1,2,3,4,5,6]
+                YPN1 = YPN1[:,new_order]
+                YPN2 = YPN2[:,new_order]
+            for i, _  in enumerate(sub_col):
+                ax_list[i].plot(TE[window::sparse_plot], YPN1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.4,label='_no_legend_',alpha=alpha)   ### np.arange(a)
+                ax_list2[i].plot(TN[window::sparse_plot], YPN2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.4,label ='_no_legend_', alpha=alpha)#,label=label1)   ### np.arange(a)
+
+
+        ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)
+            
+    fig.savefig('./plots_out/Both_sub_noise'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
+    plt.close()
+
+
 
 
 
