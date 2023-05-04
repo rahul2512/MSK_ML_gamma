@@ -19,11 +19,11 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
-    fm.LM.exposed.arg      = [43, 43, 43]
-    fm.LM.naive.arg        = [43, 43, 43]
-    fm.LM.exposed.arch     = ['LM']*3
-    fm.LM.naive.arch       = ['LM']*3
-    fm.LM.exposed_unseen     = fm.LM.exposed
+#    fm.LM.exposed.arg      = [43, 43, 43]
+#    fm.LM.naive.arg        = [43, 43, 43]
+#    fm.LM.exposed.arch     = ['LM']*3
+#    fm.LM.naive.arch       = ['LM']*3
+#    fm.LM.exposed_unseen     = fm.LM.exposed
 
 
 ### JA -- 2003, 4011
@@ -32,6 +32,13 @@ if should:
 
     fm.NN.exposed.arg        = [2003, 2809, 2003]
     fm.NN.naive.arg          = [4011, 8365, 3903]
+    fm.NN.exposed.arch       = ['NN']*3
+    fm.NN.naive.arch         = ['NN']*3
+    fm.NN.exposed_unseen     = fm.NN.exposed
+
+
+    fm.NN.exposed.arg        = [218, 2164, 2202]
+    fm.NN.naive.arg          = [3098, 6778, 4132]
     fm.NN.exposed.arch       = ['NN']*3
     fm.NN.naive.arch         = ['NN']*3
     fm.NN.exposed_unseen     = fm.NN.exposed
@@ -131,7 +138,7 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
-# train_final_models([fm.NN])
+train_final_models([fm.NN])
 # fm = compute_stat([fm.NN])
 # print_tables(fm.NN)
 
