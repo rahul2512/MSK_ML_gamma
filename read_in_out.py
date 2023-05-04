@@ -587,20 +587,16 @@ def intro_nan(data, prob_of_missing, number_of_miss):
                 data.loc[i][marker_ind] = [np.nan]*3
     return data
 
-
 def create_artifical_input_data_with_missing_markers():
     path = './Input/'
     prob_of_missing = 0.1
     number_of_miss = 1
-
     for index in np.arange(1, 17, 1):
         for trial in np.arange(1, 4, 1):
             data = pd.read_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial)+'.txt',engine='python',delimiter=',',header=None)
             data = intro_nan(data, prob_of_missing, number_of_miss)
             data.to_csv(path+'Miss_1_Marker_input_Subject'+str(index)+'_RGF_'+str(trial) + '.txt',  sep=',', index=False, header=None)
-
     return data
-
 
 #data = create_artifical_input_data_with_missing_markers()
         
@@ -625,8 +621,9 @@ def add_noise_to_trial(T_in):
         cn = continuous_noise(T[time_col])
         offset = np.random.normal(0, 2, 1) #https://www.mdpi.com/2075-1729/12/6/819#B15-life-12-00819
         T[col] = T[col] + cn + np.full(samples, offset)
-        plt.plot(cn)
-        plt.show()
-        plt.close()
+        # plt.plot(cn)
+        # plt.show()
+        # plt.close()
     return T
+
        
