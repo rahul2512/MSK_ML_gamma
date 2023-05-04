@@ -587,20 +587,16 @@ def intro_nan(data, prob_of_missing, number_of_miss):
                 data.loc[i][marker_ind] = [np.nan]*3
     return data
 
-
 def create_artifical_input_data_with_missing_markers():
     path = './Input/'
     prob_of_missing = 0.1
     number_of_miss = 1
-
     for index in np.arange(1, 17, 1):
         for trial in np.arange(1, 4, 1):
             data = pd.read_csv(path+'Marker_input_Subject'+str(index)+'_RGF_'+str(trial)+'.txt',engine='python',delimiter=',',header=None)
             data = intro_nan(data, prob_of_missing, number_of_miss)
             data.to_csv(path+'Miss_1_Marker_input_Subject'+str(index)+'_RGF_'+str(trial) + '.txt',  sep=',', index=False, header=None)
-
     return data
-
 
 #data = create_artifical_input_data_with_missing_markers()
         

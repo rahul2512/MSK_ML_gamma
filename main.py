@@ -129,15 +129,15 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
-#hyper_index = int(sys.argv[1])
-#explore(fm.LM, hyper_index)
+# hyper_index = int(sys.argv[1])
+# explore(fm.LM, hyper_index)
 # train_final_models([fm.NN])
 # fm = compute_stat([fm.NN])
 # print_tables(fm.NN)
 
-#learning_curve(fm.LM)
+# learning_curve(fm.LM)
 # fm = compute_stat([fm.NN])
-plot_noise_results(fm)
+# plot_noise_results(fm)
 # print_tables(fm.NN)
 
 # b = initiate_data('Braced_')
