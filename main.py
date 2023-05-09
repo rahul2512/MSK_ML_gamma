@@ -1,10 +1,10 @@
 import numpy as np, os.path, pandas as pd, sys, matplotlib.pyplot as plt
 #from barchart_err import barchart_error, barchart_params
 from pytorch import run_final_model, run_cross_valid, combined_plot, save_outputs, stat_new_data
-from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, combined_plot_noise, learning_curve
+from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, combined_plot_noise, learning_curve, plot_learning_curve
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 
-#feat_order     = ['JA','JM','JRF','MA','MF']
+feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
 window = 10
 #window=20 when CNN
@@ -142,7 +142,10 @@ def avg_stat(fm):
 # fm = compute_stat([fm.NN])
 # print_tables(fm.NN)
 
-lc = learning_curve(fm.LM)
+#lc = learning_curve(fm.LM)
+for feat in feat_order:
+    plot_learning_curve('LM', 'naive', feat)
+
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
 # print_tables(fm.NN)
