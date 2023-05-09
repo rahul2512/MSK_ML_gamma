@@ -19,11 +19,11 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
-#    fm.LM.exposed.arg      = [43, 43, 43]
-#    fm.LM.naive.arg        = [43, 43, 43]
-#    fm.LM.exposed.arch     = ['LM']*3
-#    fm.LM.naive.arch       = ['LM']*3
-#    fm.LM.exposed_unseen     = fm.LM.exposed
+    fm.LM.exposed.arg      = [43, 43, 43]
+    fm.LM.naive.arg        = [43, 43, 43]
+    fm.LM.exposed.arch     = ['LM']*3
+    fm.LM.naive.arch       = ['LM']*3
+    fm.LM.exposed_unseen     = fm.LM.exposed
 
 
 ### JA -- 2003, 4011
@@ -138,11 +138,11 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
-train_final_models([fm.NN])
+#train_final_models([fm.NN])
 # fm = compute_stat([fm.NN])
 # print_tables(fm.NN)
 
-# learning_curve(fm.LM)
+lc = learning_curve(fm.LM)
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
 # print_tables(fm.NN)
