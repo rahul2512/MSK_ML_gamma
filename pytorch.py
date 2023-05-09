@@ -866,6 +866,7 @@ def stat_new_data(fd, data):
 ##############################################################################
 
 def learning_curve(fm):
+    ## learning curve are done using all the data i.e. validation accuracy is essentially test accuracy
     res = analysis_options("results for learning curve -- note only for naive models")
     res.model = fm.what
     res.subject = 'naive'
