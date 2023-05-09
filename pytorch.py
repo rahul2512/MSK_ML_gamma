@@ -871,7 +871,6 @@ def learning_curve(fm):
     res.subject = 'naive'
     rand = np.arange(5)
     res.RMSE = {}
-
     for enumf, feat in enumerate(fm.feature):
         hyper_arg = fm.naive.arg[enumf]
         model_class = fm.naive.arch[enumf]
@@ -880,6 +879,8 @@ def learning_curve(fm):
         data = fm.data.subject_naive(feat,norm_out)
         nsub = len(data.train_in_list)
         res.RMSE[feat] = pd.DataFrame(index = np.arange(1, nsub), columns=rand)
+        print(res.RMSE)
+        input()
         for r in rand:
             for n in np.arange(1,nsub):
                 try:
@@ -890,11 +891,11 @@ def learning_curve(fm):
     
                 model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class)
                 res.RMSE[feat][r].loc[n] = model.evaluate(data.test_in, data.test_out, verbose=2)[1]
-        print(res.RMSE[feat])
-        input()
-        
-
+        # print(res.RMSE[feat])
+        # input()
     return fm
+
+
 
 
 

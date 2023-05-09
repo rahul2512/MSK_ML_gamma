@@ -620,6 +620,7 @@ def add_noise_to_trial(T_in):
     for col in T.columns[:-1]:
         cn = continuous_noise(T[time_col])
         offset = np.random.normal(0, 2, 1) #https://www.mdpi.com/2075-1729/12/6/819#B15-life-12-00819
+        OMC_noise = np.random.normal(0, 2.89, samples) #https://www.sciencedirect.com/science/article/pii/S0966636204000682  ## 1-5 mm
         T[col] = T[col] + cn + np.full(samples, offset)
         # plt.plot(cn)
         # plt.show()
