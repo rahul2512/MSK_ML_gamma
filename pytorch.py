@@ -2,7 +2,7 @@ from pytorch_utilities import *
 from read_in_out import analysis_options, add_noise_to_trial
 import pandas as pd
 import numpy as np
-import keras
+import keras, random
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sys, copy
@@ -447,7 +447,7 @@ def combined_plot_noise(analysis_opt):
         alpha=0.2
         for i, _  in enumerate(sub_col):
             mu1, sigma1 = YP1[:,i][window::sparse_plot], M1_std[:,i][window::sparse_plot]                
-            mu2, sigma2 = YP2[:,i][window::sparse_plot], M2_std[:,i][window::sparse_plot]                
+            mu2, sigma2 = YP2[:,i][window::sparse_plot], M2_std[:,i][window::sparse_plot]        
             ax_list[i].fill_between( TE[window::sparse_plot], mu1+sigma1, mu1-sigma1, facecolor=color_list[XX], alpha=alpha)
             ax_list2[i].fill_between(TN[window::sparse_plot], mu2+sigma2, mu2-sigma2, facecolor=color_list[XX], alpha=alpha)
             ax_list[i].plot( TE[window::sparse_plot], M1_mean[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label='_no_legend_')   ### np.arange(a)
@@ -598,7 +598,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     if debug_mode == True:
         history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
     else:
-        history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
+        history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
         
     return model
 
@@ -861,7 +861,7 @@ def stat_new_data(fd, data):
 
 ##############################################################################
 ##############################################################################
-#### learning curve
+###### learning curve
 ##############################################################################
 ##############################################################################
 
@@ -869,8 +869,9 @@ def learning_curve(fm):
     res = analysis_options("results for learning curve -- note only for naive models")
     res.model = fm.what
     res.subject = 'naive'
-    rand = np.arange(5)
-    res.RMSE = {}
+    nval = np.arange(5)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
+    res.RMSE_train = {}
+    res.RMSE_test  = {}
     for enumf, feat in enumerate(fm.feature):
         hyper_arg = fm.naive.arg[enumf]
         model_class = fm.naive.arch[enumf]
@@ -878,24 +879,48 @@ def learning_curve(fm):
         norm_out  = hyper_val['norm_out']
         data = fm.data.subject_naive(feat,norm_out)
         nsub = len(data.train_in_list)
-        res.RMSE[feat] = pd.DataFrame(index = np.arange(1, nsub), columns=rand)
-        print(res.RMSE)
-        input()
-        for r in rand:
+        res.RMSE_train[feat] = pd.DataFrame(index = np.arange(1, nsub), columns=nval)
+        res.RMSE_test[feat]  = pd.DataFrame(index = np.arange(1, nsub), columns=nval)
+        for r in nval:
             for n in np.arange(1,nsub):
+                rand = random.choices(range(0, nsub), k=n)              
+                tmp_train_in  = [ data.train_in_list[f] for f in rand]
+                tmp_train_out = [ data.train_out_list[f] for f in rand]
                 try:
-                    X = pd.concat(data.train_in_list[0:n])
+                    X = pd.concat(tmp_train_in)
                 except:
-                    X = np.concatenate(data.train_in_list[0:n])                
-                Y = pd.concat(data.train_out_list[0:n])
+                    X = np.concatenate(tmp_train_in)  
+                Y = pd.concat(tmp_train_out)
     
-                model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class)
-                res.RMSE[feat][r].loc[n] = model.evaluate(data.test_in, data.test_out, verbose=2)[1]
-        # print(res.RMSE[feat])
-        # input()
+                model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class, 0)
+                res.RMSE_train[feat][r].loc[n] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+        res.RMSE_train[feat].to_csv('./lc_data/' + res.model + '.' + res.subject + '.' + feat + '.lc.train.txt' ,index=False, header=False)
+        res.RMSE_test[feat].to_csv( './lc_data/' + res.model + '.' + res.subject + '.' + feat + '.lc.test.txt' ,index=False, header=False)
+        ## columns are various nval trials and rows are number of subjects
     return fm
 
 
 
-
-
+def plot_learning_curve(model_kind, subject_kind, feat):
+    alpha = 0.2
+    color = ['r','b']
+    s = 11
+    train_err = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.train.txt', header=None)    
+    val_err  = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.test.txt', header=None)       
+    nsub = train_err.shape[0]
+    fig, ax = plt.subplots()
+    ind = np.arange(1,nsub+1)
+    label = ['Training', 'Validation']
+    for enum,d in enumerate([train_err,val_err]):
+        ax.scatter(ind, d.mean(axis=1), color=color[enum], label=label[enum])
+        ax.plot(ind, d.mean(axis=1), color=color[enum], label='_no_legend_')
+        ax.fill_between(ind, d.mean(axis=1)+d.std(axis=1), d.mean(axis=1)-d.std(axis=1), facecolor=color[enum], alpha=alpha)
+    ax.legend(fontsize=s)
+    ax.tick_params(axis='both', labelsize=s,   pad=4,length=3,width=0.5,direction= 'inout',which='major')
+    ax.set_xlabel("# of subjects", fontsize=s)
+    ax.set_ylabel("RMSE loss", fontsize=s)
+    plt.savefig('./plots_out/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.pdf', dpi=600)
+    plt.show()
+    
+    
