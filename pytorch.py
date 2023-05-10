@@ -906,7 +906,9 @@ def learning_curve(fm):
 def plot_learning_curve(model_kind, subject_kind, feat):
     alpha = 0.2
     color = ['r','b']
-    s = 11
+    index = feature_slist.index(feat)
+    yl = feature_list[index]
+    s = 14
     train_err = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.train.txt', header=None)    
     val_err  = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.test.txt', header=None)       
     nsub = train_err.shape[0]
@@ -920,8 +922,7 @@ def plot_learning_curve(model_kind, subject_kind, feat):
     ax.legend(fontsize=s)
     ax.tick_params(axis='both', labelsize=s,   pad=4,length=3,width=0.5,direction= 'inout',which='major')
     ax.set_xlabel("# of subjects", fontsize=s)
-    ax.set_ylabel("RMSE loss", fontsize=s)
+    ax.set_ylabel("RMSE loss (" + yl + ')', fontsize=s)
     plt.savefig('./plots_out/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.pdf', dpi=600)
     plt.show()
-    
     
