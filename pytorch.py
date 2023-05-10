@@ -870,7 +870,7 @@ def learning_curve(fm):
     res = analysis_options("results for learning curve -- note only for naive models")
     res.model = fm.what
     res.subject = 'naive'
-    nval = np.arange(5)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
+    nval = np.arange(10)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
     res.RMSE_train = {}
     res.RMSE_test  = {}
     for enumf, feat in enumerate(fm.feature):

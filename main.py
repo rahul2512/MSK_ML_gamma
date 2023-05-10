@@ -3,6 +3,7 @@ import numpy as np, os.path, pandas as pd, sys, matplotlib.pyplot as plt
 from pytorch import run_final_model, run_cross_valid, combined_plot, save_outputs, stat_new_data
 from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, combined_plot_noise, learning_curve, plot_learning_curve
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
+from joblib import Parallel, delayed
 
 feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
@@ -143,8 +144,13 @@ def avg_stat(fm):
 # print_tables(fm.NN)
 
 #lc = learning_curve(fm.LM)
-for feat in feat_order:
-    plot_learning_curve('LM', 'naive', feat)
+#lc = learning_curve(fm.NN)
+
+num_workers=2
+results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN])
+
+#for feat in feat_order:
+#    plot_learning_curve('LM', 'naive', feat)
 
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
