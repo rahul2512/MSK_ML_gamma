@@ -146,11 +146,12 @@ def avg_stat(fm):
 #lc = learning_curve(fm.LM)
 #lc = learning_curve(fm.NN)
 
-num_workers=2
-results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN])
+# num_workers=2
+# results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN])
 
-#for feat in feat_order:
-#    plot_learning_curve('LM', 'naive', feat)
+for feat in feat_order:
+    plot_learning_curve('LM', 'naive', feat)
+    plot_learning_curve('NN', 'naive', feat)
 
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
