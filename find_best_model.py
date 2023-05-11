@@ -82,9 +82,9 @@ class stat_CV:
 
 def compute_stat():
 #    df = stat_CV("NN")
-#    df = stat_CV("RNN")
+    df = stat_CV("RNN")
 #    df = stat_CV("CNN")
-    df = stat_CV("LM")
+#    df = stat_CV("LM")
 #    df = stat_CV("CNNLSTM")
     return df
 
