@@ -9,9 +9,9 @@ import copy
 feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
 window = 10
-window=20  ## when CNN
-data_kind  =  [ 'CNN', 'CNNLSTM']
-#data_kind  =  ['NN','LM', 'RNN']
+#window=20  ## when CNN
+#data_kind  =  [ 'CNN', 'CNNLSTM']
+data_kind  =  ['NN','LM', 'RNN']
 
 #data_kind  =  ['LM']
 fm = ML_analysis('final_model_list', data_kind, window)
@@ -21,24 +21,24 @@ fm = ML_analysis('final_model_list', data_kind, window)
 should = 1
 
 if should:
- #   fm.LM.exposed.arg      = [43, 43, 43]
- #   fm.LM.naive.arg        = [43, 43, 43]
- #   fm.LM.exposed.arch     = ['LM']*3
- #   fm.LM.naive.arch       = ['LM']*3
- #   fm.LM.exposed_unseen     = fm.LM.exposed
+    fm.LM.exposed.arg      = [43, 43, 43]
+    fm.LM.naive.arg        = [43, 43, 43]
+    fm.LM.exposed.arch     = ['LM']*3
+    fm.LM.naive.arch       = ['LM']*3
+    fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
 
- #   fm.NN.exposed.arg        = [2003, 2809, 2003]
- #   fm.NN.naive.arg          = [4011, 8365, 3903]
- #   fm.NN.exposed.arch       = ['NN']*3
- #   fm.NN.naive.arch         = ['NN']*3
- #   fm.NN.exposed_unseen     = fm.NN.exposed
+    fm.NN.exposed.arg        = [2003, 2809, 2003]
+    fm.NN.naive.arg          = [4011, 8365, 3903]
+    fm.NN.exposed.arch       = ['NN']*3
+    fm.NN.naive.arch         = ['NN']*3
+    fm.NN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
 
 #    fm.NN.exposed.arg        = [218, 2164, 2202]
 #    fm.NN.naive.arg          = [3098, 6778, 4132]
 #    fm.NN.exposed.arch       = ['NN']*3
 #    fm.NN.naive.arch         = ['NN']*3
-#    fm.NN.exposed_unseen     = fm.NN.exposed
+#    fm.NN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
 #    fm.VRNN = copy.deepcopy(fm.RNN) 
 #    fm.LSTM = copy.deepcopy(fm.RNN) 
@@ -60,21 +60,21 @@ if should:
    # fm.GRU.naive.arch         = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
 
-    fm.CNN.exposed.arg        = [105,555,253]
-    fm.CNN.naive.arg          = [105, 413,253]
+#    fm.CNN.exposed.arg        = [105,555,253]
+#    fm.CNN.naive.arg          = [105, 413,253]
 #    fm.CNN.exposed.arg        = [248,410,106]
 #    fm.CNN.naive.arg          = [52, 516,58]
-    fm.CNN.exposed.arch       = ['CNN']*3
-    fm.CNN.naive.arch         = ['CNN']*3
-    fm.CNN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
+#    fm.CNN.exposed.arch       = ['CNN']*3
+#    fm.CNN.naive.arch         = ['CNN']*3
+#    fm.CNN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
 
-    fm.CNNLSTM.exposed.arg        = [387, 1361, 1251]
-    fm.CNNLSTM.naive.arg          = [387, 907, 1251]
+#    fm.CNNLSTM.exposed.arg        = [387, 1361, 1251]
+#    fm.CNNLSTM.naive.arg          = [387, 907, 1251]
 
-    fm.CNNLSTM.exposed.arch       = ['CNNLSTM']*3
-    fm.CNNLSTM.naive.arch         = ['CNNLSTM']*3
-    fm.CNNLSTM.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
+#    fm.CNNLSTM.exposed.arch       = ['CNNLSTM']*3
+#    fm.CNNLSTM.naive.arch         = ['CNNLSTM']*3
+#    fm.CNNLSTM.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
 
 
@@ -154,8 +154,8 @@ def avg_stat(fm):
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
 #train_final_models([fm.NN])
-# fm = compute_stat([fm.NN])
-# print_tables(fm.NN)
+#fm = compute_stat([fm.NN])
+#print_tables(fm.NN)
 
 #lc = learning_curve(fm.LM)
 #lc = learning_curve(fm.NN)
@@ -163,7 +163,7 @@ def avg_stat(fm):
 #num_workers=3
 #results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN, fm.VRNN, fm.LSTM, fm.GRU])
 #results = Parallel(n_jobs=num_workers)(delayed(train_final_models)(item) for item in [fm.VRNN, fm.LSTM, fm.GRU])
-learning_curve(fm.CNNLSTM)
+#learning_curve(fm.CNNLSTM)
 #train_final_models(fm.CNNLSTM)
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
