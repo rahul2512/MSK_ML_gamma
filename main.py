@@ -4,6 +4,7 @@ from pytorch import run_final_model, run_cross_valid, combined_plot, save_output
 from pytorch import feature_slist, feature_list, stat, specific, explore, print_tables, combined_plot_noise, learning_curve, plot_learning_curve
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 from joblib import Parallel, delayed
+import copy
 
 feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
@@ -39,9 +40,9 @@ if should:
 #    fm.NN.naive.arch         = ['NN']*3
 #    fm.NN.exposed_unseen     = fm.NN.exposed
 
-    fm.VRNN = fm.RNN 
-    fm.LSTM = fm.RNN 
-    fm.GRU  = fm.RNN 
+    fm.VRNN = copy.deepcopy(fm.RNN) 
+    fm.LSTM = copy.deepcopy(fm.RNN) 
+    fm.GRU  = copy.deepcopy(fm.RNN) 
     
     fm.VRNN.exposed.arg       = [3411, 3408, 3413]
     fm.VRNN.naive.arg         = [3169, 2136, 237  ] 
@@ -80,10 +81,9 @@ if should:
 
 def train_final_models(D):
     ## train final model with best-avg-validation accuracy
-    for d in D:
-        for i in range(3):
-            specific(d.exposed,i)
-            specific(d.naive  ,i)
+    for i in range(3):
+        specific(D.exposed,i)
+        specific(D.naive  ,i)
     return None
 
 def compute_stat(f):
@@ -161,9 +161,10 @@ def avg_stat(fm):
 #lc = learning_curve(fm.LM)
 #lc = learning_curve(fm.NN)
 
-num_workers=5
-results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN, fm.VRNN, fm.LSTM, fm.GRU])
-
+#num_workers=3
+#results = Parallel(n_jobs=num_workers)(delayed(learning_curve)(item) for item in [fm.LM, fm.NN, fm.VRNN, fm.LSTM, fm.GRU])
+#results = Parallel(n_jobs=num_workers)(delayed(train_final_models)(item) for item in [fm.VRNN, fm.LSTM, fm.GRU])
+learning_curve(fm.GRU)
 # fm = compute_stat([fm.NN])
 # plot_noise_results(fm)
 # print_tables(fm.NN)
