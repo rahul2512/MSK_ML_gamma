@@ -14,7 +14,8 @@ from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 from keras import backend as K
-
+from pytorch_utilities import initiate_transformer, rf, GBRT, xgb_model
+import joblib
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
 feature_list = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
@@ -513,24 +514,37 @@ def create_PC_data(model,X1,Y2):
         PC[i] = np.around(scipy.stats.pearsonr(Y1[:,i],Y2[:,i])[0],3)
     return PC
 
+def evaluate_mse(X,Y,model):
+    y_pred = model.predict(X)
+    mse = mean_squared_error(Y, y_pred)
+    return mse
 
 def save_outputs(model, hyper_val, data, label, save_model, model_class):
+    print(model_class)
     X_Train, Y_Train, X_val, Y_val = data.train_in, data.train_out, data.test_in, data.test_out
     feature = data.feature
     subject = data.subject
     train_error = create_PC_data(model,X_Train, Y_Train)
     val_error = create_PC_data(model,X_val, Y_val)   ## it is test error in case of final model
     mse = np.zeros(np.shape(train_error)[0])
-    mse[0] = model.evaluate(X_Train, Y_Train,verbose=0)[0]
-    mse[1] = model.evaluate(X_val, Y_val,verbose=0)[0]
+    try:
+        mse[0] = model.evaluate(X_Train, Y_Train,verbose=0)[0]
+        mse[1] = model.evaluate(X_val, Y_val,verbose=0)[0]
+    except:
+        mse[0] = evaluate_mse(X_Train, Y_Train,model)
+        mse[1] = evaluate_mse(X_val, Y_val,model)
     out = np.vstack([mse,train_error, val_error])
     out = np.nan_to_num(out, nan=0, posinf=2222)
     np.savetxt('./text_out/stat_'+ model_class + '_'  +feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + label +'.txt',out,fmt='%1.6f')
     if save_model == True:
-        model.save('./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.h5')
+        try:
+            model.save('./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.h5')
+        except:
+            joblib.dump(model,'./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.joblib')
     return None
 
 def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=False):
+    opt, loss = None, None
     if model_class   == 'RNN':
         dim = 2
         NN_variant, opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, norm_out =   hyper_val
@@ -549,6 +563,9 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     elif model_class   == 'LM':
         dim = 1 
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
+    elif model_class   == 'rf':
+        dim = 1 
+        n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out  =   hyper_val
     else:
         print('unrecog model description')
         sys.exit()
@@ -558,11 +575,11 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     t_dim = X_Train.shape[1]
 
     if debug_mode == True:
-        num_nodes=128
-        H_layer=2
-        epoch = 5
+        # num_nodes=128
+        # H_layer=2
+        # epoch = 5
         print("Debug mode on ")
-        print(inp_dim,out_dim,t_dim)
+        # print(inp_dim,out_dim,t_dim)
 
     if opt == 'Adam':
         optim = keras.optimizers.Adam
@@ -595,10 +612,14 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
         X_Train = np.reshape(X_Train, (X_Train.shape[0], X_Train.shape[1], X_Train.shape[2], 1))
         X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], X_val.shape[2], 1))
 
-    if debug_mode == True:
-        history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
+    if model_class == 'rf':
+        model = rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion)
     else:
-        history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
+        if debug_mode == True:
+            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
+        elif debug_mode == False:
+            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
+
         
     return model
 
@@ -649,8 +670,12 @@ def create_final_model(hyper_arg,hyper_val,which,pca,scale_out, model_class):
 
 
 def load_model(subject_condition,feature,model_type,hyper_arg):
-    path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)+'.h5'  
-    model = keras.models.load_model(path)
+    try:
+        path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)+'.h5'  
+        model = keras.models.load_model(path)
+    except:        
+        path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)+'.joblib'  
+        model = joblib.load(path)
     return model
 
 

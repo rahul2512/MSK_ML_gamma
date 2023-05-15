@@ -1,8 +1,10 @@
-import keras, sys, numpy as np
+import keras, sys, numpy as np, xgboost as xgb
 from keras.regularizers import l2
 from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D
 from keras.layers.convolutional import Conv1D, MaxPooling1D
 # from ann_visualizer.visualize import ann_viz;
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
 
 
 ### Initite NN model
@@ -246,6 +248,114 @@ def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, uni
     return model
 
 
+
+
+######################################
+## Randomforest
+######################################
+def rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion):
+    model = RandomForestRegressor(n_estimators=n_estimators, verbose=1, max_features=max_features, 
+                                  max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf, 
+                                  bootstrap=bootstrap, criterion=criterion)
+    model.fit(X_Train, Y_Train)
+    y_pred = model.predict(X_val)
+    mse = mean_squared_error(Y_val, y_pred)
+    print("Validation MSE --" , mse)
+    return model
+
+######################################
+#GradientBoostingRegressor
+######################################
+def GBRT(train_in, train_out, val_in, val_out, n_estimators,random_state):
+    rf = GradientBoostingRegressor(n_estimators, random_state)
+    rf.fit(train_in, train_out)
+    y_pred = rf.predict(val_in)
+    mse = mean_squared_error(val_out, y_pred)
+    print("Validation MSE --" , mse)
+    return rf
+
+######################################
+## xgboost
+######################################
+def xgb_model(train_in, train_out, val_in, val_out):
+    dtrain = xgb.DMatrix(train_in, train_out, enable_categorical=0)
+    dtest = xgb.DMatrix(val_in, val_out, enable_categorical=0)
+    params = {
+        'objective': 'reg:squarederror',  # Regression objective
+        'eta': 0.1,                       # Learning rate
+        'max_depth': 3,                   # Maximum depth of trees
+        'subsample': 0.8,                 # Subsample ratio of the training instances
+        'colsample_bytree': 0.8,          # Subsample ratio of columns when constructing each tree
+        'eval_metric': 'rmse'             # Evaluation metric
+    }        
+    num_rounds = 500  # Number of boosting rounds
+    model = xgb.train(params, dtrain, num_rounds)
+    y_pred = model.predict(dtest)
+    mse = mean_squared_error(val_out, y_pred)
+    print("Validation MSE --" , mse)
+    return model
+
+
+###################
+## Transformer code
+###################
+from tensorflow.keras import layers
+def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+    # Normalization and Attention
+    x = layers.LayerNormalization(epsilon=1e-6)(inputs)
+    x = layers.MultiHeadAttention(
+        key_dim=head_size, num_heads=num_heads, dropout=dropout
+    )(x, x)
+    x = layers.Dropout(dropout)(x)
+    res = x + inputs
+    # Feed Forward Part
+    x = layers.LayerNormalization(epsilon=1e-6)(res)
+    x = layers.Conv1D(filters=ff_dim, kernel_size=1, activation="relu")(x)
+    x = layers.Dropout(dropout)(x)
+    x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
+    return x + res
+
+def initiate_transformer(
+    input_shape,
+    out_dim,
+    head_size,
+    num_heads,
+    ff_dim,
+    num_transformer_blocks,
+    mlp_units,
+    dropout=0,
+    mlp_dropout=0,
+):
+    inputs = keras.Input(shape=input_shape)
+    x = inputs
+    for _ in range(num_transformer_blocks):
+        x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
+
+    x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
+    for dim in mlp_units:
+        x = layers.Dense(dim, activation="relu")(x)
+        x = layers.Dropout(mlp_dropout)(x)
+    outputs = layers.Dense(out_dim, activation="tanh")(x)
+    return keras.Model(inputs, outputs)
+
+
+#### Code below generates a .txt file with row as the list of hypermeters 
+#### for a given NN and then that NN hypermeters were cross-validated on cluster
+def hyper_param_rf():
+    with open('./hyperparameters/hyperparam_rf.txt', 'w') as f:
+        print('n_estimators', 'max_features', 'max_depth', 'min_samples_split', 'min_samples_leaf', 'bootstrap','criterion', 'norm_out', file=f)
+        for n_estimators in [200,400,600,800,1000]:
+            for max_features in ['auto', 'sqrt']:
+                for max_depth in [10, 30, 50, 70, 90, 110]:
+                    for min_samples_split in [2,5,10]:
+                        for min_samples_leaf in [1,2,4]:
+                            for bootstrap in [True, False]:
+                                for criterion in ['squared_error', 'absolute_error']:
+                                    for norm_out in [0]:
+                                        print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out, file=f)
+    return None
+
+
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
 def hyper_param_NN():
@@ -255,7 +365,7 @@ def hyper_param_NN():
 # mse
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('hyperparam_NN.txt', 'w') as f:
+    with open('./hyperparameters/hyperparam_NN.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant','norm_out', file=f)
         for optim in ['Adam', 'SGD']:
             for kinit in ['glorot_normal']:
@@ -277,7 +387,7 @@ def hyper_param_NN():
 
 
 def hyper_param_CNN():
-    with open('hyperparam_CNN.txt', 'w') as f:
+    with open('./hyperparameters/hyperparam_CNN.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', 'norm_out', file=f)
         for optim in ['Adam', 'SGD', 'RMSprop']:
             for kinit in ['glorot_normal']:
@@ -299,7 +409,7 @@ def hyper_param_CNN():
     return None
 
 def hyper_param_CNNLSTM():
-    with open('hyperparam_CNNLSTM.txt', 'w') as f:
+    with open('./hyperparameters/hyperparam_CNNLSTM.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', 'LSTM_units', 'norm_out',file=f)
         for optim in ['Adam', 'SGD', 'RMSprop']:
             for kinit in ['glorot_normal']:
@@ -329,7 +439,7 @@ def hyper_param_LM():
 # mse
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('hyperparam_LM.txt', 'w') as f:
+    with open('./hyperparameters/hyperparam_LM.txt', 'w') as f:
         print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', 'NN_variant', 'norm_out', file=f)
         for optim in ['Adam', 'SGD']:
             for kinit in ['glorot_normal','random_normal', 'he_normal']:
@@ -357,7 +467,7 @@ def hyper_param_RNN():
 # mse
 # relu, tanh, sigmoid
 # random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('hyperparam_RNN.txt', 'w') as f:
+    with open('./hyperparameters/hyperparam_RNN.txt', 'w') as f:
         print('NN_variant','optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','norm_out',file=f)
 #        for NN_variant in ['SimpleRNN','BSimpleRNN','LSTM','BLSTM','GRU','BGRU']:
         for NN_variant in ['BSimpleRNN','BLSTM','BGRU']:
@@ -377,6 +487,7 @@ def hyper_param_RNN():
                                                                 print(NN_variant, optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, norm_out, file=f)
     return None
 
+# hyper_param_rf()
 # hyper_param_LM()
 # hyper_param_NN()
 # hyper_param_RNN()

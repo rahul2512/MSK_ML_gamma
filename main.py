@@ -5,33 +5,40 @@ from pytorch import feature_slist, feature_list, stat, specific, explore, print_
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 from joblib import Parallel, delayed
 import copy
+# from pytorch_utilities import initiate_transformer, rf, GBRT, xgb_model
 
 feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
 window = 10
 #window=20  ## when CNN
 #data_kind  =  [ 'CNN', 'CNNLSTM']
-data_kind  =  ['NN','LM', 'RNN']
+#data_kind  =  ['NN','LM', 'RNN']
 
-#data_kind  =  ['LM']
+data_kind  =  ['rf']
 fm = ML_analysis('final_model_list', data_kind, window)
-# hyper_index = int(sys.argv[1])
-# explore(fm.LM, hyper_index)
+# hyper_arg = int(sys.argv[1])
+explore(fm.rf, hyper_arg=0)
 
 should = 1
-
 if should:
-    fm.LM.exposed.arg      = [43, 43, 43]
-    fm.LM.naive.arg        = [43, 43, 43]
-    fm.LM.exposed.arch     = ['LM']*3
-    fm.LM.naive.arch       = ['LM']*3
-    fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
+    None
+    fm.rf.exposed.arg      = [43, 43, 43]
+    fm.rf.naive.arg        = [43, 43, 43]
+    fm.rf.exposed.arch     = ['rf']*3
+    fm.rf.naive.arch       = ['rf']*3
+    fm.rf.exposed_unseen     = copy.deepcopy(fm.rf.exposed)
 
-    fm.NN.exposed.arg        = [2003, 2809, 2003]
-    fm.NN.naive.arg          = [4011, 8365, 3903]
-    fm.NN.exposed.arch       = ['NN']*3
-    fm.NN.naive.arch         = ['NN']*3
-    fm.NN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
+    # fm.LM.exposed.arg      = [43, 43, 43]
+    # fm.LM.naive.arg        = [43, 43, 43]
+    # fm.LM.exposed.arch     = ['LM']*3
+    # fm.LM.naive.arch       = ['LM']*3
+    # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
+
+    # fm.NN.exposed.arg        = [2003, 2809, 2003]
+    # fm.NN.naive.arg          = [4011, 8365, 3903]
+    # fm.NN.exposed.arch       = ['NN']*3
+    # fm.NN.naive.arch         = ['NN']*3
+    # fm.NN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
 
 #    fm.NN.exposed.arg        = [218, 2164, 2202]
@@ -153,7 +160,7 @@ def avg_stat(fm):
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
-#train_final_models([fm.NN])
+# train_final_models(fm.rf)
 #fm = compute_stat([fm.NN])
 #print_tables(fm.NN)
 
@@ -172,3 +179,50 @@ def avg_stat(fm):
 # b = initiate_data('Braced_')
 # b = stat_new_data(fm.NN, b)
 # print_tables(b)
+
+###################
+###################
+###################
+###################
+# u = fm.NN.data.subject_exposed('JA',0)
+# train_in, train_out, val_in, val_out = u.train_in, u.train_out, u.test_in, u.test_out
+
+# import keras
+# input_shape = u.train_in.shape[1:]
+
+# random_forest(train_in, train_out, val_in, val_out, 100,64)
+
+
+# model = initiate_transformer(
+#     input_shape,
+#     10,
+#     head_size=256,
+#     num_heads=4,
+#     ff_dim=4,
+#     num_transformer_blocks=4,
+#     mlp_units=[128],
+#     mlp_dropout=0.4,
+#     dropout=0.25,
+# )
+
+# model.compile(
+#     loss="mse",
+#     optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+#     metrics=["mse"],
+# )
+# model.summary()
+
+# callbacks = [keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)]
+
+# model.fit(
+#     u.train_in,
+#     u.train_out,
+#     validation_data = (u.test_in, u.test_out),
+#     epochs=200,
+#     batch_size=64,
+#     callbacks=callbacks,
+# )
+
+# model.evaluate(u.test_in, u.test_out, verbose=1)
+
+

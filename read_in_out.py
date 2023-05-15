@@ -517,22 +517,25 @@ class ML:
 
         if what == 'NN':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv('hyperparam_NN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_NN.txt',delimiter='\s+')
         elif what == 'LM':
             self.data  = initiate_data()
-            self.hyper = pd.read_csv('hyperparam_LM.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_LM.txt',delimiter='\s+')
+        elif what == 'rf':
+            self.data  = initiate_data()
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_rf.txt',delimiter='\s+')
         elif what == 'RNN':
             self.data  = initiate_RNN_data(window_size=window)
-            self.hyper = pd.read_csv('hyperparam_RNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_RNN.txt',delimiter='\s+')
         elif what == 'CNN':
             self.data  = initiate_RNN_data(window_size=window)
-            self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
         elif what == 'CNNLSTM':
             self.data  = initiate_RNN_data(window_size=window)
-            self.hyper = pd.read_csv('hyperparam_CNNLSTM.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNNLSTM.txt',delimiter='\s+')
         elif what == 'convLSTM':
             self.data  = initiate_RNN_data(window_size=window)
-            self.hyper = pd.read_csv('hyperparam_CNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
 
         self.what = what
         self.exposed        =  subject('exposed', self.data, self.hyper, self.what)
@@ -548,6 +551,8 @@ class ML_analysis:
         
         if 'LM' in data_kind:
             self.LM  = ML('LM', window)
+        if 'rf' in data_kind:
+            self.rf  = ML('rf', window)
         if 'NN' in data_kind:
             self.NN  = ML('NN', window)
         if 'RNN' in data_kind:
