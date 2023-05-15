@@ -1,7 +1,7 @@
-model="RNN"
-ncpu=36
+model="rf"
+ncpu=72
 ##  1270080 total number of hyp
-filename="hyperparam_""${model}"".txt"
+filename="./hyperparameters/hyperparam_""${model}"".txt"
 linecount=$(wc -l < "$filename")
 echo ${linecount} "total number of jobs"
 rm jobs/${model}_job*slurm

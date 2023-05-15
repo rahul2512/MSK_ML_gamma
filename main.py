@@ -14,10 +14,10 @@ window = 10
 #data_kind  =  [ 'CNN', 'CNNLSTM']
 #data_kind  =  ['NN','LM', 'RNN']
 
-data_kind  =  ['GBRT']
+data_kind  =  ['rf']
 fm = ML_analysis('final_model_list', data_kind, window)
-# hyper_arg = int(sys.argv[1])
-explore(fm.GBRT, hyper_arg=1)
+hyper_arg = int(sys.argv[1])
+explore(fm.rf, hyper_arg)
 
 should = 0
 if should:
