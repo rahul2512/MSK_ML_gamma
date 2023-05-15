@@ -14,12 +14,12 @@ window = 10
 #data_kind  =  [ 'CNN', 'CNNLSTM']
 #data_kind  =  ['NN','LM', 'RNN']
 
-data_kind  =  ['rf']
+data_kind  =  ['GBRT']
 fm = ML_analysis('final_model_list', data_kind, window)
 # hyper_arg = int(sys.argv[1])
-explore(fm.rf, hyper_arg=0)
+explore(fm.GBRT, hyper_arg=1)
 
-should = 1
+should = 0
 if should:
     None
     fm.rf.exposed.arg      = [43, 43, 43]

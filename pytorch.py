@@ -566,6 +566,9 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     elif model_class   == 'rf':
         dim = 1 
         n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out  =   hyper_val
+    elif model_class   == 'GBRT':
+        dim = 1 
+        n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out  =   hyper_val
     else:
         print('unrecog model description')
         sys.exit()
@@ -614,6 +617,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
 
     if model_class == 'rf':
         model = rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion)
+    elif model_class == 'GBRT':
+        model = GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss)
     else:
         if debug_mode == True:
             history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
@@ -894,6 +899,7 @@ def learning_curve(fm):
     ## learning curve are done using all the data i.e. validation accuracy is essentially test accuracy
     res = analysis_options("results for learning curve -- note only for naive models")
     res.model = fm.what
+    res.lc_label = fm.lc_label 
     res.subject = 'naive'
     nval = np.arange(10)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
     res.RMSE_train = {}
@@ -921,8 +927,8 @@ def learning_curve(fm):
                 model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class, 0)
                 res.RMSE_train[feat][r].loc[n] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
                 res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-        res.RMSE_train[feat].to_csv('./lc_data/' + res.model + '.' + res.subject + '.' + feat + '.lc.train.txt' ,index=False, header=False)
-        res.RMSE_test[feat].to_csv( './lc_data/' + res.model + '.' + res.subject + '.' + feat + '.lc.test.txt' ,index=False, header=False)
+        res.RMSE_train[feat].to_csv('./lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.train.txt' ,index=False, header=False)
+        res.RMSE_test[feat].to_csv( './lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.test.txt' ,index=False, header=False)
         ## columns are various nval trials and rows are number of subjects
     return fm
 

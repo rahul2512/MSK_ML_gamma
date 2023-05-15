@@ -265,14 +265,15 @@ def rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, mi
 
 ######################################
 #GradientBoostingRegressor
-######################################
-def GBRT(train_in, train_out, val_in, val_out, n_estimators,random_state):
-    rf = GradientBoostingRegressor(n_estimators, random_state)
-    rf.fit(train_in, train_out)
-    y_pred = rf.predict(val_in)
-    mse = mean_squared_error(val_out, y_pred)
+###################################
+def GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss):
+    model = GradientBoostingRegressor(n_estimators=n_estimators, verbose=1, max_features=max_features, 
+                                      max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf, loss=loss)
+    model.fit(X_Train, Y_Train)
+    y_pred = model.predict(X_val)
+    mse = mean_squared_error(Y_val, y_pred)
     print("Validation MSE --" , mse)
-    return rf
+    return model
 
 ######################################
 ## xgboost
@@ -355,6 +356,18 @@ def hyper_param_rf():
                                         print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out, file=f)
     return None
 
+def hyper_param_GBRT():
+    with open('./hyperparameters/hyperparam_GBRT.txt', 'w') as f:
+        print('n_estimators', 'max_features', 'max_depth', 'min_samples_split', 'min_samples_leaf','loss', 'norm_out', file=f)
+        for n_estimators in [200,400,600,800,1000]:
+            for max_features in ['auto', 'sqrt']:
+                for max_depth in [10, 30, 50, 70, 90, 110]:
+                    for min_samples_split in [2,5,10]:
+                        for min_samples_leaf in [1,2,4]:
+                            for loss in ['squared_error', 'absolute_error']:
+                                for norm_out in [0]:
+                                    print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out, file=f)
+    return None
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
@@ -488,6 +501,7 @@ def hyper_param_RNN():
     return None
 
 # hyper_param_rf()
+# hyper_param_GBRT()
 # hyper_param_LM()
 # hyper_param_NN()
 # hyper_param_RNN()
