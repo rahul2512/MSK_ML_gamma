@@ -278,24 +278,18 @@ def GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, 
 ######################################
 ## xgboost
 ######################################
-def xgb_model(train_in, train_out, val_in, val_out):
-    dtrain = xgb.DMatrix(train_in, train_out, enable_categorical=0)
-    dtest = xgb.DMatrix(val_in, val_out, enable_categorical=0)
-    params = {
-        'objective': 'reg:squarederror',  # Regression objective
-        'eta': 0.1,                       # Learning rate
-        'max_depth': 3,                   # Maximum depth of trees
-        'subsample': 0.8,                 # Subsample ratio of the training instances
-        'colsample_bytree': 0.8,          # Subsample ratio of columns when constructing each tree
-        'eval_metric': 'rmse'             # Evaluation metric
-    }        
-    num_rounds = 500  # Number of boosting rounds
-    model = xgb.train(params, dtrain, num_rounds)
-    y_pred = model.predict(dtest)
-    mse = mean_squared_error(val_out, y_pred)
+def xgbr(X_Train, Y_Train, X_val, Y_val, n_estimators, learning_rate,max_depth, objective, alpha,  lambda1):
+    model = xgb.XGBRegressor(objective=objective, 
+                             n_estimators=n_estimators, 
+                             learning_rate=learning_rate, 
+                             max_depth=max_depth, 
+                             reg_alpha=alpha, 
+                             reg_lambda=lambda1)
+    model.fit(X_Train, Y_Train)
+    y_pred = model.predict(X_val)
+    mse = mean_squared_error(Y_val, y_pred)
     print("Validation MSE --" , mse)
     return model
-
 
 ###################
 ## Transformer code
@@ -355,6 +349,21 @@ def hyper_param_rf():
                                     for norm_out in [0]:
                                         print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out, file=f)
     return None
+
+
+def hyper_param_xgbr():
+    with open('./hyperparameters/hyperparam_xgbr.txt', 'w') as f:
+        print('n_estimators', 'learning_rate', 'max_depth', 'objective', 'alpha', 'lambda1', 'norm_out', file=f)
+        for n_estimators in [200,400,600,800,1000]:
+            for learning_rate in [0.01, 0.005]:
+                for max_depth in [10, 30, 50, 70, 90, 110]:
+                    for objective in ['reg:squarederror', 'reg:logistic']:
+                        for alpha in [0.1, 0.2]:
+                            for lambda1 in [0.1, 0.2]:
+                                for norm_out in [0]:
+                                    print(n_estimators, learning_rate, max_depth, objective, alpha, lambda1, norm_out, file=f)
+    return None
+
 
 def hyper_param_GBRT():
     with open('./hyperparameters/hyperparam_GBRT.txt', 'w') as f:
@@ -500,6 +509,7 @@ def hyper_param_RNN():
                                                                 print(NN_variant, optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, norm_out, file=f)
     return None
 
+hyper_param_xgbr()
 # hyper_param_rf()
 # hyper_param_GBRT()
 # hyper_param_LM()

@@ -14,7 +14,7 @@ from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 from keras import backend as K
-from pytorch_utilities import initiate_transformer, rf, GBRT, xgb_model
+from pytorch_utilities import initiate_transformer, rf, GBRT, xgbr
 import joblib
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
@@ -544,7 +544,7 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
     return None
 
 def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=False):
-    opt, loss = None, None
+    opt, loss, dim = None, None, 1
     if model_class   == 'RNN':
         dim = 2
         NN_variant, opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, norm_out =   hyper_val
@@ -558,16 +558,14 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
         dim = 2
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, LSTM_units, norm_out = hyper_val
     elif model_class   == 'NN':
-        dim = 1 
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
     elif model_class   == 'LM':
-        dim = 1 
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
     elif model_class   == 'rf':
-        dim = 1 
         n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out  =   hyper_val
+    elif model_class   == 'xgbr':
+        n_estimators, learning_rate,max_depth, objective, alpha,  lambda1, norm_out  =   hyper_val
     elif model_class   == 'GBRT':
-        dim = 1 
         n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out  =   hyper_val
     else:
         print('unrecog model description')
@@ -617,6 +615,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
 
     if model_class == 'rf':
         model = rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion)
+    elif model_class == 'xgbr':
+        model = xgbr(X_Train, Y_Train, X_val, Y_val, n_estimators, learning_rate,max_depth, objective, alpha,  lambda1)
     elif model_class == 'GBRT':
         model = GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss)
     else:
@@ -624,8 +624,6 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
             history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
         elif debug_mode == False:
             history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
-
-        
     return model
 
 
