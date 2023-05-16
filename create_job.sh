@@ -1,4 +1,4 @@
-model="rf"
+model="xgbr"
 ncpu=72
 ##  1270080 total number of hyp
 filename="./hyperparameters/hyperparam_""${model}"".txt"
