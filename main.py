@@ -16,8 +16,8 @@ window = 10
 
 data_kind  =  ['xgbr']
 fm = ML_analysis('final_model_list', data_kind, window)
-hyper_arg = int(sys.argv[1])
-explore(fm.xgbr, hyper_arg)
+# hyper_arg = int(sys.argv[1])
+# explore(fm.xgbr, hyper_arg)
 
 should = 0
 if should:

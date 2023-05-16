@@ -291,6 +291,18 @@ def xgbr(X_Train, Y_Train, X_val, Y_val, n_estimators, learning_rate,max_depth, 
     print("Validation MSE --" , mse)
     return model
 
+######################################
+#SVR
+###################################
+from sklearn.svm import SVR
+def SVR_model(X_Train, Y_Train, X_val, Y_val):
+    model = SVR(kernel='rbf') 
+    model.fit(X_Train, Y_Train)
+    y_pred = model.predict(X_val)
+    mse = mean_squared_error(Y_val, y_pred)
+    print("Validation MSE --" , mse)
+    return model
+
 ###################
 ## Transformer code
 ###################
