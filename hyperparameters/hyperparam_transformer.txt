@@ -1,6 +1,6 @@
 n_estimators max_features max_depth min_samples_split min_samples_leaf bootstrap criterion norm_out
 200 auto 10 2 1 True squared_error 0
-200 auto 10 2 1 True absolute_error 0
+200 auto 10 2 1 True absolute_error 1
 200 auto 10 2 1 False squared_error 0
 200 auto 10 2 1 False absolute_error 0
 200 auto 10 2 2 True squared_error 0

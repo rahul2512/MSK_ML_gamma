@@ -14,7 +14,7 @@ from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 from keras import backend as K
-from pytorch_utilities import initiate_transformer, rf, GBRT, xgbr
+from pytorch_utilities import transformer, rf, GBRT, xgbr
 import joblib
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
@@ -204,11 +204,10 @@ def combined_plot(analysis_opt):
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
         model2 = load_model('naive'  , feature, model_class_naive, hyper_val_naive)
 
-
         XE, YE  = data.subject_exposed(feature, norm_out).test_in_list[trial_ind], data.subject_exposed(feature, norm_out).test_out_list[trial_ind]
         XN, YN  = data.subject_naive(  feature, norm_out).test_in_list[trial_ind],   data.subject_naive(  feature, norm_out).test_out_list[trial_ind]
         sub_col = data.subject_exposed(feature, norm_out).sub_col
-        
+
         SC = data.std_out[data.label[feature]]
         TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
         TN = np.linspace(0,1,YN.shape[0] + analysis_opt.window_size[XX])
@@ -218,6 +217,13 @@ def combined_plot(analysis_opt):
         YP1, YP2 = model1.predict(XE), model2.predict(XN)
         YT1, YT2 = np.array(YE), np.array(YN)
 
+        if norm_out:
+            for eel, een  in enumerate(sub_col):
+                YP1[:, eel] = SC[een]*YP1[:, eel]
+                YT1[:, eel] = SC[een]*YT1[:, eel]
+                YP2[:, eel] = SC[een]*YP2[:, eel]
+                YT2[:, eel] = SC[een]*YT2[:, eel]
+                
         if XX == 0:
             fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
 
@@ -249,16 +255,16 @@ def combined_plot(analysis_opt):
             ax_list[i].plot(TE[window::sparse_plot], YP1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
             ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
-            Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
-            RMSE  = mean_squared_error(YP1[:,i], YT1[:,i],squared=False)
+            Title  = scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
+            RMSE   = mean_squared_error(  YP1[:,i],YT1[:,i],squared=False)
 
-            Title2  = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
-            RMSE2  = mean_squared_error(YP2[:,i], YT2[:,i],squared=False)
+            Title2 = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
+            RMSE2  = mean_squared_error(  YP2[:,i],YT2[:,i],squared=False)
 
             push_plot = push_plot + 0.1
     
             NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
-    
+
             ax_list[i].set_xlim(0,1)
             ax_list2[i].set_xlim(0,1)
             Title = str(np.around(Title,2))
@@ -343,6 +349,13 @@ def combined_plot_noise(analysis_opt):
 
         YP1, YP2 = model1.predict(XE), model2.predict(XN)
         YT1, YT2 = np.array(YE), np.array(YN)
+
+        if norm_out:
+            for eel, een  in enumerate(sub_col):
+                YP1[:, eel] = SC[een]*YP1[:, eel]
+                YT1[:, eel] = SC[een]*YT1[:, eel]
+                YP2[:, eel] = SC[een]*YP2[:, eel]
+                YT2[:, eel] = SC[een]*YT2[:, eel]
 
         if XX == 0:
             fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
@@ -551,6 +564,9 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     elif model_class == 'CNN':
         dim = 2
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
+    elif model_class == 'transformer':
+        dim = 2
+        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
     elif model_class == 'convLSTM':
         dim = 2
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
@@ -606,6 +622,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
         model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
     elif model_class == 'CNN':
         model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
+    elif model_class == 'transformer':
+        model = initiate_CNN_model()
     elif model_class == 'CNNLSTM':
         model = initiate_CNNLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride, LSTM_units)
     elif model_class == 'convLSTM':

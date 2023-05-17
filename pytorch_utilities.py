@@ -322,7 +322,7 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
     return x + res
 
-def initiate_transformer(
+def transformer(
     input_shape,
     out_dim,
     head_size,
