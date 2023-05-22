@@ -35,8 +35,8 @@ if should:
     # fm.LM.naive.arch       = ['LM']*3
     # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
 
-    fm.transformer.exposed.arg      = [1, 1, 1]
-    fm.transformer.naive.arg        = [1, 1, 1]
+    fm.transformer.exposed.arg      = [1,1,1]
+    fm.transformer.naive.arg        = [1,1,1]
     fm.transformer.exposed.arch     = ['transformer']*3
     fm.transformer.naive.arch       = ['transformer']*3
     fm.transformer.exposed_unseen     = copy.deepcopy(fm.transformer.exposed)
@@ -172,7 +172,7 @@ plot_final_results([fm.transformer,fm.transformer])
 # explore(fm.LM, hyper_index)
 # train_final_models(fm.rf)
 fm = compute_stat([fm.transformer])
-# print_tables(fm.transformer)
+print_tables(fm.transformer)
 
 #lc = learning_curve(fm.LM)
 #lc = learning_curve(fm.NN)
@@ -194,42 +194,45 @@ fm = compute_stat([fm.transformer])
 ###################
 ###################
 ###################
-# u = fm.CNN.data.subject_exposed('JA',1)
-# train_in, train_out, val_in, val_out = u.train_in, u.train_out, u.test_in, u.test_out
+sys.exit()
 
-# import keras
-# input_shape = u.train_in.shape[1:]
+u = fm.transformer.data.subject_exposed('JM',1)
+train_in, train_out, val_in, val_out = u.train_in, u.train_out, u.test_in, u.test_out
 
-# model = initiate_transformer(
-#     input_shape,
-#     10,
-#     head_size=64,
-#     num_heads=8,
-#     ff_dim=4,
-#     num_transformer_blocks=6,
-#     mlp_units=[32,32],
-#     mlp_dropout=0.2,
-#     dropout=0.1,
-# )
+import keras
+input_shape = u.train_in.shape[1:]
+output_shape = u.train_out.shape[1]
+print(output_shape)
+model = transformer(
+    input_shape,
+    output_shape,
+    head_size=64,
+    num_heads=8,
+    ff_dim=4,
+    num_transformer_blocks=6,
+    mlp_units=[32,32],
+    mlp_dropout=0.2,
+    dropout=0.1,
+)
 
-# model.compile(
-#     loss="mse",
-#     optimizer=keras.optimizers.Adam(learning_rate=1e-3),
-#     metrics=["mse"],
-# )
-# model.summary()
+model.compile(
+    loss="mse",
+    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+    metrics=["mse"],
+)
+model.summary()
 
-# #callbacks = [keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)]
+#callbacks = [keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)]
 
-# model.fit(
-#     u.train_in,
-#     u.train_out,
-#     validation_data = (u.test_in, u.test_out),
-#     epochs=200,
-#     batch_size=128,
-# #    callbacks=callbacks,
-# )
+model.fit(
+    u.train_in,
+    u.train_out,
+    validation_data = (u.test_in, u.test_out),
+    epochs=200,
+    batch_size=128,
+#    callbacks=callbacks,
+)
 
-# model.evaluate(u.test_in, u.test_out, verbose=1)
+model.evaluate(u.test_in, u.test_out, verbose=1)
 
 

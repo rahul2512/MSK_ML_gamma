@@ -340,9 +340,9 @@ def transformer(
 
     x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
     for dim in mlp_units:
-        x = layers.Dense(dim, activation="relu")(x)
+        x = layers.Dense(dim, activation="tanh")(x)
         x = layers.Dropout(mlp_dropout)(x)
-    outputs = layers.Dense(out_dim, activation="relu")(x)
+    outputs = layers.Dense(out_dim, activation="linear")(x)
     return keras.Model(inputs, outputs)
 
 

@@ -217,12 +217,12 @@ def combined_plot(analysis_opt):
         YP1, YP2 = model1.predict(XE), model2.predict(XN)
         YT1, YT2 = np.array(YE), np.array(YN)
 
-        if norm_out:
-            for eel, een  in enumerate(sub_col):
-                YP1[:, eel] = SC[een]*YP1[:, eel]
-                YT1[:, eel] = SC[een]*YT1[:, eel]
-                YP2[:, eel] = SC[een]*YP2[:, eel]
-                YT2[:, eel] = SC[een]*YT2[:, eel]
+        # if norm_out:
+        #     for eel, een  in enumerate(sub_col):
+        #         YP1[:, eel] = SC[een]*YP1[:, eel]
+        #         YT1[:, eel] = SC[een]*YT1[:, eel]
+        #         YP2[:, eel] = SC[een]*YP2[:, eel]
+        #         YT2[:, eel] = SC[een]*YT2[:, eel]
                 
         if XX == 0:
             fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
