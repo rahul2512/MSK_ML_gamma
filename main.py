@@ -5,21 +5,22 @@ from pytorch import feature_slist, feature_list, stat, specific, explore, print_
 from read_in_out import initiate_data, initiate_RNN_data, analysis_options, ML_analysis
 from joblib import Parallel, delayed
 import copy
-from pytorch_utilities import initiate_transformer
+from pytorch_utilities import  transformer
 
 feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
 window = 10
 window=20  ## when CNN
+window=2  ## when CNN
 #data_kind  =  [ 'CNN', 'CNNLSTM']
 #data_kind  =  ['NN','LM', 'RNN']
 
-data_kind  =  ['CNN']
+data_kind  =  ['transformer']
 fm = ML_analysis('final_model_list', data_kind, window)
 # hyper_arg = int(sys.argv[1])
 # explore(fm.xgbr, hyper_arg)
 
-should = 0
+should = 1
 if should:
     None
     # fm.rf.exposed.arg      = [43, 43, 43]
@@ -28,11 +29,17 @@ if should:
     # fm.rf.naive.arch       = ['rf']*3
     # fm.rf.exposed_unseen     = copy.deepcopy(fm.rf.exposed)
 
-    fm.LM.exposed.arg      = [43, 43, 43]
-    fm.LM.naive.arg        = [43, 43, 43]
-    fm.LM.exposed.arch     = ['LM']*3
-    fm.LM.naive.arch       = ['LM']*3
-    fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
+    # fm.LM.exposed.arg      = [43, 43, 43]
+    # fm.LM.naive.arg        = [43, 43, 43]
+    # fm.LM.exposed.arch     = ['LM']*3
+    # fm.LM.naive.arch       = ['LM']*3
+    # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
+
+    fm.transformer.exposed.arg      = [1,1,1]
+    fm.transformer.naive.arg        = [1,1,1]
+    fm.transformer.exposed.arch     = ['transformer']*3
+    fm.transformer.naive.arch       = ['transformer']*3
+    fm.transformer.exposed_unseen     = copy.deepcopy(fm.transformer.exposed)
 
     # fm.NN.exposed.arg        = [2003, 2809, 2003]
     # fm.NN.naive.arg          = [4011, 8365, 3903]
@@ -94,7 +101,7 @@ def train_final_models(D):
 
 def compute_stat(f):
     for D in f:
-        for i in range(3):
+        for i in range(1):
             D.exposed = stat(D.exposed,i)
             D.naive   = stat(D.naive,i)
             try:
@@ -104,24 +111,24 @@ def compute_stat(f):
                 None
     return fm
 
-def plot_final_results(fm):
+def plot_final_results(ff):
     analysis_opt = analysis_options()        
     analysis_opt.save_name = 'final'
     analysis_opt.trial_ind = 2
     analysis_opt.plot_subtitle   = [False, True]
     analysis_opt.legend_label   = ['LM', 'NN']
+
     analysis_opt.window_size = [0,0]
-    analysis_opt.data    = [fm.LM.data,fm.NN.data]
-    analysis_opt.hyper    = [fm.LM.hyper,fm.NN.hyper]
+    analysis_opt.data    =  [ff[k].data  for k in range(len(ff))]
+    analysis_opt.hyper    = [ff[k].hyper for k in range(len(ff))]
     
     for i in range(3):
-        analysis_opt.feature   = fm.feature[i]
+        analysis_opt.feature   = ff[0].feature[i]
 
-        analysis_opt.model_exposed_hyper_arg  = [fm.LM.exposed.arg[i], fm.NN.exposed.arg[i]]
-        analysis_opt.model_naive_hyper_arg    = [fm.LM.naive.arg[i], fm.NN.naive.arg[i]]
-        
-        analysis_opt.model_exposed_arch  = [fm.LM.exposed.arch[i],fm.NN.exposed.arch[i]]
-        analysis_opt.model_naive_arch    = [fm.LM.naive.arch[i],fm.NN.naive.arch[i]]
+        analysis_opt.model_exposed_hyper_arg  = [ff[k].exposed.arg[i]  for k in range(len(ff))]
+        analysis_opt.model_naive_hyper_arg    = [ff[k].naive.arg[i]    for k in range(len(ff))]        
+        analysis_opt.model_exposed_arch  =      [ff[k].exposed.arch[i] for k in range(len(ff))]
+        analysis_opt.model_naive_arch    =      [ff[k].naive.arch[i]   for k in range(len(ff))]
 
         combined_plot(analysis_opt)
     return None
@@ -158,11 +165,14 @@ def avg_stat(fm):
         print('%',np.around(np.mean(a),2),np.around(np.std(a),2), j.kind, j.subject, 'NRMSE')
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
+
+plot_final_results([fm.transformer,fm.transformer])
+
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
 # train_final_models(fm.rf)
-# fm = compute_stat([fm.LM])
-# print_tables(fm.LM)
+fm = compute_stat([fm.transformer])
+print_tables(fm.transformer)
 
 #lc = learning_curve(fm.LM)
 #lc = learning_curve(fm.NN)
@@ -184,19 +194,22 @@ def avg_stat(fm):
 ###################
 ###################
 ###################
-u = fm.CNN.data.subject_exposed('JA',1)
+sys.exit()
+
+u = fm.transformer.data.subject_exposed('JM',1)
 train_in, train_out, val_in, val_out = u.train_in, u.train_out, u.test_in, u.test_out
 
 import keras
 input_shape = u.train_in.shape[1:]
-
-model = initiate_transformer(
+output_shape = u.train_out.shape[1]
+print(output_shape)
+model = transformer(
     input_shape,
-    10,
+    output_shape,
     head_size=64,
     num_heads=8,
     ff_dim=4,
-    num_transformer_blocks=4,
+    num_transformer_blocks=6,
     mlp_units=[32,32],
     mlp_dropout=0.2,
     dropout=0.1,
