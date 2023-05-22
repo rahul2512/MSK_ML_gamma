@@ -524,6 +524,9 @@ class ML:
         elif what == 'rf':
             self.data  = initiate_data()
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_rf.txt',delimiter='\s+')
+        elif what == 'transformer':
+            self.data  = initiate_RNN_data(window_size=window)
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_transformer.txt',delimiter='\s+')
         elif what == 'xgbr':
             self.data  = initiate_data()
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_xgbr.txt',delimiter='\s+')
@@ -556,6 +559,8 @@ class ML_analysis:
             self.LM  = ML('LM', window)
         if 'rf' in data_kind:
             self.rf  = ML('rf', window)
+        if 'transformer' in data_kind:
+            self.transformer  = ML('transformer', window)
         if 'xgbr' in data_kind:
             self.xgbr  = ML('xgbr', window)
         if 'NN' in data_kind:

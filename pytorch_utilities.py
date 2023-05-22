@@ -322,7 +322,7 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
     return x + res
 
-def initiate_transformer(
+def transformer(
     input_shape,
     out_dim,
     head_size,
@@ -340,9 +340,9 @@ def initiate_transformer(
 
     x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
     for dim in mlp_units:
-        x = layers.Dense(dim, activation="relu")(x)
+        x = layers.Dense(dim, activation="tanh")(x)
         x = layers.Dropout(mlp_dropout)(x)
-    outputs = layers.Dense(out_dim, activation="relu")(x)
+    outputs = layers.Dense(out_dim, activation="linear")(x)
     return keras.Model(inputs, outputs)
 
 
