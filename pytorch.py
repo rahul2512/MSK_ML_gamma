@@ -566,7 +566,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
     elif model_class == 'transformer':
         dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
+        head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, epoch, batch_size, norm_out = hyper_val
     elif model_class == 'convLSTM':
         dim = 2
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
@@ -590,6 +590,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     inp_dim = X_Train.shape[dim]
     out_dim = Y_Train.shape[1]
     t_dim = X_Train.shape[1]
+
+    ## all done except checking input shape for tf
 
     if debug_mode == True:
         # num_nodes=128
@@ -623,7 +625,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Fa
     elif model_class == 'CNN':
         model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
     elif model_class == 'transformer':
-        model = initiate_CNN_model()
+        model = transformer(input_shape, output_shape, head_size, num_heads, ff_dim, num_transformer_blocks,mlp_units, mlp_dropout, dropout=0.1)
     elif model_class == 'CNNLSTM':
         model = initiate_CNNLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride, LSTM_units)
     elif model_class == 'convLSTM':
