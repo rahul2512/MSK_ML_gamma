@@ -35,8 +35,8 @@ if should:
     # fm.LM.naive.arch       = ['LM']*3
     # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
 
-    fm.transformer.exposed.arg      = [0,0,0]
-    fm.transformer.naive.arg        = [0,0,0]
+    fm.transformer.exposed.arg      = [1,1,1]
+    fm.transformer.naive.arg        = [1,1,1]
     fm.transformer.exposed.arch     = ['transformer']*3
     fm.transformer.naive.arch       = ['transformer']*3
     fm.transformer.exposed_unseen     = copy.deepcopy(fm.transformer.exposed)
