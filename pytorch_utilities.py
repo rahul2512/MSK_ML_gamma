@@ -5,6 +5,7 @@ from keras.layers.convolutional import Conv1D, MaxPooling1D
 # from ann_visualizer.visualize import ann_viz;
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
+from tensorflow.keras import layers
 
 
 ### Initite NN model
@@ -306,8 +307,7 @@ def SVR_model(X_Train, Y_Train, X_val, Y_val):
 ###################
 ## Transformer code
 ###################
-from tensorflow.keras import layers
-def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout):
     # Normalization and Attention
     x = layers.LayerNormalization(epsilon=1e-6)(inputs)
     x = layers.MultiHeadAttention(
@@ -322,28 +322,20 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Conv1D(filters=inputs.shape[-1], kernel_size=1)(x)
     return x + res
 
-def transformer(
-    input_shape,
-    out_dim,
-    head_size,
-    num_heads,
-    ff_dim,
-    num_transformer_blocks,
-    mlp_units,
-    dropout=0,
-    mlp_dropout=0,
-):
+def transformer(input_shape, out_dim, head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, dropout):
+    mlp_units = np.array(eval(mlp_units))
     inputs = keras.Input(shape=input_shape)
     x = inputs
     for _ in range(num_transformer_blocks):
         x = transformer_encoder(x, head_size, num_heads, ff_dim, dropout)
-
     x = layers.GlobalAveragePooling1D(data_format="channels_first")(x)
     for dim in mlp_units:
         x = layers.Dense(dim, activation="tanh")(x)
         x = layers.Dropout(mlp_dropout)(x)
     outputs = layers.Dense(out_dim, activation="linear")(x)
-    return keras.Model(inputs, outputs)
+    model = keras.Model(inputs, outputs)
+    model.compile(loss="mse", optimizer=keras.optimizers.Adam(learning_rate=1e-3), metrics=["mse"],)
+    return model
 
 
 #### Code below generates a .txt file with row as the list of hypermeters 
@@ -389,6 +381,22 @@ def hyper_param_GBRT():
                                 for norm_out in [0]:
                                     print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out, file=f)
     return None
+
+def hyper_param_transformer():
+    with open('./hyperparameters/hyperparam_transformer.txt', 'w') as f:
+        print('head_size', 'num_heads', 'ff_dim', 'num_transformer_blocks', 'mlp_units','mlp_dropout', 'epoch', 'batch_size', 'norm_out', file=f)
+        for head_size in [64]:
+            for num_heads in [8]:
+                for ff_dim in [4]:
+                    for num_transformer_blocks in [4,6,8]:
+                        for mlp_units in [[32], [32,32],[32,32,32]]:
+                            for mlp_dropout in [0.2]:
+                                for epoch in [100,200, 300]:
+                                    for batch_size in [64, 128]:
+                                        for norm_out in [0,1]:
+                                            print(head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, epoch, batch_size, norm_out, file=f)
+    return None
+
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
@@ -521,7 +529,8 @@ def hyper_param_RNN():
                                                                 print(NN_variant, optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, norm_out, file=f)
     return None
 
-hyper_param_xgbr()
+hyper_param_transformer()
+#hyper_param_xgbr()
 # hyper_param_rf()
 # hyper_param_GBRT()
 # hyper_param_LM()
