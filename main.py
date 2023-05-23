@@ -11,7 +11,7 @@ feat_order     = ['JA','JM','JRF']#,'MA','MF']
 
 window = 10
 window=20  ## when CNN
-window=2  ## when CNN
+window=5  ## when CNN
 #data_kind  =  [ 'CNN', 'CNNLSTM']
 #data_kind  =  ['NN','LM', 'RNN']
 
@@ -35,8 +35,8 @@ if should:
     # fm.LM.naive.arch       = ['LM']*3
     # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
 
-    fm.transformer.exposed.arg      = [1,1,1]
-    fm.transformer.naive.arg        = [1,1,1]
+    fm.transformer.exposed.arg      = [15,15,15]
+    fm.transformer.naive.arg        = [15,15,15]
     fm.transformer.exposed.arch     = ['transformer']*3
     fm.transformer.naive.arch       = ['transformer']*3
     fm.transformer.exposed_unseen     = copy.deepcopy(fm.transformer.exposed)
@@ -46,7 +46,6 @@ if should:
     # fm.NN.exposed.arch       = ['NN']*3
     # fm.NN.naive.arch         = ['NN']*3
     # fm.NN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
-
 
 #    fm.NN.exposed.arg        = [218, 2164, 2202]
 #    fm.NN.naive.arg          = [3098, 6778, 4132]
@@ -73,7 +72,6 @@ if should:
    # fm.GRU.exposed.arch       = ['RNN']*3
    # fm.GRU.naive.arch         = ['RNN']*3   ## (SimpleRNN, LSTM, GRU)
 
-
 #    fm.CNN.exposed.arg        = [105,555,253]
 #    fm.CNN.naive.arg          = [105, 413,253]
 #    fm.CNN.exposed.arg        = [248,410,106]
@@ -82,15 +80,12 @@ if should:
 #    fm.CNN.naive.arch         = ['CNN']*3
 #    fm.CNN.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
 
-
 #    fm.CNNLSTM.exposed.arg        = [387, 1361, 1251]
 #    fm.CNNLSTM.naive.arg          = [387, 907, 1251]
 
 #    fm.CNNLSTM.exposed.arch       = ['CNNLSTM']*3
 #    fm.CNNLSTM.naive.arch         = ['CNNLSTM']*3
 #    fm.CNNLSTM.exposed_unseen     = copy.deepcopy(fm.NN.exposed)
-
-
 
 def train_final_models(D):
     ## train final model with best-avg-validation accuracy
@@ -189,17 +184,4 @@ train_final_models(fm.transformer)
 # b = initiate_data('Braced_')
 # b = stat_new_data(fm.NN, b)
 # print_tables(b)
-
-###################
-###################
-###################
-###################
-
-# input_shape = u.train_in.shape[1:]
-# output_shape = u.train_out.shape[1]
-
-
-
-
-
 

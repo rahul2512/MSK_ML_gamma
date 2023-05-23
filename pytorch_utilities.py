@@ -389,10 +389,10 @@ def hyper_param_transformer():
             for num_heads in [8]:
                 for ff_dim in [4]:
                     for num_transformer_blocks in [4,6,8]:
-                        for mlp_units in [[32], [32,32],[32,32,32]]:
+                        for mlp_units in ['[32]','[32,32]','[32,32,32]']:
                             for mlp_dropout in [0.2]:
-                                for epoch in [100,200, 300]:
-                                    for batch_size in [64, 128]:
+                                for epoch in [100,200,300,500]:
+                                    for batch_size in [64,128]:
                                         for norm_out in [0,1]:
                                             print(head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, epoch, batch_size, norm_out, file=f)
     return None
