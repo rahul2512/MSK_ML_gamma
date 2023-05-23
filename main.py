@@ -35,8 +35,8 @@ if should:
     # fm.LM.naive.arch       = ['LM']*3
     # fm.LM.exposed_unseen     = copy.deepcopy(fm.LM.exposed)
 
-    fm.transformer.exposed.arg      = [15,15,15]
-    fm.transformer.naive.arg        = [15,15,15]
+    fm.transformer.exposed.arg      = [23,23,23]
+    fm.transformer.naive.arg        = [23,23,23]
     fm.transformer.exposed.arch     = ['transformer']*3
     fm.transformer.naive.arch       = ['transformer']*3
     fm.transformer.exposed_unseen     = copy.deepcopy(fm.transformer.exposed)
@@ -161,12 +161,12 @@ def avg_stat(fm):
         print('%',np.around(np.mean(b),2),np.around(np.std(b),2), j.kind, j.subject, 'pc')
 
 
-# plot_final_results([fm.transformer,fm.transformer])
+plot_final_results([fm.transformer,fm.transformer])
 
 # hyper_index = int(sys.argv[1])
 # explore(fm.LM, hyper_index)
-train_final_models(fm.transformer)
-# fm = compute_stat([fm.transformer])
+#train_final_models(fm.transformer)
+fm = compute_stat([fm.transformer])
 # print_tables(fm.transformer)
 
 #lc = learning_curve(fm.LM)

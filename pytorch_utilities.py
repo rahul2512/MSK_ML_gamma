@@ -334,7 +334,7 @@ def transformer(input_shape, out_dim, head_size, num_heads, ff_dim, num_transfor
         x = layers.Dropout(mlp_dropout)(x)
     outputs = layers.Dense(out_dim, activation="linear")(x)
     model = keras.Model(inputs, outputs)
-    model.compile(loss="mse", optimizer=keras.optimizers.Adam(learning_rate=1e-3), metrics=["mse"],)
+    model.compile(loss="mae", optimizer=keras.optimizers.Adam(learning_rate=1e-3), metrics=["mse"],)
     return model
 
 
