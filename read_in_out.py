@@ -69,7 +69,6 @@ def Muscle_process(Y,which):
     Y = tmp
     return Y
 
-
 def filt(d):
     filters = pd.read_csv('./Output/'+d.add1+'frame_filters', header=None)
     d.filter = filters.iloc[d.index-1] 
