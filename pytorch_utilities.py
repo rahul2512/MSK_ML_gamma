@@ -1,12 +1,24 @@
-import keras, sys, numpy as np, xgboost as xgb
+import pandas as pd, numpy as np, seaborn as sns, keras, random, xgboost as xgb
+import matplotlib.pyplot as plt, sys, copy, scipy, joblib, tensorflow as tf
+from sklearn.preprocessing import StandardScaler
+from matplotlib import gridspec
+from scipy.interpolate import interp1d
+from barchart_err import barchart_error, barchart_params
+from tensorflow.keras import backend as K
 from keras.regularizers import l2
-from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D
-from keras.layers.convolutional import Conv1D, MaxPooling1D
-# from ann_visualizer.visualize import ann_viz;
+from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
+try:
+    from keras.layers.convolutional import Conv1D, MaxPooling1D
+except:
+    from keras.layers import Conv1D, MaxPooling1D
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error
 from tensorflow.keras import layers
+from tensorflow.keras import backend as K
 
+@tf.keras.utils.register_keras_serializable()
+def rmse(y_true, y_pred):
+    return K.sqrt(K.mean(K.square(y_pred - y_true)))
 
 ### Initite NN model
 def initiate_NN_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
@@ -50,92 +62,39 @@ def initiate_Linear_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop
 ## https://www.kaggle.com/code/kankanashukla/types-of-lstm
 ## https://machinelearningmastery.com/stacked-long-short-term-memory-networks/
 
-
-
 def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
     dropout_layer = Dropout(rate=p_drop)
     model = keras.Sequential()
-    #units: Positive integer, dimensionality of the output space.
+    model.add(Input(shape=(None, inp_dim)))
+    units = int(units) ## for unknown reasons, it treats units as non-int
     #inputs: A 3D tensor with shape [batch, timesteps, feature]
+    rnn_layers = {'SimpleRNN': SimpleRNN, 'LSTM': LSTM, 'GRU': GRU, 'BSimpleRNN': SimpleRNN, 'BLSTM': LSTM, 'BGRU': GRU}
+    base_layer = rnn_layers[variant]
+
     if nbr_Hlayer == 0 :
+        layer = base_layer(units=units, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)
+        if variant.startswith('B'):
+            layer = Bidirectional(layer)
+        model.add(layer)
+        
+    elif nbr_Hlayer > 0 :     
+        for _ in range(nbr_Hlayer):
+            layer = base_layer(units=units, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True)
+            if variant.startswith('B'):
+                layer = Bidirectional(layer)
+            model.add(layer)
+        final_layer = base_layer(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)
+        if variant.startswith('B'):
+            final_layer = Bidirectional(final_layer)
+        model.add(final_layer)
 
-        if variant == 'SimpleRNN':
-            model.add(SimpleRNN(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))
-            print("Initialised SimpleRNN network")
-    
-        elif variant == 'BSimpleRNN':
-            model.add(Bidirectional(SimpleRNN(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)))
-            print("Initialised Bidirectional SimpleRNN network")
-    
-        elif variant == 'LSTM':
-            model.add(LSTM(units=units,  input_shape=(None, inp_dim), activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))
-            print("Initialised LSTM network")
-    
-        elif variant == 'BLSTM':
-            model.add(Bidirectional(LSTM(units=units,  input_shape=(None, inp_dim), activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)))
-            print("Initialised Bidirectional LSTM network")
-    
-        elif variant == 'GRU':
-            model.add(GRU(units=units, input_shape=(None, inp_dim), activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)) 
-            print("Initialised GRU network")
-    
-        elif variant == 'BGRU':
-            model.add(Bidirectional(GRU(units=units, input_shape=(None, inp_dim), activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))) 
-            print("Initialised Bidirectional GRU network")
-
-        else:
-            print("incorrect choice of model")
-            sys.exit()
-
-    elif nbr_Hlayer > 0 :
-
-        if variant == 'SimpleRNN':
-            for i in range(nbr_Hlayer):
-                model.add(SimpleRNN(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True))
-            model.add(SimpleRNN(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))
-            print("Initialised SimpleRNN network")
-    
-        elif variant == 'BSimpleRNN':
-            for i in range(nbr_Hlayer):
-                model.add(Bidirectional(SimpleRNN(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True)))
-            model.add(Bidirectional(SimpleRNN(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)))
-            print("Initialised Bidirectional SimpleRNN network")
-    
-        elif variant == 'LSTM':
-            for i in range(nbr_Hlayer):
-                model.add(LSTM(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True))
-            model.add(LSTM(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))
-            print("Initialised LSTM network")
-    
-        elif variant == 'BLSTM':
-            for i in range(nbr_Hlayer):
-                model.add(Bidirectional(LSTM(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True)))
-            model.add(Bidirectional(LSTM(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)))
-            print("Initialised Bidirectional LSTM network")
-    
-        elif variant == 'GRU':
-            for i in range(nbr_Hlayer):
-                model.add(GRU(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True))
-            model.add(    GRU(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False))
-            print("Initialised GRU network")
-    
-        elif variant == 'BGRU':
-            for i in range(nbr_Hlayer):
-                model.add(Bidirectional(GRU(units=units,  input_shape = (None,inp_dim),activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=True)))
-            model.add(Bidirectional(GRU(units=units//2, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)))
-            print("Initialised Bidirectional GRU network")
-
-        else:
-            print("incorrect choice of model")
-            sys.exit()
-
-    model.add(Dense(out_dim))
-    
+    model.add(Dense(out_dim))  
     try:
         opt = optim(learning_rate=lr)
     except:
         opt = optim(lr=lr)
     model.compile(loss=loss, optimizer=opt, metrics=metric)
+    print(f"Initialised {variant} network")
     return model
 
 def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
@@ -257,7 +216,7 @@ def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, uni
 def rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion):
     model = RandomForestRegressor(n_estimators=n_estimators, verbose=1, max_features=max_features, 
                                   max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf, 
-                                  bootstrap=bootstrap, criterion=criterion)
+                                  bootstrap=bootstrap, criterion=criterion, n_jobs=4)
     model.fit(X_Train, Y_Train)
     y_pred = model.predict(X_val)
     mse = mean_squared_error(Y_val, y_pred)

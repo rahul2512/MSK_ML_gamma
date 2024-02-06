@@ -1,32 +1,9 @@
 from pytorch_utilities import *
 from read_in_out import analysis_options, add_noise_to_trial
-import pandas as pd
-import numpy as np
-import keras, random
-import seaborn as sns
-import matplotlib.pyplot as plt
-import sys, copy
-import scipy
-from sklearn.preprocessing import StandardScaler
-import random
-from sklearn.metrics import mean_squared_error
-from matplotlib import gridspec
-from scipy.interpolate import interp1d
-from barchart_err import barchart_error, barchart_params
-from keras import backend as K
-from pytorch_utilities import transformer, rf, GBRT, xgbr
-import joblib
 
 RNN_models = ['SimpleRNN','LSTM','GRU','BSimpleRNN','BLSTM','BGRU']
 feature_list = ['Joint angles','Joint reaction forces','Joint moments',  'Muscle forces', 'Muscle activations']
 feature_slist = ['JA','JRF','JM',  'MF', 'MA']
-# Define custom RMSE loss function
-def rmse(y_true, y_pred):
-    return K.sqrt(K.mean(K.square(y_pred - y_true)))
-
-from keras.utils import get_custom_objects
-get_custom_objects().update({'rmse': rmse})
-
 
 def initiate_ax(feature):
     if 'JRF' == feature:
@@ -472,7 +449,7 @@ def combined_plot_noise(analysis_opt):
     plt.close()
 
 def stat(fd, index):
-    feature = fd.feature[index]   
+    feature = fd.feature[index]
     hyper_val_exp =  fd.arg[index]
     norm_out = fd.hyper.loc[hyper_val_exp]['norm_out']
     model_class_exp = fd.arch[index]
@@ -491,9 +468,12 @@ def stat(fd, index):
     elif fd.subject == 'exposed_unseen':
         tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
-        model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
-
-    param = model1.count_params()
+        model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp)
+    try:
+        param = model1.count_params()
+    except:
+        print('Could not count parameters...')
+        param = 0
     ntrials = len(XE)
     sub_col = tmp.sub_col
     df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
@@ -533,10 +513,9 @@ def evaluate_mse(X,Y,model):
     return mse
 
 def save_outputs(model, hyper_val, data, label, save_model, model_class):
-    print(model_class)
+    print(model_class, save_model)
     X_Train, Y_Train, X_val, Y_val = data.train_in, data.train_out, data.test_in, data.test_out
-    feature = data.feature
-    subject = data.subject
+    feature, subject = data.feature, data.subject
     train_error = create_PC_data(model,X_Train, Y_Train)
     val_error = create_PC_data(model,X_val, Y_val)   ## it is test error in case of final model
     mse = np.zeros(np.shape(train_error)[0])
@@ -550,10 +529,13 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
     out = np.nan_to_num(out, nan=0, posinf=2222)
     np.savetxt('./text_out/stat_'+ model_class + '_'  +feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + label +'.txt',out,fmt='%1.6f')
     if save_model == True:
-        try:
-            model.save('./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.h5')
-        except:
-            joblib.dump(model,'./model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val) + '.joblib')
+        tmp_path = './model_out/model_' + model_class + '_' + feature + '_' + subject +'.'+ 'hv_'+ str(hyper_val)
+        if model_class == 'xgbr':
+            model.save_model(tmp_path + '.json')  ## required for xgboost
+        elif model_class == 'rf':
+            joblib.dump(model, tmp_path + '.pkl')
+        else:
+            model.save(tmp_path + '.keras')
     return None
 
 def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=True):
@@ -578,8 +560,10 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Tr
         opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
     elif model_class   == 'rf':
         n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out  =   hyper_val
+        metric = None
     elif model_class   == 'xgbr':
         n_estimators, learning_rate,max_depth, objective, alpha,  lambda1, norm_out  =   hyper_val
+        metric = None
     elif model_class   == 'GBRT':
         n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out  =   hyper_val
     else:
@@ -613,6 +597,14 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Tr
     elif loss == 'rmse':
         loss = rmse
 
+
+    if metric == 'mse':
+        metric = keras.losses.mean_squared_error
+    elif metric == 'rmse':
+        metric = tf.keras.metrics.RootMeanSquaredError
+        metric = keras.losses.mean_squared_error
+
+        # metric = loss
     if model_class == 'NN':
         model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LM':
@@ -642,13 +634,13 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Tr
         model = GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss)
     else:
         if debug_mode == True:
-            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
+            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
         elif debug_mode == False:
-            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val),epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
+            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
     return model
 
 
-def run_final_model(data,hyper_arg,hyper_val,model_class, save_model=True):
+def run_final_model(data,hyper_arg,hyper_val,model_class, save_model):
     X_Train, Y_Train, X_Test, Y_Test = data.train_in, data.train_out, data.test_in, data.test_out
     if model_class == 'RNN':
         X_Train = X_Train
@@ -656,6 +648,9 @@ def run_final_model(data,hyper_arg,hyper_val,model_class, save_model=True):
         X_Test = X_Test
         Y_Test = Y_Test.to_numpy()
     model = run_NN(X_Train, Y_Train, X_Test, Y_Test, hyper_val,  model_class)
+    save_name_old = '.fm'
+    save_outputs(model,hyper_arg, data, save_name_old, save_model, model_class)
+
     try:
         save_name_old = '.fm'
         save_outputs(model,hyper_arg, data, save_name_old, save_model, model_class)
@@ -681,7 +676,6 @@ def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
                 save_outputs(model,hyper_arg, data, save_name, save_model ,model_class)
             except:
                 print("this index is creating problem in saving --- ",hyper_arg,hyper_val, data.feature)
-
     except:
         None
 
@@ -692,17 +686,17 @@ def create_final_model(hyper_arg,hyper_val,which,pca,scale_out, model_class):
 	model = run_final_model(which,hyper_arg,hyper_val,pca,scale_out, model_class)
 	return model
 
-
 def load_model(subject_condition,feature,model_type,hyper_arg):
-    try:
-        path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)+'.h5'  
-        model = keras.models.load_model(path)
-    except:        
-        path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)+'.joblib'  
-        model = joblib.load(path)
+    path = './model_out/model_'+model_type+'_'+feature+'_'+subject_condition+'.hv_'+str(hyper_arg)
+    if model_type == 'xgbr':
+        model = xgb.XGBRegressor()
+        model.load_model(path+'.json')
+    elif model_type == 'rf':
+        model = joblib.load(path + '.pkl')        
+    else:
+        model = tf.keras.models.load_model(path+'.keras')
     return model
-
-
+    
 def interpolate(xnew,x,y):
     f1 = interp1d(x, y, kind='cubic')
     ynew = f1(xnew)
