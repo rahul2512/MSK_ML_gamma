@@ -608,7 +608,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Tr
     if model_class == 'NN':
         model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LM':
-        model = initiate_Linear_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
+        model = initiate_LM(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LR':
         model = initiate_LR_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'RNN':
