@@ -217,13 +217,13 @@ class cv_data:
 
 class initiate_data:
 
-    def __init__(self, add1=''):
+    def __init__(self, add1):
 
         if add1[0:4] == 'Miss':
             add2 = ''
         else:
             add2 = add1
-
+        self.add1 = add1
         self.i1,  self.o1  = subject_in(1,  add1), subject_out(1,  add2)
         self.i2,  self.o2  = subject_in(2,  add1), subject_out(2,  add2)
         self.i3,  self.o3  = subject_in(3,  add1), subject_out(3,  add2)
@@ -247,6 +247,7 @@ class initiate_data:
         self.out_all_list = [self.o1.all_list, self.o2.all_list, self.o3.all_list, self.o4.all_list, self.o5.all_list, self.o6.all_list, self.o7.all_list, self.o8.all_list, 
                         self.o9.all_list, self.o10.all_list, self.o11.all_list] 
 
+        ### following is because there are less braced participants
         if add1 != 'Braced_':
             self.i12, self.o12 = subject_in(12, add1), subject_out(12, add2) 
             self.i13, self.o13 = subject_in(13, add1), subject_out(13, add2)
@@ -297,12 +298,18 @@ class initiate_data:
             print('Crude outputs')
         ## held-out test data 2, 5, 9, 15
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
-        HO = [1, 4, 8, 14]  #python indexing
-        shuffled = [12,  0, 10,  7, 9, 11,  2,  6,  5, 15, 13,  3]
-                    
-        V1, T1 = shuffled[0:4],   shuffled[4:12]
-        V2, T2 = shuffled[4:8],   shuffled[0:4] + shuffled[8:12]
-        V3, T3 = shuffled[8:12],  shuffled[0:8] 
+        if self.add1 == 'Braced_':
+            HO = [1, 4, 8]  #python indexing
+            shuffled = [  0, 10,  7, 9,  2,  6,  5,  3]                    
+            V1, T1 = shuffled[0:3],   shuffled[3:8]
+            V2, T2 = shuffled[3:6],   shuffled[0:3] + shuffled[6:8]
+            V3, T3 = shuffled[6:8],   shuffled[0:6] 
+        else:
+            HO = [1, 4, 8, 14]  #python indexing
+            shuffled = [12,  0, 10,  7, 9, 11,  2,  6,  5, 15, 13,  3]                    
+            V1, T1 = shuffled[0:4],   shuffled[4:12]
+            V2, T2 = shuffled[4:8],   shuffled[0:4] + shuffled[8:12]
+            V3, T3 = shuffled[8:12],  shuffled[0:8] 
 
         if self.data_class in ['LM','normal']:
             cv.cv1['train_in']  = pd.concat([self.inp_all[i] for i in T1])
@@ -377,7 +384,11 @@ class initiate_data:
 
         ## held-out test data 
         ## remaining data list 1,3,4, 6,7,8, 10,11,12, 13,14, 16
-        HO = [0,1,2,3,7,11,12,13,14,15]  #Trial1, python indexing
+        if self.add1 == 'Braced_':
+            print('ohhh ..............................')
+            HO = [0,1,2,3,7]  #Trial1, python indexing, Note that there is less braced data
+        else:
+            HO = [0,1,2,3,7,11,12,13,14,15]  #Trial1, python indexing
         rem1 = [5,8,10]  #super held-out test data
         rem2 = [4,9]
         rem3 = [6]
@@ -400,7 +411,7 @@ class initiate_data:
         V3_in  = [self.inp[i].T1 for i in rem2] + [self.inp[i].T1 for i in rem3]
         V3_out = [self.out[i].T1 for i in rem2] + [self.out[i].T1 for i in rem3]
 
-        if self.data_class in ['LM','normal']:
+        if self.data_class in ['LM', 'normal']:
             cv.cv1['train_in']  = pd.concat(T1_in)
             cv.cv1['val_in']    = pd.concat(V1_in)
             cv.cv2['train_in']  = pd.concat(T2_in)
@@ -412,7 +423,7 @@ class initiate_data:
             cv.test_in_list          = [self.inp[i].T1  for i in HO]
             cv.super_test_in_list    = [self.inp[i].T1  for i in rem1]
 
-        elif self.data_class in ['RNN','CNN','CNNLSTM']:
+        elif self.data_class in ['RNN', 'CNN', 'CNNLSTM', 'convLSTM']:
             cv.cv1['train_in']  = np.concatenate(T1_in)
             cv.cv1['val_in']    = np.concatenate(V1_in)
             cv.cv2['train_in']  = np.concatenate(T2_in)
@@ -422,6 +433,7 @@ class initiate_data:
             cv.train_in         = np.concatenate(cv.train_in_list)
             cv.test_in          = np.concatenate([self.inp[i].T1  for i in HO])
             cv.test_in_list          = [self.inp[i].T1  for i in HO]
+            cv.super_test_in_list    = [self.inp[i].T1  for i in rem1]
         else:
             print("incorrect data class")
             sys.exit()
@@ -443,8 +455,9 @@ class initiate_data:
 
 
 class initiate_RNN_data(initiate_data):
-    def __init__(self, window_size, add1=''):
+    def __init__(self, window_size, add1):
         initiate_data.__init__(self, add1)
+        self.add1 = add1
         self.data_class = 'RNN'
         self.window = window_size
         self.i1, self.o1 = transform_subject_into_windows(self.i1, self.o1, window_size)
@@ -512,34 +525,34 @@ class subject:
         self.hyper   = hyper        
         
 class ML:
-    def __init__(self, what, window):
-
+    def __init__(self, what, window, add1):
+        self.add1 = add1
         if what == 'NN':
-            self.data  = initiate_data()
+            self.data  = initiate_data(add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_NN.txt',delimiter='\s+')
         elif what == 'LM':
-            self.data  = initiate_data()
+            self.data  = initiate_data(add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_LM.txt',delimiter='\s+')
         elif what == 'rf':
-            self.data  = initiate_data()
+            self.data  = initiate_data(add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_rf.txt',delimiter='\s+')
         elif what == 'transformer':
-            self.data  = initiate_RNN_data(window_size=window)
+            self.data  = initiate_RNN_data(window, add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_transformer.txt',delimiter='\s+')
         elif what == 'xgbr':
-            self.data  = initiate_data()
+            self.data  = initiate_data(add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_xgbr.txt',delimiter='\s+')
         elif what == 'RNN':
-            self.data  = initiate_RNN_data(window_size=window)
+            self.data  = initiate_RNN_data(window, add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_RNN.txt',delimiter='\s+')
         elif what == 'CNN':
-            self.data  = initiate_RNN_data(window_size=window)
+            self.data  = initiate_RNN_data(window, add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
         elif what == 'CNNLSTM':
-            self.data  = initiate_RNN_data(window_size=window)
+            self.data  = initiate_RNN_data(window, add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNNLSTM.txt',delimiter='\s+')
         elif what == 'convLSTM':
-            self.data  = initiate_RNN_data(window_size=window)
+            self.data  = initiate_RNN_data(window, add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
 
         self.what = what
@@ -551,27 +564,29 @@ class ML:
         self.feature_l2  = feat_order_l2
 
 class ML_analysis:
-    def __init__(self, what, data_kind, window):
+    def __init__(self, what, data_kind, window, add1=''):
         self.what = what
-        
+        self.add1 = add1
+        if add1 == 'Braced_':
+            print('Loading Braced data .. for normal data use empty string as input ...')
         if 'LM' in data_kind:
-            self.LM  = ML('LM', window)
+            self.LM  = ML('LM', window, add1)
         if 'rf' in data_kind:
-            self.rf  = ML('rf', window)
+            self.rf  = ML('rf', window, add1)
         if 'transformer' in data_kind:
-            self.transformer  = ML('transformer', window)
+            self.transformer  = ML('transformer', window, add1)
         if 'xgbr' in data_kind:
-            self.xgbr  = ML('xgbr', window)
+            self.xgbr  = ML('xgbr', window, add1)
         if 'NN' in data_kind:
-            self.NN  = ML('NN', window)
+            self.NN  = ML('NN', window, add1)
         if 'RNN' in data_kind:
-            self.RNN = ML('RNN', window)
+            self.RNN = ML('RNN', window, add1)
         if 'CNN' in data_kind:
-            self.CNN = ML('CNN', window)
+            self.CNN = ML('CNN', window, add1)
         if 'CNNLSTM' in data_kind:
-            self.CNNLSTM = ML('CNNLSTM', window)
+            self.CNNLSTM = ML('CNNLSTM', window, add1)
         if 'convLSTM' in data_kind:
-            self.convLSTM = ML('convLSTM', window)
+            self.convLSTM = ML('convLSTM', window, add1)
 
         self.feature = feat_order
         self.feature = feat_order[0:3]

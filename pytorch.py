@@ -233,10 +233,10 @@ def combined_plot(analysis_opt):
             ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
             Title  = scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
-            RMSE   = mean_squared_error(  YP1[:,i],YT1[:,i],squared=False)
+            RMSE  = root_mean_squared_error(YP1[:,i],YT1[:,i])
 
             Title2 = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
-            RMSE2  = mean_squared_error(  YP2[:,i],YT2[:,i],squared=False)
+            RMSE2  = root_mean_squared_error(  YP2[:,i],YT2[:,i])
 
             push_plot = push_plot + 0.1
     
@@ -366,10 +366,10 @@ def combined_plot_noise(analysis_opt):
             ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
             Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
-            RMSE  = mean_squared_error(YP1[:,i], YT1[:,i],squared=False)
+            RMSE  = root_mean_squared_error(YP1[:,i], YT1[:,i])
 
             Title2  = scipy.stats.pearsonr(YP2[:,i],YT2[:,i])[0]
-            RMSE2  = mean_squared_error(YP2[:,i], YT2[:,i],squared=False)
+            RMSE2  = root_mean_squared_error(YP2[:,i], YT2[:,i])
 
             push_plot = push_plot + 0.1
     
@@ -465,6 +465,10 @@ def stat(fd, index):
         tmp = data.subject_naive(feature, norm_out)
         XE, YE = tmp.test_in_list, tmp.test_out_list
         model1 = load_model('naive', feature, model_class_exp,   hyper_val_exp  )
+    elif fd.subject == 'naive_braced':
+        tmp = data.subject_naive(feature, norm_out)
+        XE, YE = tmp.test_in_list, tmp.test_out_list
+        model1 = load_model('naive', feature, model_class_exp,   hyper_val_exp)
     elif fd.subject == 'exposed_unseen':
         tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
@@ -487,9 +491,12 @@ def stat(fd, index):
     #     YP1 = YP1[:,new_order]
     #     YT1 = YT1[:,new_order]      
         for enum, col in enumerate(sub_col):
-                PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0]
-                NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
-                RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
+                # PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0] 
+                # NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
+                # RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
+                PC.loc[n, col]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0] 
+                NRMSE.loc[n, col] =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])/SCE[col]
+                RMSE.loc[n, col]  =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])
                 
     fd.NRMSE[feature] = NRMSE
     fd.RMSE[feature]  = RMSE
@@ -534,6 +541,8 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
             model.save_model(tmp_path + '.json')  ## required for xgboost
         elif model_class == 'rf':
             joblib.dump(model, tmp_path + '.pkl')
+        elif model_class == 'RNN':
+            model.save(tmp_path+'.keras')
         else:
             model.save(tmp_path + '.keras')
     return None
@@ -608,7 +617,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=Tr
     if model_class == 'NN':
         model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LM':
-        model = initiate_Linear_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
+        model = initiate_LM(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'LR':
         model = initiate_LR_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
     elif model_class == 'RNN':
@@ -723,37 +732,50 @@ def check_interpolation(data):
         time.sleep(1)
     return None
 
+def td(a):
+    a = np.around(a, 2)
+    return f"{a:.2f}"
 
-def print_tables(d):
-    title = ['Subject-exposed model','Subject-naive model', 'Subject-exposed model for unseen data']
-    print(d.what, 'results \n')
-    hyper = d.hyper
-    
-    for enumsub, sub in enumerate([d.exposed, d.naive, d.exposed_unseen]):
-        print(title[enumsub], '\n')
-        for enum, h in enumerate(sub.arg):
-            if d.what == 'NN':
-                print(d.feature_l[enum], '&', hyper.iloc[h]['kinit'], '&', hyper.iloc[h]['optim'], '&',hyper.iloc[h]['batch_size'], '&',hyper.iloc[h]['epoch'], '&',hyper.iloc[h]['act'], '&',hyper.iloc[h]['num_nodes'], 
-                      '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
-        print('\n \n')
-        
-        print('& \\multicolumn{15}{c}{\\textbf{Optimal hyperparameters for \\textit{', title[enumsub] ,'}}}   \\\\')
+
+def print_optimal_tables(d):
+    hyper = d.hyper        
+    for enum, h in enumerate(sub.arg):
+        if d.what == 'NN':
+            print('& \\multicolumn{15}{c}{\\textbf{Optimal hyperparameters for \\textit{', title[enumsub] ,'}}}   \\\\')
+            print(d.feature_l[enum], '&', hyper.iloc[h]['kinit'], '&', hyper.iloc[h]['optim'], '&',hyper.iloc[h]['batch_size'], '&',hyper.iloc[h]['epoch'], '&',hyper.iloc[h]['act'], '&',hyper.iloc[h]['num_nodes'], 
+                  '&',hyper.iloc[h]['H_layer']+1, '&',hyper.iloc[h]['lr'], '&',hyper.iloc[h]['p'], '\\\\' )
+
+
+def print_stat_tables(d):
+    hyper = d.hyper        
+    print('\n\n')
+    print('%%%', d.what, 'results....')
+    print("\\begin{table}[htb!] \\begin{center} \\scalebox{0.72}{\\begin{tabular}{c | c c c c c | c c c c c | c c c c c} \\hline")
+    print("& \\multicolumn{5}{c}{r} & \\multicolumn{5}{c}{NRMSE} & \\multicolumn{5}{c}{RMSE} \\\\ \\hline")
+    print(" Output &  Mean & SD & Max & Min & IQR & Mean & SD  & Max & Min & IQR & Mean & SD  & Max & Min & IQR \\\\ \\hline \\hline")
+
+    title = ['Subject-exposed model','Subject-naive model', 'Subject-exposed model for unseen data', 'Subject-naive model for braced data']
+    for enumsub, sub in enumerate([d.exposed, d.naive, d.exposed_unseen, d.naive_braced]):
+        # print(title[enumsub], '\n')
+        print(f"& \\multicolumn{{15}}{{c}}{{\\textbf{{\\textit{{ {title[enumsub]} }}}}}}   \\\\")
         for enum, h in enumerate(sub.feature):
             pc = pd.concat([sub.pc[h][col]    for col in sub.pc[h].columns],    axis=0, ignore_index=True)
             nr = pd.concat([sub.NRMSE[h][col] for col in sub.NRMSE[h].columns], axis=0, ignore_index=True)
             rm = pd.concat([sub.RMSE[h][col]  for col in sub.RMSE[h].columns],  axis=0, ignore_index=True)
+            norm_out = hyper.iloc[sub.arg[enum]]['norm_out'] ### if data is already normalized
+            if norm_out: ## then need to swap RMSE and NRMSE
+                nr, rm = rm, nr
             a, b = '&', '\\\\'
             print('\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}')
             print(d.feature_l[enum],  a, 
-                  pc.mean().round(2), a, pc.std().round(2), a, pc.max().round(2), a, pc.min().round(2), a, (pc.quantile(0.75) - pc.quantile(0.25)).round(2), a, 
-                  nr.mean().round(2), a, nr.std().round(2), a, nr.max().round(2), a, nr.min().round(2), a, (nr.quantile(0.75) - nr.quantile(0.25)).round(2), a, 
-                  rm.mean().round(2), a, rm.std().round(2), a, rm.max().round(2), a, rm.min().round(2), a, (rm.quantile(0.75) - rm.quantile(0.25)).round(2), b                              
-                  )
-            if enumsub ==0:
+                  td(pc.mean()), a, td(pc.std()), a, td(pc.max()), a, td(pc.min()), a, td((pc.quantile(0.75) - pc.quantile(0.25))), a, 
+                  td(nr.mean()), a, td(nr.std()), a, td(nr.max()), a, td(nr.min()), a, td((nr.quantile(0.75) - nr.quantile(0.25))), a, 
+                  td(rm.mean()), a, td(rm.std()), a, td(rm.max()), a, td(rm.min()), a, td((rm.quantile(0.75) - rm.quantile(0.25))), b)
+            if enumsub <=2:
                 print('\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}')
 
-        print('\n \n')
-        
+    print('\\hline \\end{tabular}} \\vspace{0.2cm}')
+    print("\\caption{Average Pearson's correlation coefficient and Average NRMSE Values for", d.what ,"predictions compared with Musculoskeletal (MSK) model outputs. The subject-exposed model is tested on held-out (unseen) test data, highlighting the need for subject-naive models. For braced data sets, the accuracy of subject-naive models are reported, highlighting the transferability of the models. Note: The average is taken over all output features and over all test trials (for a given output category). IQR refers to inter-quartile range.} \\label{tab:result_' + d.what + '} \\end{center} \\end{table}")
     return None
 
 def print_table_RNN(hyper, h, extra):
@@ -805,7 +827,7 @@ def tab2(d):
 
 def tab22(fm, D):
     for i in range(5):
-        print("\multirow{2}*{", fm.feature_l[i], '}')
+        print("\\multirow{2}*{", fm.feature_l[i], '}')
         for k in D:
             print(' & ', k.arch[i], ' & ', tab2(k.pc[fm.feature[i]]),' & ', tab2(k.NRMSE[fm.feature[i]]),'\\\\')
         print("\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}")
@@ -820,7 +842,7 @@ def print_SI_table2(fm):
 
 def tab3(fm, D):
     for i in range(5):
-        print("\multirow{2}*{", fm.feature_l2[i], '}')
+        print("\\multirow{2}*{", fm.feature_l2[i], '}')
         for k in D:
             print(' & ', k.arch[i], ' & ', tab2(k.RMSE[fm.feature[i]]), '\\\\')
         print("\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}")
@@ -887,8 +909,8 @@ def stat_new_data(fd, data):
                 YT = np.array(YE[n])
                 for enum, col in enumerate(col_labels):
                         PC[col].loc[n]    =  scipy.stats.pearsonr(YP[:,enum],YT[:,enum])[0]
-                        NRMSE[col].loc[n] =  mean_squared_error(  YP[:,enum],YT[:,enum],squared=False)/SCE[col]
-                        RMSE[col].loc[n]  =  mean_squared_error(  YP[:,enum],YT[:,enum],squared=False)
+                        NRMSE[col].loc[n] =  root_mean_squared_error(  YP[:,enum],YT[:,enum])/SCE[col]
+                        RMSE[col].loc[n]  =  root_mean_squared_error(  YP[:,enum],YT[:,enum])
                         
             if sub.subject == 'exposed':
                 data.exposed.NRMSE[feat] = NRMSE

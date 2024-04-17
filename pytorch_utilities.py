@@ -1,18 +1,20 @@
-import pandas as pd, numpy as np, seaborn as sns, keras, random, xgboost as xgb
-import matplotlib.pyplot as plt, sys, copy, scipy, joblib, tensorflow as tf
+import pandas as pd, numpy as np, seaborn as sns, keras, random, xgboost as xgb, itertools
+import matplotlib.pyplot as plt, sys, copy, scipy, joblib
+import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
 from matplotlib import gridspec
 from scipy.interpolate import interp1d
 from barchart_err import barchart_error, barchart_params
 from tensorflow.keras import backend as K
 from keras.regularizers import l2
-from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
+# from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
+from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
 try:
     from keras.layers.convolutional import Conv1D, MaxPooling1D
 except:
     from keras.layers import Conv1D, MaxPooling1D
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, root_mean_squared_error
 from tensorflow.keras import layers
 from tensorflow.keras import backend as K
 
@@ -23,12 +25,12 @@ def rmse(y_true, y_pred):
 ### Initite NN model
 def initiate_NN_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
     model = keras.Sequential()
-    model.add(keras.layers.Dense(Neu_layer, input_shape=(inp_dim,), activation=activation))
+    model.add(Dense(Neu_layer, input_shape=(inp_dim,), activation=activation))
     for i in range(nbr_Hlayer):
         model.add(Dense(Neu_layer, activation=activation,kernel_initializer=kinit))
-        model.add(keras.layers.Flatten())
+        model.add(Flatten())
         model.add(Dropout(p_drop))
-    model.add(keras.layers.Dense(out_dim, activation=final_act))
+    model.add(Dense(out_dim, activation=final_act))
     try:
         opt = optim(learning_rate=lr)
     except:
@@ -37,16 +39,16 @@ def initiate_NN_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
     print("Initialised NN network")
     return model
 
-def initiate_Linear_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
+def initiate_LM(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
     #### rest of the parameters are redundnt but kept for generalisibilty of code
     # model = keras.Sequential()
-    # model.add(keras.layers.Dense(out_dim, input_shape=(inp_dim,), activation='linear'))
+    # model.add(Dense(out_dim, input_shape=(inp_dim,), activation='linear'))
     try:
         opt = optim(learning_rate=lr)
     except:
         opt = optim(lr=lr)
-    inputs = keras.layers.Input(shape=(inp_dim,))
-    outputs = keras.layers.Dense(out_dim)(inputs)
+    inputs = Input(shape=(inp_dim,))
+    outputs = Dense(out_dim)(inputs)
     model = keras.models.Model(inputs=inputs, outputs=outputs)
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     print("Initialised Linear network")
@@ -63,8 +65,9 @@ def initiate_Linear_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop
 ## https://machinelearningmastery.com/stacked-long-short-term-memory-networks/
 
 def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, p_drop, lr, kinit, final_act, metric, variant):
-    dropout_layer = Dropout(rate=p_drop)
-    model = keras.Sequential()
+    
+    # dropout_layer = Dropout(rate=p_drop)
+    model = tf.keras.Sequential()
     model.add(Input(shape=(None, inp_dim)))
     units = int(units) ## for unknown reasons, it treats units as non-int
     #inputs: A 3D tensor with shape [batch, timesteps, feature]
@@ -97,10 +100,11 @@ def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     print(f"Initialised {variant} network")
     return model
 
+
 def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,optim,loss,metric,kinit,final_act,regularizer_val):
     #### rest of the parameters are redundnt but kept for generalisibilty of code
     model = keras.Sequential()
-    model.add(keras.layers.Dense(out_dim, input_shape=(inp_dim,), activation='sigmoid'))
+    model.add(Dense(out_dim, input_shape=(inp_dim,), activation='sigmoid'))
     try:
         opt = optim(learning_rate=lr)
     except:
@@ -142,28 +146,67 @@ def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
 
 
 
-def initiate_CNNLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride, LSTM_units):
-    model = keras.Sequential()
+# def initiate_CNNLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride, LSTM_units):
+#     model = keras.Sequential()
 
-
-    if nbr_Hlayer == 1:
-        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
-        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+#     if nbr_Hlayer == 1:
+#         model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
+#         model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
     
-        model.add(LSTM(units=LSTM_units, return_sequences=False))
+#         model.add(LSTM(units=LSTM_units, return_sequences=False))
 
-    elif nbr_Hlayer > 1:
-        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
-        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
-        model.add(LSTM(units=LSTM_units, return_sequences=True))       
-        for i in range(nbr_Hlayer-2):
-            model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
-            model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
-            model.add(LSTM(units=LSTM_units, return_sequences=True))
-        model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
-        model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
-        model.add(LSTM(units=LSTM_units, return_sequences=False))
+#     elif nbr_Hlayer > 1:
+#         model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same',input_shape=(t_dim, inp_dim)))
+#         model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
+#         model.add(LSTM(units=LSTM_units, return_sequences=True))       
+#         for i in range(nbr_Hlayer-2):
+#             model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
+#             model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
+#             model.add(LSTM(units=LSTM_units, return_sequences=True))
+#         model.add(Conv1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding = 'same'))
+#         model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))   
+#         model.add(LSTM(units=LSTM_units, return_sequences=False))
             
+#     model.add(Dense(int(out_dim)))
+
+#     try:
+#         opt = optim(learning_rate=lr)
+#     except:
+#         opt = optim(lr=lr)
+
+#     model.compile(loss=loss, optimizer=opt, metrics=metric)
+#     print("initiate_CNNLSTM_model .....")
+#     # print(model.summary())
+#     return model
+
+
+def initiate_CNNLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride, LSTM_units):
+    
+    inp_dim = int(inp_dim)
+    out_dim = int(out_dim)
+    t_dim   = int(t_dim)
+    nbr_Hlayer = int(nbr_Hlayer)
+    batch_size = int(batch_size)
+    filt_size = int(filt_size)
+    stride = int(stride)
+    LSTM_units = int(LSTM_units)
+    pool_size = int(pool_size)
+    
+    model = keras.Sequential()
+    # model.add(Conv1D(filters=units, kernel_size=filt_size, strides=stride, activation=act, kernel_initializer=kinit, padding='same', input_shape=(t_dim, inp_dim)))
+
+    model.add(Input(shape=(t_dim, inp_dim)))  # Explicitly define the input shape
+    model.add(Conv1D(filters=units, kernel_size=filt_size, strides=stride, activation=act, kernel_initializer=kinit, padding='same'))
+    
+    model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+    model.add(LSTM(units=LSTM_units, return_sequences=nbr_Hlayer > 1))
+
+    if nbr_Hlayer > 1:
+        for i in range(nbr_Hlayer - 1): 
+            model.add(Conv1D(filters=units, kernel_size=filt_size, strides=stride, activation=act, kernel_initializer=kinit, padding='same'))
+            model.add(MaxPooling1D(pool_size=pool_size, padding='same'))
+            model.add(LSTM(units=LSTM_units, return_sequences=(i < nbr_Hlayer - 1)))  # True for all but the last LSTM layer
+
     model.add(Dense(out_dim))
 
     try:
@@ -177,11 +220,9 @@ def initiate_CNNLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, unit
     return model
 
 
-
 def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride):
     #https://medium.com/neuronio/an-introduction-to-convlstm-55c9025563a7
     model = keras.Sequential()
-
     if nbr_Hlayer == 1 :
         model.add(ConvLSTM1D(filters = int(units), kernel_size=int(filt_size), strides=int(stride), activation=act, kernel_initializer=kinit, padding='same', return_sequences=False, input_shape=(t_dim, inp_dim, 1)))
         model.add(MaxPooling1D(pool_size=int(pool_size), padding = 'same'))
@@ -214,6 +255,7 @@ def initiate_ConvLSTM_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, uni
 ## Randomforest
 ######################################
 def rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion):
+    print(max_features)
     model = RandomForestRegressor(n_estimators=n_estimators, verbose=1, max_features=max_features, 
                                   max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf, 
                                   bootstrap=bootstrap, criterion=criterion, n_jobs=4)
@@ -299,196 +341,165 @@ def transformer(input_shape, out_dim, head_size, num_heads, ff_dim, num_transfor
 
 #### Code below generates a .txt file with row as the list of hypermeters 
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
-def hyper_param_rf():
-    with open('./hyperparameters/hyperparam_rf.txt', 'w') as f:
-        print('n_estimators', 'max_features', 'max_depth', 'min_samples_split', 'min_samples_leaf', 'bootstrap','criterion', 'norm_out', file=f)
-        for n_estimators in [200,400,600,800,1000]:
-            for max_features in ['auto', 'sqrt']:
-                for max_depth in [10, 30, 50, 70, 90, 110]:
-                    for min_samples_split in [2,5,10]:
-                        for min_samples_leaf in [1,2,4]:
-                            for bootstrap in [True, False]:
-                                for criterion in ['squared_error', 'absolute_error']:
-                                    for norm_out in [0]:
-                                        print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out, file=f)
+def write(hyperparameters, file_name):
+    with open(f'./hyperparameters/hyperparam_{file_name}.txt', 'w') as f:
+        print(*hyperparameters.keys(), file=f)
+        for values in itertools.product(*hyperparameters.values()):
+            print(*values, file=f)
     return None
 
+def hyper_param_rf():
+    hyperparameters = {
+        'n_estimators': [200, 400, 600, 800, 1000],
+        'max_features': ['log2', 'sqrt'],
+        'max_depth': [10, 30, 50, 70, 90, 110],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4],
+        'bootstrap': [True, False],
+        'criterion': ['squared_error', 'absolute_error'],
+        'norm_out': [0]
+    }
+    write(hyperparameters, 'rf')
 
 def hyper_param_xgbr():
-    with open('./hyperparameters/hyperparam_xgbr.txt', 'w') as f:
-        print('n_estimators', 'learning_rate', 'max_depth', 'objective', 'alpha', 'lambda1', 'norm_out', file=f)
-        for n_estimators in [200,400,600,800,1000]:
-            for learning_rate in [0.01, 0.005]:
-                for max_depth in [10, 30, 50, 70, 90, 110]:
-                    for objective in ['reg:squarederror', 'reg:logistic']:
-                        for alpha in [0.1, 0.2]:
-                            for lambda1 in [0.1, 0.2]:
-                                for norm_out in [0]:
-                                    print(n_estimators, learning_rate, max_depth, objective, alpha, lambda1, norm_out, file=f)
-    return None
-
+    hyperparameters = {
+        'n_estimators': [200, 400, 600, 800, 1000],
+        'learning_rate': [0.01, 0.005],
+        'max_depth': [10, 30, 50, 70, 90, 110],
+        'objective': ['reg:squarederror', 'reg:logistic'],
+        'alpha': [0.1, 0.2],
+        'lambda1': [0.1, 0.2],
+        'norm_out': [0]
+    }
+    write(hyperparameters, 'xgbr')
 
 def hyper_param_GBRT():
-    with open('./hyperparameters/hyperparam_GBRT.txt', 'w') as f:
-        print('n_estimators', 'max_features', 'max_depth', 'min_samples_split', 'min_samples_leaf','loss', 'norm_out', file=f)
-        for n_estimators in [200,400,600,800,1000]:
-            for max_features in ['auto', 'sqrt']:
-                for max_depth in [10, 30, 50, 70, 90, 110]:
-                    for min_samples_split in [2,5,10]:
-                        for min_samples_leaf in [1,2,4]:
-                            for loss in ['squared_error', 'absolute_error']:
-                                for norm_out in [0]:
-                                    print(n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out, file=f)
-    return None
+    hyperparameters = {
+        'n_estimators': [200, 400, 600, 800, 1000],
+        'max_features': ['auto', 'sqrt'],
+        'max_depth': [10, 30, 50, 70, 90, 110],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4],
+        'loss': ['squared_error', 'absolute_error'],
+        'norm_out': [0]
+    }
+    write(hyperparameters, 'GBRT')
 
 def hyper_param_transformer():
-    with open('./hyperparameters/hyperparam_transformer.txt', 'w') as f:
-        print('head_size', 'num_heads', 'ff_dim', 'num_transformer_blocks', 'mlp_units','mlp_dropout', 'epoch', 'batch_size', 'norm_out', file=f)
-        for head_size in [64]:
-            for num_heads in [8]:
-                for ff_dim in [4]:
-                    for num_transformer_blocks in [4,6,8]:
-                        for mlp_units in ['[32]','[32,32]','[32,32,32]']:
-                            for mlp_dropout in [0.2]:
-                                for epoch in [100,200,300,500]:
-                                    for batch_size in [64,128]:
-                                        for norm_out in [0,1]:
-                                            print(head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, epoch, batch_size, norm_out, file=f)
-    return None
+    hyperparameters = {
+        'head_size': [64],
+        'num_heads': [8],
+        'ff_dim': [4],
+        'num_transformer_blocks': [4, 6, 8],
+        'mlp_units': ['[32]', '[32,32]', '[32,32,32]'],
+        'mlp_dropout': [0.2],
+        'epoch': [100, 200, 300, 500],
+        'batch_size': [64, 128],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'transformer')
 
-
-#### Code below generates a .txt file with row as the list of hypermeters 
-#### for a given NN and then that NN hypermeters were cross-validated on cluster
 def hyper_param_NN():
-# batch-size {Automatic, 64, 1000, 2000}
-# epoch = 40
-# Adam, SGD, RMSprop
-# mse
-# relu, tanh, sigmoid
-# random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('./hyperparameters/hyperparam_NN.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','NN_variant','norm_out', file=f)
-        for optim in ['Adam', 'SGD']:
-            for kinit in ['glorot_normal']:
-                for batch_size in [64,128]:
-                    for epoch in [50,100,200]:
-                        for act in ['relu','tanh','sigmoid']:
-                            for H_layer in [2,4,6,8]:
-                                for metric in ['rmse']:
-                                    for loss in ['mse', 'rmse']:
-                                        for lr in [0.001,0.005]:
-                                            for p in [0.1, 0.2]:
-                                                for num_nodes in np.arange(200,1100,200):
-                                                    for reg in [0]:
-                                                        for NN_variant in ['NN']:
-                                                            for norm_out in [0, 1]:
-                                                                print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, norm_out, file=f)
-    return None
-
-
+    hyperparameters = {
+        'optim': ['Adam', 'SGD'],
+        'kinit': ['glorot_normal'],
+        'batch_size': [64, 128],
+        'epoch': [50, 100, 200],
+        'act': ['relu', 'tanh', 'sigmoid'],
+        'H_layer': [2, 4, 6, 8],
+        'metric': ['rmse'],
+        'loss': ['mse', 'rmse'],
+        'lr': [0.001, 0.005],
+        'p': [0.1, 0.2],
+        'num_nodes': list(range(200, 1100, 200)),
+        'regularizer_val': [0],
+        'NN_variant': ['NN'],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'NN')
 
 def hyper_param_CNN():
-    with open('./hyperparameters/hyperparam_CNN.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', 'norm_out', file=f)
-        for optim in ['Adam', 'SGD', 'RMSprop']:
-            for kinit in ['glorot_normal']:
-                for batch_size in [64,128]:
-                    for epoch in [50,100,200]:
-                        for act in ['relu','tanh','sigmoid']:
-                            for H_layer in [1,2]:
-                                for metric in ['rmse']:
-                                    for loss in ['mse', 'rmse']:
-                                        for lr in [0.001,0.005]:
-                                            for pool_size in [2]:
-                                                for num_nodes in [32,64]:
-                                                    for reg in [0]:
-                                                        for NN_variant in ['CNN']:
-                                                            for filt_size in [3]:
-                                                                for stride in [1,3]:
-                                                                    for norm_out in [0, 1]:
-                                                                        print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size,reg, NN_variant, filt_size, stride, norm_out, file=f)
-    return None
+    hyperparameters = {
+        'optim': ['Adam', 'SGD', 'RMSprop'],
+        'kinit': ['glorot_normal'],
+        'batch_size': [64, 128],
+        'epoch': [50, 100, 200],
+        'act': ['relu', 'tanh', 'sigmoid'],
+        'H_layer': [1, 2],
+        'metric': ['rmse'],
+        'loss': ['mse', 'rmse'],
+        'lr': [0.001, 0.005],
+        'pool_size': [2],
+        'num_nodes': [32, 64],
+        'regularizer_val': [0],
+        'NN_variant': ['CNN'],
+        'filt_size': [3],
+        'stride': [1, 3],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'CNN')
 
 def hyper_param_CNNLSTM():
-    with open('./hyperparameters/hyperparam_CNNLSTM.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'pool_size','regularizer_val','NN_variant','filt_size', 'stride', 'LSTM_units', 'norm_out',file=f)
-        for optim in ['Adam', 'SGD', 'RMSprop']:
-            for kinit in ['glorot_normal']:
-                for batch_size in [64,128]:
-                    for epoch in [50,100,200]:
-                        for act in ['relu','tanh','sigmoid']:
-                            for H_layer in [1,2]:
-                                for metric in ['rmse']:
-                                    for loss in ['mse', 'rmse']:
-                                        for lr in [0.001,0.005]:
-                                            for pool_size in [2]:
-                                                for num_nodes in [32,64]:
-                                                    for reg in [0]:
-                                                        for NN_variant in ['CNNLSTM']:
-                                                            for filt_size in [3]:
-                                                                for stride in [1,3]:
-                                                                    for LSTM_units in [128, 256]:
-                                                                        for norm_out in [0, 1]:
-                                                                            print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size,reg, NN_variant, filt_size, stride, LSTM_units, norm_out, file=f)
-    return None
-
+    hyperparameters = {
+        'optim': ['Adam', 'SGD', 'RMSprop'],
+        'kinit': ['glorot_normal'],
+        'batch_size': [64, 128],
+        'epoch': [50, 100, 200],
+        'act': ['relu', 'tanh', 'sigmoid'],
+        'H_layer': [1, 2],
+        'metric': ['rmse'],
+        'loss': ['mse', 'rmse'],
+        'lr': [0.001, 0.005],
+        'pool_size': [2],
+        'num_nodes': [32, 64],
+        'regularizer_val': [0],
+        'NN_variant': ['CNNLSTM'],
+        'filt_size': [3],
+        'stride': [1, 3],
+        'LSTM_units': [128, 256],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'CNNLSTM')
 
 def hyper_param_LM():
-# batch-size {Automatic, 64, 1000, 2000}
-# epoch = 40
-# Adam, SGD, RMSprop
-# mse
-# relu, tanh, sigmoid
-# random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('./hyperparameters/hyperparam_LM.txt', 'w') as f:
-        print('optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val', 'NN_variant', 'norm_out', file=f)
-        for optim in ['Adam', 'SGD']:
-            for kinit in ['glorot_normal','random_normal', 'he_normal']:
-                for batch_size in [64,256]:
-                    for epoch in [50,100,200]:
-                        for act in ['linear']:
-                            for H_layer in [0]:
-                                for metric in ['rmse']:
-                                    for loss in ['mse', 'rmse']:
-                                        for lr in [0.001]:
-                                            for p in [0]:
-                                                for num_nodes in [200]:
-                                                    for reg in [0]:
-                                                        for NN_variant in ['LM']:
-                                                            for norm_out in [0, 1]:
-                                                                print(optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, NN_variant, norm_out, file=f)
-    return None
-
-
+    hyperparameters = {
+        'optim': ['Adam', 'SGD'],
+        'kinit': ['glorot_normal', 'random_normal', 'he_normal'],
+        'batch_size': [64, 256],
+        'epoch': [50, 100, 200],
+        'act': ['linear'],
+        'H_layer': [0],
+        'metric': ['rmse'],
+        'loss': ['mse', 'rmse'],
+        'lr': [0.001],
+        'p': [0],
+        'num_nodes': [200],
+        'regularizer_val': [0],
+        'NN_variant': ['LM'],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'LM')
 
 def hyper_param_RNN():
-# batch-size {Automatic, 64, 1000, 2000}
-# epoch = 40
-# Adam, SGD, RMSprop
-# mse
-# relu, tanh, sigmoid
-# random_uniform, random_normal, he_normal, xavier, glorot_uniform, glorot_normal (Xavier), 
-    with open('./hyperparameters/hyperparam_RNN.txt', 'w') as f:
-        print('NN_variant','optim', 'kinit', 'batch_size', 'epoch', 'act', 'num_nodes', 'H_layer', 'metric', 'loss', 'lr', 'p','regularizer_val','norm_out',file=f)
-#        for NN_variant in ['SimpleRNN','BSimpleRNN','LSTM','BLSTM','GRU','BGRU']:
-        for NN_variant in ['BSimpleRNN','BLSTM','BGRU']:
-            for optim in ['Adam', 'RMSprop']:
-                for kinit in ['glorot_normal']:
-                    for batch_size in [64, 128]:
-                        for epoch in [50,100, 200]: 
-                            for act in ['relu','tanh','sigmoid']:
-                                for H_layer in [0, 1, 2, 3]:
-                                    for metric in ['rmse']:
-                                        for loss in ['mse', 'rmse']:
-                                            for lr in [0.001]:
-                                                for p in [0.1,0.2]:
-                                                    for num_nodes in [128, 256, 512]:
-                                                        for reg in [0]:
-                                                            for norm_out in [0, 1]:
-                                                                print(NN_variant, optim, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p,reg, norm_out, file=f)
-    return None
+    hyperparameters = {
+        'NN_variant': ['BSimpleRNN', 'BLSTM', 'BGRU'],
+        'optim': ['Adam', 'RMSprop'],
+        'kinit': ['glorot_normal'],
+        'batch_size': [64, 128],
+        'epoch': [50, 100, 200],
+        'act': ['relu', 'tanh', 'sigmoid'],
+        'H_layer': [0, 1, 2, 3],
+        'metric': ['rmse'],
+        'loss': ['mse', 'rmse'],
+        'lr': [0.001],
+        'p': [0.1, 0.2],
+        'num_nodes': [128, 256, 512],
+        'regularizer_val': [0],
+        'norm_out': [0, 1]
+    }
+    write(hyperparameters, 'RNN')
 
-hyper_param_transformer()
+# hyper_param_transformer()
 #hyper_param_xgbr()
 # hyper_param_rf()
 # hyper_param_GBRT()
