@@ -476,12 +476,12 @@ def hyper_param_LM():
         'batch_size': [64, 256],
         'epoch': [50, 100, 200],
         'act': ['linear'],
+        'num_nodes': [200],
         'H_layer': [0],
         'metric': ['rmse'],
         'loss': ['mse', 'rmse'],
         'lr': [0.001],
         'p': [0],
-        'num_nodes': [200],
         'regularizer_val': [0],
         'NN_variant': ['LM'],
         'norm_out': [0, 1]

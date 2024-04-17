@@ -960,8 +960,10 @@ def learning_curve(fm):
                 Y = pd.concat(tmp_train_out)
     
                 model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class, 0)
-                res.RMSE_train[feat][r].loc[n] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-                res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                # res.RMSE_train[feat][r].loc[n] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                # res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                res.RMSE_train[feat].loc[n,r] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                res.RMSE_test[feat].loc[n,r]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
         res.RMSE_train[feat].to_csv('./lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.train.txt' ,index=False, header=False)
         res.RMSE_test[feat].to_csv( './lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.test.txt' ,index=False, header=False)
         ## columns are various nval trials and rows are number of subjects
