@@ -936,7 +936,7 @@ def learning_curve(fm):
     res.model = fm.what
     res.lc_label = fm.lc_label 
     res.subject = 'naive'
-    nval = np.arange(10)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
+    nval = np.arange(1)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
     res.RMSE_train = {}
     res.RMSE_test  = {}
     for enumf, feat in enumerate(fm.feature):
@@ -964,8 +964,8 @@ def learning_curve(fm):
                 # res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
                 res.RMSE_train[feat].loc[n,r] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
                 res.RMSE_test[feat].loc[n,r]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-        res.RMSE_train[feat].to_csv('./lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.train.txt' ,index=False, header=False)
-        res.RMSE_test[feat].to_csv( './lc_data/' + res.model + '.' + res.subject + '.' + feat + lc_label + '.lc.test.txt' ,index=False, header=False)
+        res.RMSE_train[feat].to_csv(f'./lc_data/{res.model}.{res.subject}.{feat}.{res.lc_label}.train.txt',index=False, header=False)
+        res.RMSE_test[feat].to_csv( f'./lc_data/{res.model}.{res.subject}.{feat}.{res.lc_label}.test.txt' ,index=False, header=False)
         ## columns are various nval trials and rows are number of subjects
     return fm
 
@@ -977,8 +977,8 @@ def plot_learning_curve(model_kind, subject_kind, feat):
     index = feature_slist.index(feat)
     yl = feature_list[index]
     s = 14
-    train_err = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.train.txt', header=None)    
-    val_err  = pd.read_csv('./lc_data/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.test.txt', header=None)       
+    train_err = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.lc.train.txt', header=None)    
+    val_err   = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.lc.test.txt',  header=None)       
     nsub = train_err.shape[0]
     fig, ax = plt.subplots()
     ind = np.arange(1,nsub+1)
@@ -990,7 +990,7 @@ def plot_learning_curve(model_kind, subject_kind, feat):
     ax.legend(fontsize=s)
     ax.tick_params(axis='both', labelsize=s,   pad=4,length=3,width=0.5,direction= 'inout',which='major')
     ax.set_xlabel("# of subjects", fontsize=s)
-    ax.set_ylabel("RMSE loss (" + yl + ')', fontsize=s)
+    ax.set_ylabel(f"RMSE loss ({yl})", fontsize=s)
     plt.savefig('./plots_out/' + model_kind + '.' + subject_kind+ '.' + feat + '.lc.pdf', dpi=600)
     plt.show()
     

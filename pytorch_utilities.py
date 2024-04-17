@@ -414,12 +414,12 @@ def hyper_param_NN():
         'batch_size': [64, 128],
         'epoch': [50, 100, 200],
         'act': ['relu', 'tanh', 'sigmoid'],
+        'num_nodes': list(range(200, 1100, 200)),
         'H_layer': [2, 4, 6, 8],
         'metric': ['rmse'],
         'loss': ['mse', 'rmse'],
         'lr': [0.001, 0.005],
         'p': [0.1, 0.2],
-        'num_nodes': list(range(200, 1100, 200)),
         'regularizer_val': [0],
         'NN_variant': ['NN'],
         'norm_out': [0, 1]
@@ -433,12 +433,12 @@ def hyper_param_CNN():
         'batch_size': [64, 128],
         'epoch': [50, 100, 200],
         'act': ['relu', 'tanh', 'sigmoid'],
+        'num_nodes': [32, 64],
         'H_layer': [1, 2],
         'metric': ['rmse'],
         'loss': ['mse', 'rmse'],
         'lr': [0.001, 0.005],
         'pool_size': [2],
-        'num_nodes': [32, 64],
         'regularizer_val': [0],
         'NN_variant': ['CNN'],
         'filt_size': [3],
@@ -454,12 +454,12 @@ def hyper_param_CNNLSTM():
         'batch_size': [64, 128],
         'epoch': [50, 100, 200],
         'act': ['relu', 'tanh', 'sigmoid'],
+        'num_nodes': [32, 64],
         'H_layer': [1, 2],
         'metric': ['rmse'],
         'loss': ['mse', 'rmse'],
         'lr': [0.001, 0.005],
         'pool_size': [2],
-        'num_nodes': [32, 64],
         'regularizer_val': [0],
         'NN_variant': ['CNNLSTM'],
         'filt_size': [3],
@@ -507,12 +507,12 @@ def hyper_param_RNN():
     }
     write(hyperparameters, 'RNN')
 
-# hyper_param_transformer()
-# hyper_param_xgbr()
-# hyper_param_rf()
-# hyper_param_GBRT()
-# hyper_param_LM()
-# hyper_param_NN()
-# hyper_param_RNN()
-# hyper_param_CNN()
-# hyper_param_CNNLSTM()
+hyper_param_transformer()
+hyper_param_xgbr()
+hyper_param_rf()
+hyper_param_GBRT()
+hyper_param_LM()
+hyper_param_NN()
+hyper_param_RNN()
+hyper_param_CNN()
+hyper_param_CNNLSTM()
