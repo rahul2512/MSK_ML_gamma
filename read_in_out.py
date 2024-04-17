@@ -529,31 +529,31 @@ class ML:
         self.add1 = add1
         if what == 'NN':
             self.data  = initiate_data(add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_NN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_NN.txt',delimiter=',')
         elif what == 'LM':
             self.data  = initiate_data(add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_LM.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_LM.txt',delimiter=',')
         elif what == 'rf':
             self.data  = initiate_data(add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_rf.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_rf.txt',delimiter=',')
         elif what == 'transformer':
             self.data  = initiate_RNN_data(window, add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_transformer.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_transformer.txt',delimiter=',')
         elif what == 'xgbr':
             self.data  = initiate_data(add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_xgbr.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_xgbr.txt',delimiter=',')
         elif what == 'RNN':
             self.data  = initiate_RNN_data(window, add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_RNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_RNN.txt',delimiter=',')
         elif what == 'CNN':
             self.data  = initiate_RNN_data(window, add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter=',')
         elif what == 'CNNLSTM':
             self.data  = initiate_RNN_data(window, add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNNLSTM.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNNLSTM.txt',delimiter=',')
         elif what == 'convLSTM':
             self.data  = initiate_RNN_data(window, add1)
-            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter='\s+')
+            self.hyper = pd.read_csv('./hyperparameters/hyperparam_CNN.txt',delimiter=',')
 
         self.what = what
         self.exposed        =  subject('exposed', self.data, self.hyper, self.what)

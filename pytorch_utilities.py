@@ -74,6 +74,7 @@ def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     rnn_layers = {'SimpleRNN': SimpleRNN, 'LSTM': LSTM, 'GRU': GRU, 'BSimpleRNN': SimpleRNN, 'BLSTM': LSTM, 'BGRU': GRU}
     base_layer = rnn_layers[variant]
 
+    print(nbr_Hlayer, '----------------------------')
     if nbr_Hlayer == 0 :
         layer = base_layer(units=units, activation=act, dropout = p_drop, kernel_initializer=kinit, return_sequences=False)
         if variant.startswith('B'):
@@ -97,7 +98,7 @@ def initiate_RNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, l
     except:
         opt = optim(lr=lr)
     model.compile(loss=loss, optimizer=opt, metrics=metric)
-    print(f"Initialised {variant} network")
+    print(f"Initialised {variant} network .. note that there is an issue with tf version and there can't use 2.16.1 for bidrec layes... ")
     return model
 
 
@@ -112,6 +113,7 @@ def initiate_LR_model(inp_dim,out_dim,nbr_Hlayer,Neu_layer,activation,p_drop,lr,
     model.compile(loss=loss, optimizer=opt, metrics=metric)
     print("Initialised logistic regression network")
     return model
+
 
 def initiate_CNN_model(inp_dim, out_dim, t_dim, nbr_Hlayer, batch_size, units, loss, optim, act, pool_size, lr, kinit, final_act, metric, filt_size, variant, stride):
     # https://machinelearningmastery.com/how-to-develop-convolutional-neural-network-models-for-time-series-forecasting/
@@ -343,10 +345,16 @@ def transformer(input_shape, out_dim, head_size, num_heads, ff_dim, num_transfor
 #### for a given NN and then that NN hypermeters were cross-validated on cluster
 def write(hyperparameters, file_name):
     with open(f'./hyperparameters/hyperparam_{file_name}.txt', 'w') as f:
-        print(*hyperparameters.keys(), file=f)
+        # print(*hyperparameters.keys(), file=f)
+        print(','.join(hyperparameters.keys()), file=f)
         for values in itertools.product(*hyperparameters.values()):
-            print(*values, file=f)
+            print(','.join(map(str, values)), file=f)
+            # print(*values, file=f)
     return None
+
+
+
+
 
 def hyper_param_rf():
     hyperparameters = {
@@ -482,25 +490,25 @@ def hyper_param_LM():
 
 def hyper_param_RNN():
     hyperparameters = {
-        'NN_variant': ['BSimpleRNN', 'BLSTM', 'BGRU'],
+        'NN_variant': ['SimpleRNN', 'LSTM', 'GRU'],
         'optim': ['Adam', 'RMSprop'],
         'kinit': ['glorot_normal'],
         'batch_size': [64, 128],
         'epoch': [50, 100, 200],
         'act': ['relu', 'tanh', 'sigmoid'],
+        'num_nodes': [128, 256, 512],
         'H_layer': [0, 1, 2, 3],
         'metric': ['rmse'],
         'loss': ['mse', 'rmse'],
         'lr': [0.001],
         'p': [0.1, 0.2],
-        'num_nodes': [128, 256, 512],
         'regularizer_val': [0],
         'norm_out': [0, 1]
     }
     write(hyperparameters, 'RNN')
 
 # hyper_param_transformer()
-#hyper_param_xgbr()
+# hyper_param_xgbr()
 # hyper_param_rf()
 # hyper_param_GBRT()
 # hyper_param_LM()
