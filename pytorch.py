@@ -470,18 +470,27 @@ def stat(fd, index, verbose = 0):
         tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp)
-    try:
+    if fd.kind in ['rf']:
+        total_nodes = sum(tree.tree_.node_count for tree in model1.estimators_)
+        total_splits = sum(tree.tree_.n_leaves - 1 for tree in model1.estimators_)
+        print(total_nodes, total_splits, 'rf...')
+        param = total_nodes + total_splits
+    elif fd.kind in ['xgbr']:
+        print('xgbr...')
+        param = 0        
+    else:
         param = model1.count_params()
-    except:
-        print('Could not count parameters...')
-        param = 0
+        
     ntrials = len(XE)
     sub_col = tmp.sub_col
     df = pd.DataFrame(index = np.arange(ntrials),columns=sub_col)
     NRMSE, PC, RMSE  = copy.deepcopy(df), copy.deepcopy(df), copy.deepcopy(df)
 
     for n in range(ntrials):
-        YP1 = model1.predict(XE[n], verbose = verbose)
+        try:
+            YP1 = model1.predict(XE[n], verbose = verbose)
+        except:
+            YP1 = model1.predict(XE[n])
         YT1 = np.array(YE[n])
     # if 'JA' in feature:
     #     new_order = [7,8,9,0,1,2,3,4,5,6]
