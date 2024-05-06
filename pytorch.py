@@ -445,7 +445,7 @@ def combined_plot_noise(opt):
         plt.show()
         plt.close()
 
-def stat(fd, index):
+def stat(fd, index, verbose = 0):
     feature = fd.feature[index]
     hyper_val_exp =  fd.arg[index]
     norm_out = fd.hyper.loc[hyper_val_exp]['norm_out']
@@ -481,7 +481,7 @@ def stat(fd, index):
     NRMSE, PC, RMSE  = copy.deepcopy(df), copy.deepcopy(df), copy.deepcopy(df)
 
     for n in range(ntrials):
-        YP1 = model1.predict(XE[n])
+        YP1 = model1.predict(XE[n], verbose = verbose)
         YT1 = np.array(YE[n])
     # if 'JA' in feature:
     #     new_order = [7,8,9,0,1,2,3,4,5,6]
@@ -544,105 +544,51 @@ def save_outputs(model, hyper_val, data, label, save_model, model_class):
             model.save(tmp_path + '.keras')
     return None
 
-def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, debug_mode=True):
-    opt, loss, dim = None, None, 1
-    if model_class   == 'RNN':
-        dim = 2
-        NN_variant, opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p, regularizer_val, norm_out =   hyper_val
-    elif model_class == 'CNN':
-        dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
-    elif model_class == 'transformer':
-        head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, mlp_dropout, epoch, batch_size, norm_out = hyper_val
-    elif model_class == 'convLSTM':
-        dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, norm_out = hyper_val
-    elif model_class == 'CNNLSTM':
-        dim = 2
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, pool_size, regularizer_val, NN_variant, filt_size, stride, LSTM_units, norm_out = hyper_val
-    elif model_class   == 'NN':
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
-    elif model_class   == 'LM':
-        opt, kinit, batch_size, epoch, act, num_nodes, H_layer, metric, loss, lr, p , regularizer_val, NN_variant, norm_out =   hyper_val
-    elif model_class   == 'rf':
-        n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion, norm_out  =   hyper_val
-        metric = None
-    elif model_class   == 'xgbr':
-        n_estimators, learning_rate,max_depth, objective, alpha,  lambda1, norm_out  =   hyper_val
-        metric = None
-    elif model_class   == 'GBRT':
-        n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss, norm_out  =   hyper_val
-    else:
-        print('unrecog model description')
+def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, verbose = 2):
+    ML_choices = hyper_val.to_dict()
+    ML_choices['verbose'] = verbose
+    ML_choices['model_class'] = model_class
+    ML_choices['dim'] = 2 if model_class in ['RNN', 'CNN', 'convLSTM', 'CNNLSTM'] else 1        
+    ML_choices['inp_dim'] = X_Train.shape[ML_choices['dim']]
+    ML_choices['t_dim']   = X_Train.shape[1]
+    ML_choices['out_dim'] = Y_Train.shape[1]
+    ML_choices['final_act'] = None
+    
+    from tensorflow.keras.optimizers import Adam, RMSprop, SGD
+    map_optim = {'Adam': Adam, 'RMSprop': RMSprop, 'SGD': SGD}
+    def root_mean_squared_error(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
+    map_loss = {'mse': [keras.losses.mean_squared_error], 'rmse': [root_mean_squared_error]}    
+    if 'optim' in ML_choices: ## for some model it's not there
+        ML_choices['optim'] = map_optim[ML_choices['optim']]
+    if 'metric' in ML_choices: ## for some model it's not there
+        ML_choices['metric'] = map_loss[ML_choices['metric']]
+    if 'loss' in ML_choices: ## for some model it's not there
+        ML_choices['loss']   = map_loss[ML_choices['loss']]
+
+    if model_class == 'transformer':
+        print('check here whats happeening....')
         sys.exit()
-        
-    inp_dim = X_Train.shape[dim]
-    out_dim = Y_Train.shape[1]
-    t_dim = X_Train.shape[1]
+        # inp_dim = X_Train.shape[dim:]
+        # dropout = 0.1
+        # model = transformer(inp_dim, out_dim, head_size, num_heads, ff_dim, num_transformer_blocks,mlp_units, mlp_dropout, dropout)
 
-    ## all done except checking input shape for tf
+    model_list = {'LM': initiate_LM, 'LR': initiate_LR_model, 'NN': initiate_NN_model, 'RNN': initiate_RNN_model, 
+                  'CNN': initiate_CNN_model, 'CNNLSTM': initiate_CNNLSTM_model,'convLSTM': initiate_ConvLSTM_model  }
+    model = model_list[model_class](ML_choices)
 
-    if debug_mode == True:
-        # num_nodes=128
-        # H_layer=2
-        # epoch = 5
-        print("Debug mode on ")
-        # print(inp_dim,out_dim,t_dim)
-
-    if opt == 'Adam':
-        optim = keras.optimizers.Adam
-    elif opt == 'RMSprop':
-        optim = keras.optimizers.RMSprop
-    elif opt == 'SGD':
-        optim = keras.optimizers.SGD
-    #inp_dim, out_dim, nbr_Hlayer, Neu_layer, activation, p_drop, lr, optim,loss,metric,kinit
-    final_act = None
-
-    if loss == 'mse':
-        loss = keras.losses.mean_squared_error
-    elif loss == 'rmse':
-        loss = rmse
-
-
-    if metric == 'mse':
-        metric = keras.losses.mean_squared_error
-    elif metric == 'rmse':
-        metric = tf.keras.metrics.RootMeanSquaredError
-        metric = keras.losses.mean_squared_error
-
-        # metric = loss
-    if model_class == 'NN':
-        model = initiate_NN_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
-    elif model_class == 'LM':
-        model = initiate_LM(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
-    elif model_class == 'LR':
-        model = initiate_LR_model(inp_dim, out_dim, H_layer, num_nodes, act, p, lr, optim, loss, [metric], kinit,final_act,regularizer_val)
-    elif model_class == 'RNN':
-        model = initiate_RNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, p, lr, kinit, final_act, [metric], NN_variant)
-    elif model_class == 'CNN':
-        model = initiate_CNN_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
-    elif model_class == 'transformer':
-        inp_dim = X_Train.shape[dim:]
-        dropout = 0.1
-        model = transformer(inp_dim, out_dim, head_size, num_heads, ff_dim, num_transformer_blocks,mlp_units, mlp_dropout, dropout)
-    elif model_class == 'CNNLSTM':
-        model = initiate_CNNLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride, LSTM_units)
-    elif model_class == 'convLSTM':
-        model = initiate_ConvLSTM_model(inp_dim, out_dim,  t_dim, H_layer, batch_size, num_nodes, loss, optim, act, pool_size, lr, kinit, final_act, [metric], filt_size, NN_variant, stride)
+    if model_class == 'convLSTM':
         X_Train = np.reshape(X_Train, (X_Train.shape[0], X_Train.shape[1], X_Train.shape[2], 1))
         X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], X_val.shape[2], 1))
 
+    ### following train the model
     if model_class == 'rf':
-        model = rf(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, bootstrap, criterion)
+        model = rf(ML_choices,X_Train, Y_Train, X_val, Y_val)
     elif model_class == 'xgbr':
-        model = xgbr(X_Train, Y_Train, X_val, Y_val, n_estimators, learning_rate,max_depth, objective, alpha,  lambda1)
+        model = xgbr(ML_choices,X_Train, Y_Train, X_val, Y_val)
     elif model_class == 'GBRT':
-        model = GBRT(X_Train, Y_Train, X_val, Y_val, n_estimators, max_features, max_depth, min_samples_split, min_samples_leaf, loss)
+        model = GBRT(ML_choices,X_Train, Y_Train, X_val, Y_val)
     else:
-        if debug_mode == True:
-            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=epoch, batch_size=batch_size, verbose=2,shuffle=True)
-        elif debug_mode == False:
-            history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=epoch, batch_size=batch_size, verbose=0,shuffle=True)
+        history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=ML_choices['epoch'], batch_size=ML_choices['batch_size'], verbose=verbose, shuffle=True)
     return model
 
 
