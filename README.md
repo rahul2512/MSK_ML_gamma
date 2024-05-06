@@ -1,15 +1,14 @@
 # MSK_ML_gamma
-#This file contains the code corresponding to the article "Generalisation and Robustness of Supervised Machine Learning Algorithms for Biomechanical Modelling."
+#This file contains the code corresponding to the article "Supervised Machine Learning Workflows for Biomechanical Modelling"
 
 #A HPC cluster was used to run the complete cross-validation runs which are not feasible to run on a normap laptop. However, few instances, can be easily done using the function "specific" and "specific_CV" in pytorch.py, respectively.
 
 #Lastly, all the plots and statistics provided in the paper can be reproduced by simply running main.py. Note that the path need to be modified in main.py. 
 
-#Test data for reproducing the results are provided here. The full training dataset can be obtained on request to vikranth.harthikotenagaraja@eng.ox.ac.uk
+#Test data for reproducing the results are provided here. The full training dataset can be obtained on request to V.HarthikoteNagaraja@salford.ac.uk
 
 #The codes are developed using Python 3 with keras for ML.
-#MSK_ML_beta #This file contains the code description used in the article: "Machine Learning for Optical Motion Capture-driven
-Musculoskeletal Modeling from Inertial Motion Capture Data" #The codes are developed in python3 using standard python modules and keras for ML.
+#MSK_ML_gamma #This file contains the code description used in the article: "Supervised Machine Learning Workflows for Biomechanical Modelling" #The codes are developed in python3 using standard python modules and keras for ML.
 
 #The code here contains: 
 #a) Pipeline to run ML methods such FFNN, RNN, and LM which can be easily extended for other methods. 
