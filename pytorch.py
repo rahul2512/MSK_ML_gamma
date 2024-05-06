@@ -580,7 +580,7 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, verbose = 2):
                   'CNN': initiate_CNN_model, 'CNNLSTM': initiate_CNNLSTM_model, 'convLSTM': initiate_ConvLSTM_model,
                   'rf': rf, 'xgbr': xgbr, 'GBRT': GBRT }
     ### following train the model
-    if model_list[model_class] in ['rf', 'xgbr', 'GBRT']:
+    if model_class in ['rf', 'xgbr', 'GBRT']:
         model = model_list[model_class](ML_choices,X_Train, Y_Train, X_val, Y_val)
     else:
         model = model_list[model_class](ML_choices)
