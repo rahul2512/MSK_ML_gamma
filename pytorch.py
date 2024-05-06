@@ -572,22 +572,18 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, verbose = 2):
         # dropout = 0.1
         # model = transformer(inp_dim, out_dim, head_size, num_heads, ff_dim, num_transformer_blocks,mlp_units, mlp_dropout, dropout)
 
-    model_list = {'LM': initiate_LM, 'LR': initiate_LR_model, 'NN': initiate_NN_model, 'RNN': initiate_RNN_model, 
-                  'CNN': initiate_CNN_model, 'CNNLSTM': initiate_CNNLSTM_model,'convLSTM': initiate_ConvLSTM_model  }
-    model = model_list[model_class](ML_choices)
-
     if model_class == 'convLSTM':
         X_Train = np.reshape(X_Train, (X_Train.shape[0], X_Train.shape[1], X_Train.shape[2], 1))
         X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], X_val.shape[2], 1))
 
+    model_list = {'LM': initiate_LM, 'LR': initiate_LR_model, 'NN': initiate_NN_model, 'RNN': initiate_RNN_model, 
+                  'CNN': initiate_CNN_model, 'CNNLSTM': initiate_CNNLSTM_model, 'convLSTM': initiate_ConvLSTM_model,
+                  'rf': rf, 'xgbr': xgbr, 'GBRT': GBRT }
     ### following train the model
-    if model_class == 'rf':
-        model = rf(ML_choices,X_Train, Y_Train, X_val, Y_val)
-    elif model_class == 'xgbr':
-        model = xgbr(ML_choices,X_Train, Y_Train, X_val, Y_val)
-    elif model_class == 'GBRT':
-        model = GBRT(ML_choices,X_Train, Y_Train, X_val, Y_val)
+    if model_list[model_class] in ['rf', 'xgbr', 'GBRT']:
+        model = model_list[model_class](ML_choices,X_Train, Y_Train, X_val, Y_val)
     else:
+        model = model_list[model_class](ML_choices)
         history = model.fit(X_Train, Y_Train, validation_data = (X_val,Y_val), epochs=ML_choices['epoch'], batch_size=ML_choices['batch_size'], verbose=verbose, shuffle=True)
     return model
 
