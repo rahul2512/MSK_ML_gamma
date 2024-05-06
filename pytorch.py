@@ -240,7 +240,7 @@ def combined_plot(analysis_opt):
 
             push_plot = push_plot + 0.1
     
-            NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
+            NRMSE, NRMSE2 = RMSE/SC.iloc[i], RMSE2/SC.iloc[i]
 
             ax_list[i].set_xlim(0,1)
             ax_list2[i].set_xlim(0,1)
@@ -291,25 +291,24 @@ def combined_plot(analysis_opt):
 
 
 
-def combined_plot_noise(analysis_opt):
+def combined_plot_noise(opt):
     # it plots the first trial and provides the statistics for each trial as well as average, std, iqr, min,max etc etc
-    lll = len(analysis_opt.model_exposed_hyper_arg)
-    save_name = analysis_opt.save_name
-    trial_ind = analysis_opt.trial_ind
-    color_list = ['r','b']
-    ls_list = ['-','-']
+    # lll = len(opt.model_exposed_hyper_arg)
+    lll = len(opt.exposed.arg)
+    save_name = opt.save_name
+    trial_ind = 0 #opt.trial_ind
+    color_list = ['r','b','g']
+    ls_list = ['-','-','-']
     lsk = '--'
     for XX in range(lll):
-        feature = analysis_opt.feature 
-        hyper_val_exp =  analysis_opt.model_exposed_hyper_arg[XX]
-        hyper_val_naive = analysis_opt.model_naive_hyper_arg[XX]
-        model_class_exp = analysis_opt.model_exposed_arch[XX]
-        model_class_naive = analysis_opt.model_naive_arch[XX]
-        hyper = analysis_opt.hyper[XX]
-        data = analysis_opt.data[XX]
-        window = analysis_opt.window_size[XX]
-        norm_out = hyper.iloc[hyper_val_exp]['norm_out']
-
+        feature = opt.feature[XX] 
+        hyper_val_exp =  opt.exposed.arg[XX]
+        hyper_val_naive = opt.naive.arg[XX]
+        model_class_exp = opt.exposed.arch[XX]
+        model_class_naive = opt.naive.arch[XX]
+        # hyper = opt.hyper[XX]
+        data = opt.data#[XX]
+        norm_out = opt.hyper.iloc[hyper_val_exp]['norm_out']
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp  )
         model2 = load_model('naive'  , feature, model_class_naive, hyper_val_naive)
 
@@ -319,12 +318,12 @@ def combined_plot_noise(analysis_opt):
         sub_col = data.subject_exposed(feature, norm_out).sub_col
         
         SC = data.std_out[data.label[feature]]
-        TE = np.linspace(0,1,YE.shape[0] + analysis_opt.window_size[XX])
-        TN = np.linspace(0,1,YN.shape[0] + analysis_opt.window_size[XX])
+        TE = np.linspace(0,1,YE.shape[0] + opt.window)
+        TN = np.linspace(0,1,YN.shape[0] + opt.window)
 
-        plot_subtitle = analysis_opt.plot_subtitle[XX]
+        plot_subtitle = 'test .. fix here'##opt.plot_subtitle[XX]
 
-        YP1, YP2 = model1.predict(XE), model2.predict(XN)
+        YP1, YP2 = model1.predict(XE, verbose = 0), model2.predict(XN, verbose = 0)
         YT1, YT2 = np.array(YE), np.array(YN)
 
         if norm_out:
@@ -334,9 +333,8 @@ def combined_plot_noise(analysis_opt):
                 YP2[:, eel] = SC[een]*YP2[:, eel]
                 YT2[:, eel] = SC[een]*YT2[:, eel]
 
-        if XX == 0:
-            fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
-
+        fig, ax_list, ax_list2, ss, b_xlabel, ylabel, plot_list = initiate_ax(feature)
+            
         if 'JA' == feature:
             new_order = [7,8,9,0,1,2,3,4,5,6]
             YP1 = YP1[:,new_order]
@@ -350,20 +348,18 @@ def combined_plot_noise(analysis_opt):
             push_plot = 0
             count = 0   ## plotting first trial
             if ax_list[i] == ax_list[0]:
-                label1  = analysis_opt.legend_label[XX] #+ ' prediction'
+                label1  = opt.save_name + ' prediction'
                 if label1 == 'NN':
                     label1 = 'FFNN'
-                if XX == 0:
-                    label2 = 'MSK'
+                label2 = 'MSK'
             else:
                 label1, label2 = '_no_legend_', '_no_legend_'
 
-            if XX == 0:
-                ax_list[i].plot( TE[window::sparse_plot], YT1[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
-                ax_list2[i].plot(TN[window::sparse_plot], YT2[:,i][window::sparse_plot],color='k',lw=0.9,ls = lsk, label ='_no_legend_')#,label=label2)
+            ax_list[i].plot( TE[opt.window::sparse_plot], YT1[:,i][opt.window::sparse_plot],color='k',lw=0.9,ls = lsk, label=label2)
+            ax_list2[i].plot(TN[opt.window::sparse_plot], YT2[:,i][opt.window::sparse_plot],color='k',lw=0.9,ls = lsk, label='_no_legend_')
                 
-            ax_list[i].plot(TE[window::sparse_plot], YP1[:,i][window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
-            ax_list2[i].plot(TN[window::sparse_plot], YP2[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
+            ax_list[i].plot(TE[opt.window::sparse_plot], YP1[:,i][opt.window::sparse_plot],color=color_list[XX],ls = ls_list[XX], lw=0.7,label=label1)   ### np.arange(a)
+            ax_list2[i].plot(TN[opt.window::sparse_plot], YP2[:,i][opt.window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
             Title =  scipy.stats.pearsonr(YP1[:,i],YT1[:,i])[0]
             RMSE  = root_mean_squared_error(YP1[:,i], YT1[:,i])
@@ -372,8 +368,7 @@ def combined_plot_noise(analysis_opt):
             RMSE2  = root_mean_squared_error(YP2[:,i], YT2[:,i])
 
             push_plot = push_plot + 0.1
-    
-            NRMSE, NRMSE2 = RMSE/SC[i], RMSE2/SC[i]
+            NRMSE, NRMSE2 = RMSE/SC.iloc[i], RMSE2/SC.iloc[i]
     
             ax_list[i].set_xlim(0,1)
             ax_list2[i].set_xlim(0,1)
@@ -425,7 +420,7 @@ def combined_plot_noise(analysis_opt):
         M2 = np.zeros((samples,YP2.shape[0],YP2.shape[1]))
         for samp in range(samples):
             XEN, XNN = add_noise_to_trial(XE), add_noise_to_trial(XN)
-            YPN1, YPN2 = model1.predict(XEN), model2.predict(XNN)
+            YPN1, YPN2 = model1.predict(XEN,  verbose=0), model2.predict(XNN,  verbose=0)
             if 'JA' == feature:
                 new_order = [7,8,9,0,1,2,3,4,5,6]
                 YPN1 = YPN1[:,new_order]
@@ -437,16 +432,18 @@ def combined_plot_noise(analysis_opt):
 
         alpha=0.2
         for i, _  in enumerate(sub_col):
-            mu1, sigma1 = YP1[:,i][window::sparse_plot], M1_std[:,i][window::sparse_plot]                
-            mu2, sigma2 = YP2[:,i][window::sparse_plot], M2_std[:,i][window::sparse_plot]        
-            ax_list[i].fill_between( TE[window::sparse_plot], mu1+sigma1, mu1-sigma1, facecolor=color_list[XX], alpha=alpha)
-            ax_list2[i].fill_between(TN[window::sparse_plot], mu2+sigma2, mu2-sigma2, facecolor=color_list[XX], alpha=alpha)
-            ax_list[i].plot( TE[window::sparse_plot], M1_mean[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label='_no_legend_')   ### np.arange(a)
-            ax_list2[i].plot(TN[window::sparse_plot], M2_mean[:,i][window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
+            mu1, sigma1 = YP1[:,i][opt.window::sparse_plot], M1_std[:,i][opt.window::sparse_plot]                
+            mu2, sigma2 = YP2[:,i][opt.window::sparse_plot], M2_std[:,i][opt.window::sparse_plot]        
+            ax_list[i].fill_between( TE[opt.window::sparse_plot], mu1+sigma1, mu1-sigma1, facecolor=color_list[XX], alpha=alpha)
+            ax_list2[i].fill_between(TN[opt.window::sparse_plot], mu2+sigma2, mu2-sigma2, facecolor=color_list[XX], alpha=alpha)
+            ### no idea what below lines are
+            # ax_list[i].plot( TE[opt.window::sparse_plot], M1_mean[:,i][opt.window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label='_no_legend_')   ### np.arange(a)
+            # ax_list2[i].plot(TN[opt.window::sparse_plot], M2_mean[:,i][opt.window::sparse_plot],color=color_list[XX], ls = ls_list[XX], lw=0.7,label ='_no_legend_')#,label=label1)   ### np.arange(a)
 
         ax_list, ax_list2 = end_ax(ax_list,ax_list2, feature, ss)            
-    fig.savefig('./plots_out/Both_sub_noise'+'_'+save_name+'_'+feature+'_combine'+'.pdf',dpi=600)
-    plt.close()
+        fig.savefig(f'./plots_out/Both_sub_noise.{save_name}.{feature}.combine.pdf',dpi=600)
+        plt.show()
+        plt.close()
 
 def stat(fd, index):
     feature = fd.feature[index]
@@ -668,7 +665,6 @@ def run_final_model(data,hyper_arg,hyper_val,model_class, save_model):
     return model
 
 def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
-
     Da = [data.cv1, data.cv2, data.cv3]
     try:
         for enum,d in enumerate(Da):
@@ -687,9 +683,7 @@ def run_cross_valid(data,hyper_arg,hyper_val,model_class,save_model=False):
                 print("this index is creating problem in saving --- ",hyper_arg,hyper_val, data.feature)
     except:
         None
-
     return None
-
 
 def create_final_model(hyper_arg,hyper_val,which,pca,scale_out, model_class):
 	model = run_final_model(which,hyper_arg,hyper_val,pca,scale_out, model_class)
@@ -936,7 +930,7 @@ def learning_curve(fm):
     res.model = fm.what
     res.lc_label = fm.lc_label 
     res.subject = 'naive'
-    nval = np.arange(1)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
+    nval = np.arange(5)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
     res.RMSE_train = {}
     res.RMSE_test  = {}
     for enumf, feat in enumerate(fm.feature):

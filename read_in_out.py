@@ -527,6 +527,7 @@ class subject:
 class ML:
     def __init__(self, what, window, add1):
         self.add1 = add1
+        self.window = window
         if what == 'NN':
             self.data  = initiate_data(add1)
             self.hyper = pd.read_csv('./hyperparameters/hyperparam_NN.txt',delimiter=',')
