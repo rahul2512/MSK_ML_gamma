@@ -488,9 +488,6 @@ def stat(fd, index, verbose = 0):
     #     YP1 = YP1[:,new_order]
     #     YT1 = YT1[:,new_order]      
         for enum, col in enumerate(sub_col):
-                # PC[col].loc[n]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0] 
-                # NRMSE[col].loc[n] =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)/SCE[col]
-                # RMSE[col].loc[n]  =  mean_squared_error(  YP1[:,enum],YT1[:,enum],squared=False)
                 PC.loc[n, col]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0] 
                 NRMSE.loc[n, col] =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])/SCE[col]
                 RMSE.loc[n, col]  =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])
@@ -556,8 +553,8 @@ def run_NN(X_Train, Y_Train, X_val, Y_val, hyper_val, model_class, verbose = 2):
     
     from tensorflow.keras.optimizers import Adam, RMSprop, SGD
     map_optim = {'Adam': Adam, 'RMSprop': RMSprop, 'SGD': SGD}
-    def root_mean_squared_error(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
-    map_loss = {'mse': [keras.losses.mean_squared_error], 'rmse': [root_mean_squared_error]}    
+    def rmse(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
+    map_loss = {'mse': [keras.losses.mean_squared_error], 'rmse': [rmse]}
     if 'optim' in ML_choices: ## for some model it's not there
         ML_choices['optim'] = map_optim[ML_choices['optim']]
     if 'metric' in ML_choices: ## for some model it's not there

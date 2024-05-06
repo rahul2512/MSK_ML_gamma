@@ -17,6 +17,10 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, root_mean_squared_error
 from tensorflow.keras import layers
 from tensorflow.keras import backend as K
+@keras.saving.register_keras_serializable()
+def root_mean_squared_error(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
+@keras.saving.register_keras_serializable()
+def rmse(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
 
 ### Initite NN model
 def initiate_NN_model(ML_opt):
