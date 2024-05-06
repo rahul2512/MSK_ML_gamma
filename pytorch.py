@@ -473,11 +473,14 @@ def stat(fd, index, verbose = 0):
     if fd.kind in ['rf']:
         total_nodes = sum(tree.tree_.node_count for tree in model1.estimators_)
         total_splits = sum(tree.tree_.n_leaves - 1 for tree in model1.estimators_)
-        print(total_nodes, total_splits, 'rf...')
         param = total_nodes + total_splits
+        print(total_nodes, total_splits, 'rf...')
     elif fd.kind in ['xgbr']:
-        print('xgbr...')
-        param = 0        
+        trees_dump = model1.get_booster().get_dump()        
+        total_nodes = sum(tree.count('leaf') for tree in trees_dump)
+        total_splits = total_nodes - len(trees_dump)
+        param = total_nodes + total_splits
+        print(total_nodes, total_splits, 'xgbr...')
     else:
         param = model1.count_params()
         
