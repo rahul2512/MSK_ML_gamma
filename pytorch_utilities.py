@@ -8,7 +8,7 @@ from barchart_err import barchart_error, barchart_params
 from tensorflow.keras import backend as K
 from keras.regularizers import l2
 # from keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
-from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input
+from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU, Bidirectional, Dropout, Flatten, ConvLSTM1D, Input, Masking
 try:
     from keras.layers.convolutional import Conv1D, MaxPooling1D
 except:
@@ -23,9 +23,11 @@ def root_mean_squared_error(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pre
 def rmse(y_true, y_pred): return K.sqrt(K.mean(K.square(y_pred - y_true)))    
 
 ### Initite NN model
-def initiate_NN_model(ML_opt):
+def initiate_NN_model(ML_opt, masking=False):
     print(ML_opt)
     model = keras.Sequential()
+    if masking:
+        model.add(Masking(mask_value=0.0, input_shape=(ML_opt['inp_dim'],)))
     model.add(Dense(ML_opt['num_nodes'], input_shape=(ML_opt['inp_dim'],), activation=ML_opt['act']))
     for i in range(ML_opt['H_layer']):
         model.add(Dense(ML_opt['num_nodes'], activation=ML_opt['act'],kernel_initializer=ML_opt['kinit']))
@@ -345,10 +347,10 @@ def hyper_param_rf():
 
 def hyper_param_xgbr():
     hyperparameters = {
-        'n_estimators': [200, 400, 600, 800, 1000],
+        'n_estimators': [50, 100, 200, 400, 600, 800, 1000],
         'learning_rate': [0.01, 0.005],
         'max_depth': [10, 30, 50, 70, 90, 110],
-        'objective': ['reg:squarederror', 'reg:logistic'],
+        'objective': ['reg:squarederror'],
         'alpha': [0.1, 0.2],
         'lambda1': [0.1, 0.2],
         'norm_out': [0]
@@ -482,7 +484,7 @@ def hyper_param_RNN():
     write(hyperparameters, 'RNN')
 
 # hyper_param_transformer()
-# hyper_param_xgbr()
+hyper_param_xgbr()
 # hyper_param_rf()
 # hyper_param_GBRT()
 # hyper_param_LM()

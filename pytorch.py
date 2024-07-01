@@ -470,17 +470,16 @@ def stat(fd, index, verbose = 0):
         tmp = data.subject_exposed(feature, norm_out)
         XE, YE = tmp.super_test_in_list, tmp.super_test_out_list
         model1 = load_model('exposed', feature, model_class_exp,   hyper_val_exp)
+
     if fd.kind in ['rf']:
         total_nodes = sum(tree.tree_.node_count for tree in model1.estimators_)
-        total_splits = sum(tree.tree_.n_leaves - 1 for tree in model1.estimators_)
-        param = total_nodes + total_splits
-        print(total_nodes, total_splits, 'rf...')
+        param = total_nodes #+ total_splits          # total_splits = sum(tree.tree_.n_leaves - 1 for tree in model1.estimators_)
+        # print(total_nodes, 'rf...') ##total_splits
     elif fd.kind in ['xgbr']:
-        trees_dump = model1.get_booster().get_dump()        
+        trees_dump = model1.get_booster().get_dump() 
         total_nodes = sum(tree.count('leaf') for tree in trees_dump)
-        total_splits = total_nodes - len(trees_dump)
-        param = total_nodes + total_splits
-        print(total_nodes, total_splits, 'xgbr...')
+        param = total_nodes #+ total_splits #        total_splits = total_nodes - len(trees_dump)
+        # print(total_nodes,  'xgbr...') ##total_splits
     else:
         param = model1.count_params()
         
@@ -501,8 +500,8 @@ def stat(fd, index, verbose = 0):
     #     YT1 = YT1[:,new_order]      
         for enum, col in enumerate(sub_col):
                 PC.loc[n, col]    =  scipy.stats.pearsonr(YP1[:,enum],YT1[:,enum])[0] 
-                NRMSE.loc[n, col] =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])/SCE[col]
-                RMSE.loc[n, col]  =  root_mean_squared_error(  YP1[:,enum],YT1[:,enum])
+                RMSE.loc[n, col]  =  root_mean_squared_error(YP1[:,enum],YT1[:,enum]).numpy()
+                NRMSE.loc[n, col] =  RMSE.loc[n, col]/SCE[col] #root_mean_squared_error(YP1[:,enum],YT1[:,enum]).numpy()/SCE[col]
                 
     fd.NRMSE[feature] = NRMSE
     fd.RMSE[feature]  = RMSE
@@ -681,7 +680,6 @@ def td(a):
     a = np.around(a, 2)
     return f"{a:.2f}"
 
-
 def print_optimal_tables(d):
     hyper = d.hyper        
     for enum, h in enumerate(sub.arg):
@@ -720,7 +718,7 @@ def print_stat_tables(d):
                 print('\\arrayrulecolor{lightgray} \\hline \\arrayrulecolor{black}')
 
     print('\\hline \\end{tabular}} \\vspace{0.2cm}')
-    print("\\caption{Average Pearson's correlation coefficient and Average NRMSE Values for", d.what ,"predictions compared with Musculoskeletal (MSK) model outputs. The subject-exposed model is tested on held-out (unseen) test data, highlighting the need for subject-naive models. For braced data sets, the accuracy of subject-naive models are reported, highlighting the transferability of the models. Note: The average is taken over all output features and over all test trials (for a given output category). IQR refers to inter-quartile range.} \\label{tab:result_' + d.what + '} \\end{center} \\end{table}")
+    print("\\caption{Average Pearson's correlation coefficient and Average NRMSE Values for", d.what ,"predictions compared with Musculoskeletal (MSK) model outputs. The subject-exposed model is tested on held-out (unseen) test data, highlighting the need for subject-naive models. For braced data sets, the accuracy of subject-naive models are reported, highlighting the transferability of the models. Note: The average is taken over all output features and over all test trials (for a given output category). IQR refers to inter-quartile range.} \\label{tab:result_" + d.what + "} \\end{center} \\end{table}")
     return None
 
 def print_table_RNN(hyper, h, extra):
@@ -879,12 +877,13 @@ def learning_curve(fm):
     ## learning curve are done using all the data i.e. validation accuracy is essentially test accuracy
     res = analysis_options("results for learning curve -- note only for naive models")
     res.model = fm.what
-    res.lc_label = fm.lc_label 
+    res.save_name = fm.save_name 
     res.subject = 'naive'
-    nval = np.arange(5)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
+    nval = np.arange(10)  ### this allows picking random subjects to initialze or repeat the computation multiple times (with same subejcts) to check robustness
     res.RMSE_train = {}
     res.RMSE_test  = {}
     for enumf, feat in enumerate(fm.feature):
+        print(f'Ongoing feature .... {fm.feature}')
         hyper_arg = fm.naive.arg[enumf]
         model_class = fm.naive.arch[enumf]
         hyper_val = fm.hyper.loc[hyper_arg]
@@ -894,6 +893,7 @@ def learning_curve(fm):
         res.RMSE_train[feat] = pd.DataFrame(index = np.arange(1, nsub), columns=nval)
         res.RMSE_test[feat]  = pd.DataFrame(index = np.arange(1, nsub), columns=nval)
         for r in nval:
+            print(f'Ongoing trials .... {fm.feature}')
             for n in np.arange(1,nsub):
                 rand = random.choices(range(0, nsub), k=n)              
                 tmp_train_in  = [ data.train_in_list[f] for f in rand]
@@ -902,15 +902,16 @@ def learning_curve(fm):
                     X = pd.concat(tmp_train_in)
                 except:
                     X = np.concatenate(tmp_train_in)  
-                Y = pd.concat(tmp_train_out)
-    
+                Y = pd.concat(tmp_train_out)    
                 model = run_NN(X, Y, data.test_in, data.test_out, hyper_val,  model_class, 0)
-                # res.RMSE_train[feat][r].loc[n] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-                # res.RMSE_test[feat][r].loc[n]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-                res.RMSE_train[feat].loc[n,r] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-                res.RMSE_test[feat].loc[n,r]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
-        res.RMSE_train[feat].to_csv(f'./lc_data/{res.model}.{res.subject}.{feat}.{res.lc_label}.train.txt',index=False, header=False)
-        res.RMSE_test[feat].to_csv( f'./lc_data/{res.model}.{res.subject}.{feat}.{res.lc_label}.test.txt' ,index=False, header=False)
+                try:
+                    res.RMSE_train[feat].loc[n,r] = model.evaluate(X, Y, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                    res.RMSE_test[feat].loc[n,r]  = model.evaluate(data.test_in, data.test_out, verbose=2)[0]  ### test loss = 0 and test accuracy 1
+                except:
+                    res.RMSE_train[feat].loc[n,r] = evaluate_mse(X, Y, model)  ### test loss = 0 and test accuracy 1
+                    res.RMSE_test[feat].loc[n,r]  = evaluate_mse(data.test_in, data.test_out, model)  ### test loss = 0 and test accuracy 1
+        res.RMSE_train[feat].to_csv(f'./lc_data/{res.model}.{res.subject}.{feat}.{res.save_name}.train.txt',index=False, header=False)
+        res.RMSE_test[feat].to_csv( f'./lc_data/{res.model}.{res.subject}.{feat}.{res.save_name}.test.txt' ,index=False, header=False)
         ## columns are various nval trials and rows are number of subjects
     return fm
 
@@ -922,8 +923,8 @@ def plot_learning_curve(model_kind, subject_kind, feat):
     index = feature_slist.index(feat)
     yl = feature_list[index]
     s = 14
-    train_err = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.lc.train.txt', header=None)    
-    val_err   = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.lc.test.txt',  header=None)       
+    train_err = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.{model_kind}.train.txt', header=None)    
+    val_err   = pd.read_csv(f'./lc_data/{model_kind}.{subject_kind}.{feat}.{model_kind}.test.txt',  header=None)       
     nsub = train_err.shape[0]
     fig, ax = plt.subplots()
     ind = np.arange(1,nsub+1)
